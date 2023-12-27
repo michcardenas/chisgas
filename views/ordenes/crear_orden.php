@@ -87,7 +87,7 @@ if (file_exists($ruta)) {
 <label for="telefono_cliente">Tiempo estimado</label>
       <input class="input" name="tiempo_estimado" type="number" placeholder="Tiempo estimado" id="tiempo_estimado" >
       <label for="valor_prenda">Valor Total</label>
-      <input class="input" name="valor_prenda" type="text" data-real-value="" placeholder="$" id="valor_prenda" >
+      <input class="input" name="valor_prenda" type="text" data-real-value="" placeholder="$" value="0" id="valor_prenda" >
     </div>  
    
 

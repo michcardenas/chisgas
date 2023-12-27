@@ -122,7 +122,6 @@ $arreglos_prendas = prendas_por_orden_con_cliente($id_orden);
     </tbody>
 </table>
 <div class=" flex">
-<button class="button" id="atras_calendario">Atrás</button>
 <button id="entregar"  class="button">Entregar &#128722;</button>
 </div>
 

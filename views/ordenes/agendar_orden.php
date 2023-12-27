@@ -110,19 +110,24 @@ if (isset($_SESSION['cliente_consultar'])) {
         echo '  <div class="card-title">' . htmlspecialchars($cliente['nombre_ropa']) . ' <br> Cantidad: <b>' . htmlspecialchars($cliente['prendas_numero']) . ' </b></div>';
         echo '  <div class="card-subtitle">' . htmlspecialchars($cliente['descripcion_arreglo']) . '</div>';
         echo '  <hr class="card-divider">';
+        echo '    <div class="card-price">';
+        echo '      <span>$</span>';
+        echo '      <input type="text" class="input-valor" value="' . number_format(htmlspecialchars($cliente['valor'])) . '">';
+        echo '    </div>';
         echo '  <div class="card-footer">';
-        echo '    <div class="card-price"><span>$</span> ' . number_format(htmlspecialchars($cliente['valor'])) . '</div>';
+       
+        echo '    <button class="card-btn btn-save" data-id="' . htmlspecialchars($cliente['prenda_id']) . '" data-cliente_id="' . htmlspecialchars($cliente['cliente_id']) . '">';
+        echo '      💲';  
+        echo '    </button>';
         echo '    <button class="card-btn btn-delete" data-id="' . htmlspecialchars($cliente['prenda_id']) . '" data-cliente_id="' . htmlspecialchars($cliente['cliente_id']) . '">';
         echo '      <img class="icon-trash" src="../img/basura.png">';  
         echo '    </button>';
-
-        
         echo '    <button class="card-btn btn-edit" data-id="' . htmlspecialchars($cliente['prenda_id']) . '" data-cliente_id="' . htmlspecialchars($cliente['cliente_id']) . '">';
         echo '      <img class="icon-trash" src="../img/lapiz.png">';
         echo '    </button>';
+        echo '</div>';
+        echo '</div>';
         
-        echo '</div>';
-        echo '</div>';
     }
 }
 ?>

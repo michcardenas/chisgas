@@ -2,6 +2,7 @@ $(document).ready(function(){
   $('#atras_calendario').click(function(){  
     window.location.href = "calendario.php";
   });
+
   $('#valor_prenda').on('change', function() {
     // obtener el valor actual del campo
     var valor = $(this).val();

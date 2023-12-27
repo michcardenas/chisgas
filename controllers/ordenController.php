@@ -38,9 +38,7 @@ if ($action == 'agregar_prenda') {
     if (empty($tiempo_estimado)) {
         $errorFields[] = 'tiempo_estimado';
     }
-    if (empty($valor_prenda)) {
-        $errorFields[] = 'valor_prenda';
-    }
+   
     if (empty($estado)) {
         $errorFields[] = 'estado';
     }
