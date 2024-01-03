@@ -13,7 +13,7 @@ $ruta = 'template.php';
 
 if (file_exists($ruta)) {
     $ruta_css = 'css/style.css';
-d    $ruta_image = "img/chisgas_fondo_blanco.png";
+   $ruta_image = "img/chisgas_fondo_blanco.png";
     include $ruta;
 } else {
     echo "El archivo $ruta no existe.";

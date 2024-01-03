@@ -184,6 +184,23 @@ function generador_orden($fecha_entrega, $franja_horaria, $total_prendas, $valor
     
     return false;
 }
+function actualizar_valor($id, $valor_actualizado, $cliente_id) {
+    global $conn; 
+    
+    $stmt = $conn->prepare("UPDATE prendas SET valor = ? WHERE id = ? ");
+    
+    $stmt->bind_param("ii", $valor_actualizado, $id);
+
+    if ($stmt->execute()) {
+        if ($stmt->affected_rows > 0) {
+            return true; // Actualización exitosa
+        } else {
+            return false; // No se actualizó ningún registro
+        }
+    } else {
+        return false; // Error en la ejecución
+    }
+}
 
 function consultar_factura($order_id) {
     global $conn;

@@ -122,10 +122,8 @@ elseif ($_POST['action'] == 'edit_prenda') {
         echo json_encode(["success" => false, "message" => "Error al editada la prenda."]);
     }
 }
-elseif (isset($_POST['action']) == 'generar_orden') {
-    // Verificamos que todos los datos necesarios estén establecidos
+if ($_POST['action'] == 'generar_orden') {
     if (isset($_POST['prenda_ids'])) {
-        // Obtener los datos del POST
         $fecha_entrega = $_POST['fecha_entrega'];
         $franja_horaria = $_POST['franja_horaria'];
         $total_prendas = $_POST['total_prendas'];
@@ -141,27 +139,43 @@ elseif (isset($_POST['action']) == 'generar_orden') {
             echo json_encode(["success" => false, "message" => "Hubo un error al procesar la orden."]);
         }
     } else {
-        // En caso de que algún dato no esté establecido, regresamos un mensaje de error.
         echo json_encode(["success" => false, "message" => "Datos incompletos."]);
     }
 }
 
-if (isset($_GET['order_id'])) { // Cambio aquí de $_POST a $_GET
+
+elseif (isset($_POST['action']) == 'actualizar_valor') {
+    $id = $_POST['id'];
+    $valor_actualizado = $_POST['valor_actualizado'];
+    $cliente_id = $_POST['cliente_id'];
+   
+    $actualizar_valor = actualizar_valor($id, $valor_actualizado, $cliente_id);
+
+    if ($actualizar_valor) {
+        echo json_encode(["success" => true, "message" => "Se ha actualizado correctamente.", "cliente_id" => $cliente_id]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Hubo un error al procesar la orden."]);
+    }
+
+
+  
+}
+
+if (isset($_GET['order_id'])) {
     $order_id = $_GET['order_id']; 
 
-    // Eliminar los datos anteriores de la sesión (si existen)
+    
     if(isset($_SESSION['cliente_consultar'])){
         unset($_SESSION['orden_consultar']);
         unset($_SESSION['cliente_consultar']);
     }
 
-    // Consultar los datos con la función consultar_factura
+
     $orden_data = consultar_factura($order_id);
 
-    // Almacenar los datos en la variable de sesión
+
     $_SESSION['orden_consultar'] = $orden_data;
 
-    // No redireccionamos aquí, sino que enviamos una respuesta que AJAX procesará
     header('Location: ../views/ordenes/orden_guardar.php');
     exit;
 }

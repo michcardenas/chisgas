@@ -61,7 +61,7 @@ if(isset($_SESSION['cliente_consultar'])) {
     </div>
     <div class="field">
       <label for="nombre_cliente">Nombre</label>
-      <input class="input" readonly name="nombre_cliente" type="text" placeholder="nombre" id="nombre_cliente" value="<?php echo isset($cliente_nombre) ? htmlspecialchars($cliente_nombre) : ''; ?>">
+      <input class="input readonly" readonly name="nombre_cliente" type="text" placeholder="nombre" id="nombre_cliente" value="<?php echo isset($cliente_nombre) ? htmlspecialchars($cliente_nombre) : ''; ?>">
     </div>
     <div class="field">
       <label for="telefono_cliente">Telefono</label>
@@ -112,11 +112,12 @@ if (isset($_SESSION['cliente_consultar'])) {
         echo '  <hr class="card-divider">';
         echo '    <div class="card-price">';
         echo '      <span>$</span>';
-        echo '      <input type="text" class="input-valor" value="' . number_format(htmlspecialchars($cliente['valor'])) . '">';
+        echo '      <input type="text" class="input valor_actualizado"   style="width: 70%; text-align: center;border: ' . (htmlspecialchars($cliente['valor']) == 0 ? '1px solid red' : '1px solid #ccc') . ';" value="' . number_format(htmlspecialchars($cliente['valor'])) . '">';
+        echo '<div class="loader_caset"></div>';
         echo '    </div>';
         echo '  <div class="card-footer">';
        
-        echo '    <button class="card-btn btn-save" data-id="' . htmlspecialchars($cliente['prenda_id']) . '" data-cliente_id="' . htmlspecialchars($cliente['cliente_id']) . '">';
+        echo '    <button  class="card-btn actualizar_valor" data-id="' . htmlspecialchars($cliente['prenda_id']) . '" data-cliente_id="' . htmlspecialchars($cliente['cliente_id']) . '">';
         echo '      💲';  
         echo '    </button>';
         echo '    <button class="card-btn btn-delete" data-id="' . htmlspecialchars($cliente['prenda_id']) . '" data-cliente_id="' . htmlspecialchars($cliente['cliente_id']) . '">';

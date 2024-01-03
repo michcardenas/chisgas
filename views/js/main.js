@@ -19,6 +19,22 @@ $(document).ready(function(){
         $(this).val(valor);
     }
 });
+$('.valor_actualizado').on('change', function() {
+  // obtener el valor actual del campo
+  var valor = $(this).val();
+
+  // remover cualquier formato existente (puntos, comas y símbolo de moneda)
+  valor = parseFloat(valor.replace(/[^0-9-.]/g, ''));
+
+  // verificar si el valor es un número
+  if (!isNaN(valor)) {
+      // formatear el número
+      valor = valor.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+
+      // establecer el valor formateado de nuevo en el campo
+      $(this).val(valor);
+  }
+});
 //abono
 var changingValue = false;
 
@@ -242,13 +258,11 @@ $('#abono').on('input', function() {
     var fechaEntrega = $("#fecha_entrega").val();
     var abono = extractNumber($("#abono").val());
 
-    // Verifica si la fecha de entrega está vacía
     if (!fechaEntrega) {
         alert("Por favor, llena la fecha de entrega.");
         return;
     }
 
-    // Verifica si el abono está vacío o no es un número
     if (isNaN(abono)) {
         alert("Por favor, ingresa un abono válido.");
         return;
@@ -267,26 +281,36 @@ $('#abono').on('input', function() {
     var valorTotal = extractNumber($("#valor_total").val());
     var saldo = valorTotal - abono;
 
-    // Verifica si el saldo es negativo
     if (saldo < 0) {
         alert("El saldo no puede ser negativo. Por favor, verifica el abono ingresado.");
         return;
     }
 
-    // Si quieres mostrar el saldo en su campo puedes hacerlo así:
     $("#saldo").val("$ " + saldo.toLocaleString('es-CO', { maximumFractionDigits: 0 }));
 
-    // Supongo que el cliente_id podría estar en un campo oculto en el formulario. Si no es así, ajusta esta línea.
-     // Crear un array para almacenar los IDs
      var prendaIDs = [];
-     // Iterar sobre cada botón (o elemento que tenga el data-id) para obtener el ID y agregarlo al array
+   
      $(".btn-delete").each(function() {
          prendaIDs.push($(this).data("id"));
      });
-console.log(abono);
-console.log(saldo);
-console.log(valorTotal)
+    console.log(abono);
+    console.log(saldo);
+    console.log(valorTotal);
+    var hayValoresEnCero = false;
+    $(".valor_actualizado").each(function() {
+        var valor = extractNumber($(this).val());
+        if (valor === 0) {
+            hayValoresEnCero = true;
+            return false; // Salir del bucle
+        }
+    });
 
+    if (hayValoresEnCero) {
+        const userConfirmed = window.confirm("Hay valores de prenda en $0 . ¿Estás seguro de que quieres continuar, estas prendas seran pasadas como garantia?");
+        if (!userConfirmed) {
+            return; 
+        }
+    }
 
     $.ajax({
       url: '../../controllers/ordenController.php',
@@ -425,6 +449,51 @@ $("#agregar_prenda").click(function(e){
 
 
 });
+$('.actualizar_valor').click(function() {
+  const id = $(this).data('id');
+  const cliente_id = $(this).data('cliente_id'); 
+  var valor_actualizado = $(this).closest('.card').find('.valor_actualizado').val(); 
+  console.log(id);
+  console.log(cliente_id);
+  console.log(valor_actualizado);
+ var valor_prenda_actualizado = valor_actualizado;
+ var valor_prenda_text = valor_prenda_actualizado.replace(/[$\s.]/g, "");
+
+  // Convierte la cadena en un número (opcional)
+  var valor_prenda = parseFloat(valor_prenda_text);
+
+  console.log(valor_prenda); 
+
+  const userConfirmed = window.confirm("¿Estás seguro de actualizar este valor?");
+  
+  if (userConfirmed) {
+    $.ajax({
+      url: '../../controllers/ordenController.php',
+      type: 'POST',
+      data: {
+          'action': 'actualizar_valor',
+          'id': id,
+          'valor_actualizado': valor_prenda,
+          'cliente_id': cliente_id
+      },
+      dataType: 'json',
+      success: function(response) {
+          if (response.success) {
+              alert(response.message);
+              window.location.href = "../../controllers/ordenController.php?cliente_id=" + cliente_id + "&action=agendar_orden";
+          } else {
+              alert(response.message); // Muestra un mensaje de error
+          }
+      },
+      error: function() {
+          alert("Error en la comunicación con el servidor.");
+      }
+    });
+  }
+});
+
+
+
 $('.btn-delete').click(function() {
   const id = $(this).data('id');
   const cliente_id = $(this).data('cliente_id');  // Asegúrate de que este dato esté disponible
@@ -455,6 +524,7 @@ $('.btn-delete').click(function() {
       });
   }
 });
+
 $('.btn-edit').click(function() {
   const id = $(this).data('id');
   const cliente_id = $(this).data('cliente_id');  // Asegúrate de que este dato esté disponible

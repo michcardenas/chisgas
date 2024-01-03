@@ -84,14 +84,23 @@ $orden = $_SESSION['orden_consultar'][0];
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($_SESSION['orden_consultar'] as $orden): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($orden['nombre_ropa']); ?></td>
-                <td><?php echo htmlspecialchars($orden['descripcion_arreglo']); ?></td>
-                <td><?php echo htmlspecialchars($orden['valor']); ?></td>
-                <td><?php echo htmlspecialchars($orden['prendas_numero']); ?></td>
-            </tr>
-        <?php endforeach; ?>
+    <?php foreach ($_SESSION['orden_consultar'] as $orden): ?>
+    <tr>
+        <td><?php echo htmlspecialchars($orden['nombre_ropa']); ?></td>
+        <td><?php echo htmlspecialchars($orden['descripcion_arreglo']); ?></td>
+        <td>
+            <?php 
+            if ($orden['valor'] == 0) {
+                echo '<span style="color: red;">Garantía</span>';
+            } else {
+                echo htmlspecialchars($orden['valor']);
+            }
+            ?>
+        </td>
+        <td><?php echo htmlspecialchars($orden['prendas_numero']); ?></td>
+    </tr>
+<?php endforeach; ?>
+
     </tbody>
 </table>
 
