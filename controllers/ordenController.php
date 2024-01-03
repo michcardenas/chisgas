@@ -144,7 +144,7 @@ if ($_POST['action'] == 'generar_orden') {
 }
 
 
-elseif (isset($_POST['action']) == 'actualizar_valor') {
+elseif ($_POST['action']== 'actualizar_valor') {
     $id = $_POST['id'];
     $valor_actualizado = $_POST['valor_actualizado'];
     $cliente_id = $_POST['cliente_id'];
