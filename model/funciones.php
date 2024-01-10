@@ -176,26 +176,37 @@ function obtener_info_ordenes($cliente_id) {
 
     $query = "
     SELECT 
-        o.id,
-        o.fecha_creacion,
-        o.fecha_entrega,
-        o.franja_horaria,
-        o.total_prendas,
-        o.valor_total,
-        o.abono,
-        o.saldo,
-        CASE
-            WHEN COUNT(p.id) > 0 THEN 'Pendiente'
-            ELSE 'Entregada'
-        END AS estado
-    FROM 
-        ordenes o
-    LEFT JOIN 
-        prendas p ON p.id_orden = o.id
-    WHERE 
-        p.id_cliente = ?
-    GROUP BY 
-        o.id, o.fecha_creacion, o.fecha_entrega, o.franja_horaria, o.total_prendas, o.valor_total, o.abono, o.saldo
+    o.id, 
+    o.fecha_creacion, 
+    o.fecha_entrega, 
+    o.franja_horaria, 
+    o.total_prendas, 
+    o.valor_total, 
+    o.abono, 
+    o.saldo,
+    CASE 
+        WHEN SUM(CASE WHEN p.estado = 5 THEN 1 ELSE 0 END) = COUNT(p.id) THEN 'Arreglada'
+        WHEN SUM(CASE WHEN p.estado = 4 THEN 1 ELSE 0 END) > 0 THEN 'En proceso'
+        WHEN SUM(CASE WHEN p.estado = 3 THEN 1 ELSE 0 END) > 0 THEN 'En proceso'
+        WHEN SUM(CASE WHEN p.estado = 1 THEN 1 ELSE 0 END) = COUNT(p.id) THEN 'Ingresada'
+        ELSE 'Estado mixto'
+    END AS estado
+FROM 
+    ordenes o 
+LEFT JOIN 
+    prendas p ON p.id_orden = o.id
+WHERE 
+    p.id_cliente = ?
+GROUP BY 
+    o.id, 
+    o.fecha_creacion, 
+    o.fecha_entrega, 
+    o.franja_horaria, 
+    o.total_prendas, 
+    o.valor_total, 
+    o.abono, 
+    o.saldo;
+
 ";
 
 
