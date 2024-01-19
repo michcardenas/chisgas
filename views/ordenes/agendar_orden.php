@@ -162,12 +162,20 @@ if (isset($_SESSION['cliente_consultar'])) {
     <label for="valor_total">Valor Total</label>
     <input readonly class="input input_readonly" name="valor_total" type="text" placeholder="Valor Total" id="valor_total" readonly value="$ <?php echo number_format($valor_total); ?>">
   </div>
+ 
 
-  <div class="field">
-    <label for="abono">Abono</label>
-    <input  class="input" name="abono" type="text"  id="abono">
+    <div class="field">
+      <label for="abono">Abono</label>
+      <input  class="input" name="abono" type="text"  id="abono">
+    </div>
+    <div class="field">
+      <label for="forma_pago">Forma de Pago</label>
+      <select class="input" name="forma_pago" id="forma_pago">
+          <option value="efectivo">Efectivo</option>
+          <option value="nequi">Nequi</option>
+          <option value="daviplata">Daviplata</option>
+      </select>
   </div>
-
   <div class="field">
     <label for="saldo">Saldo</label>
     <input readonly class="input input_readonly" name="saldo" type="text" placeholder="Saldo" id="saldo">

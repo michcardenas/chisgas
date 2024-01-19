@@ -139,17 +139,17 @@ function editar_prenda($prenda_id, $nombre_prenda, $prendas_numero, $estado, $de
     return $result;
 }
 
-function generador_orden($fecha_entrega, $franja_horaria, $total_prendas, $valor_total, $abono, $saldo, $prendas_ids) {
+function generador_orden($fecha_entrega, $franja_horaria, $total_prendas, $valor_total, $abono, $saldo, $prendas_ids, $forma_pago) {
     global $conn;
     
     // Usando la función date para obtener la fecha y hora actual en formato 'Y-m-d H:i:s'
     $fecha_creacion = date('Y-m-d H:i:s');
 
     // Preparar la consulta SQL para insertar una nueva orden
-    $stmt_orden = $conn->prepare("INSERT INTO ordenes (fecha_creacion, fecha_entrega, franja_horaria, total_prendas, valor_total, abono, saldo) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt_orden = $conn->prepare("INSERT INTO ordenes (fecha_creacion, fecha_entrega, franja_horaria, total_prendas, valor_total, abono, saldo,forma_pago) VALUES (?, ?, ?, ?, ?, ?, ?,?)");
     
     // Vincular los parámetros a la consulta SQL
-    $stmt_orden->bind_param("sssisdd", $fecha_creacion, $fecha_entrega, $franja_horaria, $total_prendas, $valor_total, $abono, $saldo);
+    $stmt_orden->bind_param("sssisdds", $fecha_creacion, $fecha_entrega, $franja_horaria, $total_prendas, $valor_total, $abono, $saldo, $forma_pago);
 
     // Ejecutar la consulta
     $result_orden = $stmt_orden->execute();

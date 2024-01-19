@@ -129,9 +129,10 @@ if ($_POST['action'] == 'generar_orden') {
         $total_prendas = $_POST['total_prendas'];
         $valor_total = $_POST['valor_total'];
         $abono = $_POST['abono'];
+        $forma_pago = $_POST['forma_pago'];
         $saldo = $_POST['saldo'];
         $prendas_ids = $_POST['prenda_ids'];
-        $orden_id = generador_orden($fecha_entrega, $franja_horaria, $total_prendas, $valor_total, $abono, $saldo, $prendas_ids);
+        $orden_id = generador_orden($fecha_entrega, $franja_horaria, $total_prendas, $valor_total, $abono, $saldo, $prendas_ids, $forma_pago);
 
         if ($orden_id) {
             echo json_encode(["success" => true, "message" => "Orden generada y prendas actualizadas exitosamente.", "order_id" => $orden_id]);

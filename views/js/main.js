@@ -254,7 +254,7 @@ $('#abono').on('input', function() {
 
   $("#generar_orden").click(function(e) {
     e.preventDefault();
-
+    var forma_pago = $("#forma_pago").val();
     var fechaEntrega = $("#fecha_entrega").val();
     var abono = extractNumber($("#abono").val());
 
@@ -295,7 +295,7 @@ $('#abono').on('input', function() {
      });
     console.log(abono);
     console.log(saldo);
-    console.log(valorTotal);
+    console.log(forma_pago);
     var hayValoresEnCero = false;
     $(".valor_actualizado").each(function() {
         var valor = extractNumber($(this).val());
@@ -323,7 +323,8 @@ $('#abono').on('input', function() {
         valor_total: valorTotal,
         abono: abono,
         saldo: saldo,
-        prenda_ids: prendaIDs  
+        prenda_ids: prendaIDs,
+        forma_pago: forma_pago  
 
        
       },
