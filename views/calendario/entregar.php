@@ -107,7 +107,9 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
         <hr>
         <div class="payments">
           <span>Detalles Pago</span>
+          
           <div class="details">
+          <br>
             <span>Subtotal:</span>
             <label class="price"><?php echo "$" . number_format($prenda['valor_total'], 0, ',', '.'); ?></label>     
             <span>Abono:</span>
