@@ -214,7 +214,6 @@ $('#abono').on('input', function() {
         
       });
   });
-  $(document).ready(function() {
     // Manejador de clic para el botón con id 'entregar'
     $("#entregar").click(function(e) {
         e.preventDefault(); // Evita que el botón realice la acción por defecto (como enviar un formulario)
@@ -237,6 +236,10 @@ $('#abono').on('input', function() {
                 if (response.success) {
                     // Si la respuesta fue exitosa, muestra un mensaje
                     alert(response.message);
+                    setTimeout(function(){
+                window.location.href = 'entregar.php?id_orden=' + id_orden; // Redirige a entregar.php con el id_orden
+                  }, 1000);
+                    
                     // Aquí puedes añadir cualquier otra lógica necesaria, como redireccionar o actualizar la página
                 } else {
                     // Si la respuesta indica un fallo, muestra el mensaje de error
@@ -250,7 +253,7 @@ $('#abono').on('input', function() {
             }
         });
     });
-});
+
 
   $("#generar_orden").click(function(e) {
     e.preventDefault();

@@ -682,3 +682,19 @@ then set the desired styles for .card-img. */
   color: rgb(255, 255, 255);
   background-color: blue;
 }
+/* entregar */
+.arreglo-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.arreglo-etiqueta {
+  flex: 1;
+  font-weight: bold; /* Esto hará que el texto de las etiquetas esté en negrita */
+}
+
+.arreglo-valor {
+  flex: 1;
+}
+

@@ -99,6 +99,59 @@ function prendas_por_orden_con_cliente($id_orden) {
     // Cerrar el statement y la conexión
     $stmt->close();
 }
+function prendas_por_entregar($id_orden) {
+    global $conn;  // Asegúrate de que tu conexión se llama $conn
+
+    $query = "
+                SELECT 
+                p.nombre_ropa,
+                p.tiempo_estimado,
+                p.estado,
+                p.id,
+                c.nombre AS nombre_cliente,
+                c.telefono AS telefono_cliente,
+                u.login,
+                p.valor,
+                o.valor_total,
+                o.saldo,
+                o.abono
+            FROM 
+                prendas p
+            LEFT JOIN 
+                clientes c ON c.id = p.id_cliente
+            LEFT JOIN 
+                usuarios u ON p.id_asignacion = u.id
+            LEFT JOIN 
+                ordenes o ON o.id = p.id_orden
+            WHERE 
+                p.id_orden = ?
+                AND P.estado = 5
+    ";
+
+    // Preparar la consulta y vincular el parámetro
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id_orden); // "i" significa que es un entero (integer)
+
+    // Ejecutar la consulta
+    $stmt->execute();
+
+    // Obtener los resultados
+    $result = $stmt->get_result();
+
+    // Verificar si la consulta devuelve resultados
+    if ($result->num_rows > 0) {
+        $data = [];
+        while($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        return $data;
+    } else {
+        return false;  // O podrías devolver un array vacío dependiendo de lo que necesites
+    }
+
+    // Cerrar el statement y la conexión
+    $stmt->close();
+}
 function ver_arreglo($prenda_id) {
     global $conn;  // Asegúrate de que tu conexión se llama $conn
 
