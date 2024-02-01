@@ -86,7 +86,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
             <p><?php echo htmlspecialchars($primer_resultado['nombre_cliente']); ?> </p>
         </div>
         <div class="field">
-            <label for="nombre_cliente">Nombre</label>
+            <label for="nombre_cliente">Numero:</label>
             <p><?php echo htmlspecialchars($primer_resultado['telefono_cliente']); ?> </p>
         </div>
         </div>
@@ -103,7 +103,8 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
   </div>
         </div>
         <hr>
-        
+        <input type="hidden" name="id_orden" id="id_orden" value="<?php echo $id_orden;?>">
+
         <hr>
         <div class="payments">
           <span>Detalles Pago</span>

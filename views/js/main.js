@@ -38,29 +38,29 @@ $('.valor_actualizado').on('change', function() {
 //abono
 var changingValue = false;
 
-$('#abono').on('input', function() {
-    if (changingValue) return; // Salir si el valor ya está siendo cambiado
+    $('#abono').on('input', function() {
+        if (changingValue) return; // Salir si el valor ya está siendo cambiado
 
-    // Indicar que se va a cambiar el valor programáticamente
-    changingValue = true;
+        // Indicar que se va a cambiar el valor programáticamente
+        changingValue = true;
 
-    // Tomar el valor del input, eliminar cualquier carácter no numérico
-    var value = $(this).val().replace(/[^0-9]/g, '');
+        // Tomar el valor del input, eliminar cualquier carácter no numérico
+        var value = $(this).val().replace(/[^0-9]/g, '');
 
-    // Convertir el valor limpio a un número
-    var numericValue = parseFloat(value);
+        // Convertir el valor limpio a un número
+        var numericValue = parseFloat(value);
 
-    // Hacer los cálculos que necesitas aquí, por ejemplo actualizar el campo "saldo"
-    var valorTotal = parseFloat($('#valor_total').val().replace(/[^0-9]/g, '')) || 0;
-    var saldo = valorTotal - numericValue;
-    $('#saldo').val(saldo.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }));
+        // Hacer los cálculos que necesitas aquí, por ejemplo actualizar el campo "saldo"
+        var valorTotal = parseFloat($('#valor_total').val().replace(/[^0-9]/g, '')) || 0;
+        var saldo = valorTotal - numericValue;
+        $('#saldo').val(saldo.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }));
 
-    // Volver a formatear el valor del input como moneda
-    $(this).val(numericValue.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }));
+        // Volver a formatear el valor del input como moneda
+        $(this).val(numericValue.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }));
 
-    // Indicar que se ha terminado de cambiar el valor
-    changingValue = false;
-});
+        // Indicar que se ha terminado de cambiar el valor
+        changingValue = false;
+    });
     // Función para buscar clientes
     $(".button-buscar").click(function(e){
         e.preventDefault();
@@ -344,7 +344,7 @@ $('#abono').on('input', function() {
     }
     
   });
-});
+  });
 
 
 
@@ -707,6 +707,40 @@ $("#atras").click(function(){
   window.location.href = "ordenes.php";
 });
 
+$("#entrega_total").click(function(e) {
+  e.preventDefault();
+
+  // Aquí puedes recoger cualquier otra información necesaria para generar la factura
+  // Por ejemplo, el ID de la orden, información del cliente, etc.
+  var idOrden = $("#id_orden").val(); // Asegúrate de tener este valor disponible en tu formulario o página
+  console.log(idOrden);
+  $.ajax({
+      url: '../../controllers/calendarioController.php', // Cambia esto por la ruta real a tu script PHP
+      type: 'post',
+      dataType: 'json', // Asumiendo que tu PHP devolverá una respuesta en formato JSON
+      data: {
+          accion: 'entregaTotal', // Una acción para identificar qué hacer en tu PHP
+          idOrden: idOrden // Envía el ID de la orden como parte de la solicitud
+      },
+      beforeSend: function() {
+          // Opcional: Mostrar un loader o mensaje de "enviando..."
+      },
+      success: function(response) {
+          // Aquí manejas la respuesta de tu script PHP
+          if(response.exito) {
+              alert("La factura ha sido enviada con éxito.");
+          } else {
+              // Manejar situaciones de error o fallo
+              alert("Hubo un problema al enviar la factura. Por favor, inténtalo de nuevo.");
+          }
+      },
+      error: function(xhr, status, error) {
+          // Manejar errores de AJAX aquí
+          console.error("Error en AJAX:", status, error);
+          alert("Error al enviar la solicitud. Por favor, revisa tu conexión y vuelve a intentarlo.");
+      }
+  });
+});
 
     
 
