@@ -30,7 +30,6 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
 
 
 
-
 ?>
 <div class="p_centrar">
 <div class="centrar">
@@ -77,7 +76,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
 </table>
 <div class="container_rosa">
   <div class="card cart">
-    <label class="title">Factura  <?php echo "#" . number_format($prenda['id'], 0, ',', '.'); ?></label>
+    <label class="title">Tiquete  <?php echo "#" . number_format($prenda['id'], 0, ',', '.'); ?></label>
     <div class="steps">
       <div class="step">
         <div>
@@ -104,6 +103,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
         </div>
         <hr>
         <input type="hidden" name="id_orden" id="id_orden" value="<?php echo $id_orden;?>">
+        <input type="hidden" name="id_usuario" id="id_usuario" value="<?php echo $_SESSION['username'];?>">
 
         <hr>
         <div class="payments">

@@ -706,36 +706,35 @@ $("#atras").click(function(){
   console.log(window.location.href);
   window.location.href = "ordenes.php";
 });
-
 $("#entrega_total").click(function(e) {
   e.preventDefault();
 
-  // Aquí puedes recoger cualquier otra información necesaria para generar la factura
-  // Por ejemplo, el ID de la orden, información del cliente, etc.
-  var idOrden = $("#id_orden").val(); // Asegúrate de tener este valor disponible en tu formulario o página
-  console.log(idOrden);
+  var idOrden = $("#id_orden").val(); 
+  var id_usuario = $("#id_usuario").val(); 
+  var forma_pago = $("#forma_pago").val(); // Esto debería ser 'forma_pago', no 'id_usuario'
+
+  console.log(idOrden, id_usuario, forma_pago);
+
   $.ajax({
-      url: '../../controllers/calendarioController.php', // Cambia esto por la ruta real a tu script PHP
+      url: '../../controllers/calendarioController.php',
       type: 'post',
-      dataType: 'json', // Asumiendo que tu PHP devolverá una respuesta en formato JSON
       data: {
-          accion: 'entregaTotal', // Una acción para identificar qué hacer en tu PHP
-          idOrden: idOrden // Envía el ID de la orden como parte de la solicitud
+          action: 'entregaTotal',
+          idOrden: idOrden,
+          id_usuario: id_usuario,
+          forma_pago: forma_pago
       },
       beforeSend: function() {
           // Opcional: Mostrar un loader o mensaje de "enviando..."
       },
       success: function(response) {
-          // Aquí manejas la respuesta de tu script PHP
-          if(response.exito) {
+          if(response.success) { // Esto debería ser 'success', no 'exito'
               alert("La factura ha sido enviada con éxito.");
           } else {
-              // Manejar situaciones de error o fallo
               alert("Hubo un problema al enviar la factura. Por favor, inténtalo de nuevo.");
           }
       },
       error: function(xhr, status, error) {
-          // Manejar errores de AJAX aquí
           console.error("Error en AJAX:", status, error);
           alert("Error al enviar la solicitud. Por favor, revisa tu conexión y vuelve a intentarlo.");
       }

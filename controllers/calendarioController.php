@@ -78,5 +78,26 @@ elseif ($action == 'entregar') {
     exit;
 }
 
+elseif ($action == 'entregaTotal') {
+    $id_orden = isset($_POST['idOrden']) ? $_POST['idOrden'] : null;
+    $forma_pago = isset($_POST['forma_pago']) ? $_POST['forma_pago'] : null;
+    $id_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : null;
+  
+
+    if ($id_orden !== null && $forma_pago !== null && $id_usuario !== null) {
+        $result = registrarEntrega($id_orden, $id_usuario, $forma_pago);
+       
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'La entrega se ha registrado correctamente']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No se pudo registrar la entrega']);
+        }
+        
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Faltan datos para procesar la entrega']);
+    }
+
+    exit;
+}
 
 ?>

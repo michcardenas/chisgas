@@ -177,6 +177,74 @@ function editar_estado_prenda($prenda_id, $estado) {
         return false;  // Devuelve false si hay un error
     }
 }
+function registrarEntrega($id_orden, $nombre_usuario, $forma_pago) {
+    global $conn;
+
+    // Buscar el id_usuario basado en el nombre_usuario
+    $queryUsuario = "SELECT id FROM usuarios WHERE login = ?";
+    $stmtUsuario = $conn->prepare($queryUsuario);
+    if (!$stmtUsuario) {
+        echo "Error preparando la consulta: " . $conn->error;
+        return false;
+    }
+    $stmtUsuario->bind_param("s", $nombre_usuario);
+    if (!$stmtUsuario->execute()) {
+        echo "Error ejecutando la consulta: " . $stmtUsuario->error;
+        $stmtUsuario->close();
+        return false;
+    }
+    $resultadoUsuario = $stmtUsuario->get_result();
+    if ($resultadoUsuario->num_rows == 0) {
+        echo "Usuario no encontrado.";
+        $stmtUsuario->close();
+        return false; // No se encontró el usuario
+    }
+    $filaUsuario = $resultadoUsuario->fetch_assoc();
+    $id_usuario = $filaUsuario['id'];
+    $stmtUsuario->close();
+
+    // Primero, actualizamos el estado de la orden a entregado (estado 6)
+    $queryOrdenes = "
+        UPDATE ordenes
+        SET estado = 6, forma_pago = ?
+        WHERE id = ?
+    ";
+    
+    $stmtOrdenes = $conn->prepare($queryOrdenes);
+    if (!$stmtOrdenes) {
+        echo "Error preparando la consulta: " . $conn->error;
+        return false;
+    }
+    $stmtOrdenes->bind_param("si", $forma_pago, $id_orden);
+    if (!$stmtOrdenes->execute()) {
+        echo "Error ejecutando la consulta: " . $stmtOrdenes->error;
+        $stmtOrdenes->close();
+        return false; // Devuelve false si hay un error actualizando la orden
+    }
+    $stmtOrdenes->close();
+    
+    // Ahora, registramos la entrega en la nueva tabla
+    $queryEntregas = "
+        INSERT INTO entregas (orden_id, usuario_id, fecha, hora)
+        VALUES (?, ?, CURDATE(), CURTIME())
+    ";
+
+    $stmtEntregas = $conn->prepare($queryEntregas);
+    if (!$stmtEntregas) {
+        echo "Error preparando la consulta: " . $conn->error;
+        return false;
+    }
+    $stmtEntregas->bind_param("ii", $id_orden, $id_usuario);
+    if (!$stmtEntregas->execute()) {
+        echo "Error ejecutando la consulta: " . $stmtEntregas->error;
+        $stmtEntregas->close();
+        return false; // Devuelve false si hay un error en el registro de la entrega
+    }
+    $stmtEntregas->close();
+    return true; // Devuelve true si todo salió bien
+}
+
+
 
 
 ?>
