@@ -388,7 +388,6 @@ $html = <<<EOD
 </tr>
 </table>
 </div>
-<h1 style="font-weight: bold; color: red;" >Cancelado</h1>
 
 <div class="condiciones-servicio">
     <p><strong>Condiciones de Servicio para Ajustes y Arreglos de Ropa:</strong></p>
