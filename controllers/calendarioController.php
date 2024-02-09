@@ -81,18 +81,24 @@ elseif ($action == 'entregar') {
 elseif ($action == 'entregaTotal') {
     $id_orden = isset($_POST['idOrden']) ? $_POST['idOrden'] : null;
     $forma_pago = isset($_POST['forma_pago']) ? $_POST['forma_pago'] : null;
-    $id_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : null;
+    $nombre_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : null;
   
 
-    if ($id_orden !== null && $forma_pago !== null && $id_usuario !== null) {
-        $result = registrarEntrega($id_orden, $id_usuario, $forma_pago);
+    if ($id_orden !== null && $forma_pago !== null && $nombre_usuario !== null) {
+        $result = registrarEntrega($id_orden, $nombre_usuario, $forma_pago);
        
         if ($result) {
-            echo json_encode(['success' => true, 'message' => 'La entrega se ha registrado correctamente']);
+            // Llama a la función generarFacturaPDF pasando el ID de la orden y el nombre de usuario
+            $pdfGenerado = generarFacturaPDF($id_orden, $nombre_usuario);
+            
+            if ($pdfGenerado) {
+                echo json_encode(['success' => true, 'message' => 'La entrega se ha registrado correctamente y la factura ha sido generada.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'La entrega se ha registrado, pero no se pudo generar la factura.']);
+            }
         } else {
             echo json_encode(['success' => false, 'message' => 'No se pudo registrar la entrega']);
         }
-        
     } else {
         echo json_encode(['success' => false, 'message' => 'Faltan datos para procesar la entrega']);
     }

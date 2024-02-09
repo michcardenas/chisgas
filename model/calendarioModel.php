@@ -1,5 +1,6 @@
 <?php
 include_once '../conexion/db_connection.php';
+include_once '../TCPDF/tcpdf.php';
 function ver_calendario() {
     global $conn;  // Asegúrate de que tu conexión se llama $conn
 
@@ -242,6 +243,180 @@ function registrarEntrega($id_orden, $nombre_usuario, $forma_pago) {
     }
     $stmtEntregas->close();
     return true; // Devuelve true si todo salió bien
+}
+
+function generarFacturaPDF($id_orden, $nombre_usuario) {
+    global $conn; // Asume la conexión a la base de datos
+
+    // Define el query para obtener los datos de la factura
+    $query = "SELECT o.id, o.fecha_creacion, o.fecha_entrega, o.total_prendas, o.valor_total, o.abono, o.saldo, c.nombre, c.telefono, p.nombre_ropa, p.descripcion_arreglo,p.valor FROM ordenes o JOIN prendas p on p.id_orden=o.id JOIN clientes c on p.id_cliente=c.id WHERE o.id=?";
+    
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $id_orden);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $fechayhora = date("Y-m-d H:i:s");
+    
+    if ($resultado->num_rows > 0) {
+        $datosFactura = $resultado->fetch_assoc();
+        $nombre_cliente = $datosFactura['nombre'];
+        $telefono_cliente = $datosFactura['telefono'];
+        $abono = $datosFactura['abono'];
+        $saldo = $datosFactura['saldo'];
+        $valor_total = $datosFactura['valor_total'];
+        $subtotalFormateado = "$" . number_format($valor_total, 0, ',', '.');
+        $abonoFormateado = "$" . number_format($abono, 0, ',', '.');
+        $totalFormateado = "$" . number_format($saldo, 0, ',', '.');
+  // Suponiendo que TCPDF ya está incluido e inicializado
+$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+$resultado->data_seek(0);
+
+// Recoger todos los datos en un arreglo primero
+$datosPrendas = [];
+while ($fila = $resultado->fetch_assoc()) {
+    $datosPrendas[] = $fila;
+}
+
+// Luego, generas las filas de la tabla
+$filasTabla = '';
+foreach ($datosPrendas as $prenda) {
+    $filasTabla .= "<tr>
+                        <td>{$prenda['nombre_ropa']}</td>
+                        <td>{$prenda['descripcion_arreglo']}</td>
+                        <td>$" . number_format($prenda['valor'], 0, ',', '.') . "</td>
+                        </tr>";
+}
+// Configura el documento
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('Tu Empresa');
+$pdf->SetTitle('Factura');
+$pdf->SetSubject('Factura Detallada');
+$pdf->SetMargins(20, 20, 20);
+$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+$pdf->AddPage();
+
+// Preparar el HTML de la factura
+$html = <<<EOD
+<style>
+    .factura-header, .factura-cliente, .factura-items, .factura-totales, .factura-footer {
+        font-family: 'Helvetica', 'sans-serif';
+    }
+    .factura-header {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+    .factura-cliente {
+        margin-bottom: 20px;
+    }
+    .factura-items th, .factura-items td {
+        border-bottom: 1px solid #000;
+        padding: 5px;
+    }
+    .factura-totales {
+        margin-top: 20px;
+        text-align: right;
+    }
+    .factura-totales th, .factura-totales td {
+        padding: 5px;
+    }
+    .factura-footer {
+        font-size: 10px;
+        text-align: center;
+        margin-top: 30px;
+    }
+    .tabla-items {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .tabla-items th, .tabla-items td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    .tabla-items th {
+        background-color: #f2f2f2;
+        color: #333;
+        font-weight: bold;
+    }
+    .tabla-items tr:nth-child(even){background-color: #f9f9f9;}
+    .tabla-items tr:hover {background-color: #f1f1f1;}
+</style>
+<div class="factura-header" style="text-align: right;">
+    <img src="../views/img/logo_negro.png" alt="Logo Empresa" style="width:100px; height:auto; float:right; margin-bottom: 20px;">
+    <p>NIT: 1032455582-5</p>
+    <h2>Orden de arreglo N°:$id_orden</h2>
+    <p>Fecha: $fechayhora</p>
+    <p>Sastreria Chisgas</p>
+</div>
+
+
+<div class="factura-cliente">
+    <p><strong>Datos cliente</strong><br>
+    {$nombre_cliente}<br>
+    {$telefono_cliente}<br>
+</div>
+
+<div class="factura-items">
+<table class="tabla-items">
+    <thead>
+        <tr>
+            <th style="font-weight: bold; background-color: #f2f2f2; color: #333; border: 1px solid #ddd; padding: 8px; text-align: left;"> Prenda</th>
+            <th>Descripcion</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+    <tbody>
+        $filasTabla
+    </tbody>
+</table>
+</div>
+
+<div class="factura-totales">
+<table>
+<tr>
+    <th>Sub-total</th>
+    <td>{$subtotalFormateado}</td>
+</tr>
+<tr>
+    <th>Abono</th>
+    <td>{$abonoFormateado}</td>
+</tr>
+<tr>
+    <th>Total</th>
+    <td>{$totalFormateado}</td>
+</tr>
+</table>
+</div>
+<h1 style="font-weight: bold; color: red;" >Cancelado</h1>
+
+<div class="condiciones-servicio">
+    <p><strong>Condiciones de Servicio para Ajustes y Arreglos de Ropa:</strong></p>
+    <ul>
+        <li>La responsabilidad sobre los arreglos finaliza 30 días después de la fecha de entrega acordada.</li>
+        <li>La ropa para arreglo debe entregarse limpia. No se aceptarán prendas sucias.</li>
+        <li>Los arreglos están garantizados por 15 días siguientes a la fecha de entrega. Cualquier inconformidad debe ser notificada dentro de este período.</li>
+        <li>Después de 15 días de garantía, no se aceptarán reclamos por ajustes en prendas que no se adecuen a cambios en la medida corporal del cliente.</li>
+    </ul>
+    <p>Las presentes condiciones están sujetas a aceptación por parte del cliente antes del servicio.</p>
+</div>
+
+EOD;
+
+// Imprime el HTML en el PDF
+$pdf->writeHTML($html, true, false, true, false, '');
+        
+        // Define el nombre del archivo y la ruta de guardado
+        $nombreArchivo = 'factura_' . $id_orden . '.pdf';
+        $rutaGuardado = __DIR__ . '/../facturas/' . $nombreArchivo;
+        
+        // Guardar el PDF en el servidor
+        $pdf->Output($rutaGuardado, 'F');
+        
+        return $nombreArchivo; // Retorna el nombre del archivo para su uso posterior
+    } else {
+        return false; // No se encontraron datos
+    }
 }
 
 
