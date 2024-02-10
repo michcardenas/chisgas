@@ -712,12 +712,14 @@ $("#entrega_total").click(function(e) {
   var idOrden = $("#id_orden").val(); 
   var id_usuario = $("#id_usuario").val(); 
   var forma_pago = $("#forma_pago").val(); // Esto debería ser 'forma_pago', no 'id_usuario'
+  var telefono = $("#telefono_cliente").val(); 
+  console.log(telefono);
 
-  console.log(idOrden, id_usuario, forma_pago);
 
   $.ajax({
       url: '../../controllers/calendarioController.php',
       type: 'post',
+      dataType: 'json',
       data: {
           action: 'entregaTotal',
           idOrden: idOrden,
@@ -727,20 +729,31 @@ $("#entrega_total").click(function(e) {
       beforeSend: function() {
           // Opcional: Mostrar un loader o mensaje de "enviando..."
       },
-      success: function(response) {
-          if(response.success) { // Esto debería ser 'success', no 'exito'
-              alert("La factura ha sido enviada con éxito.");
-          } else {
-              alert("Hubo un problema al enviar la factura. Por favor, inténtalo de nuevo.");
-          }
-      },
-      error: function(xhr, status, error) {
-          console.error("Error en AJAX:", status, error);
-          alert("Error al enviar la solicitud. Por favor, revisa tu conexión y vuelve a intentarlo.");
-      }
-  });
-});
+    // Dentro de la función success de tu llamada AJAX
+    success: function(responseData) {
+      console.log(responseData);
+      if(responseData.success) {
+        // Extrae el nombre del archivo de la ruta completa del servidor
+        var filePath = responseData.pdf;
+        var fileName = filePath.split('/').pop(); // Ajusta esto según sea necesario para obtener correctamente el nombre del archivo
 
+        // Construye la URL final usando el nombre del archivo
+        var whatsappMessage = "Hola, aquí está la factura: http://localhost/chisgas/facturas/" + fileName;
+        var whatsappUrl =  `https://api.whatsapp.com/send?phone=+57${telefono}&text=${encodeURIComponent(whatsappMessage)}`;
+       
+
+        // Abre la URL de WhatsApp
+        window.open(whatsappUrl, '_blank');
+      } else {
+          alert("Hubo un problema al generar la factura. Por favor, inténtalo de nuevo.");
+      }
+  },
+  error: function(xhr, status, error) {
+      console.error("Error en AJAX:", status, error);
+      alert("Error al enviar la solicitud. Por favor, revisa tu conexión y vuelve a intentarlo.");
+  }
+});
+});
     
 
 });

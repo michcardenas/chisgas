@@ -89,10 +89,11 @@ elseif ($action == 'entregaTotal') {
        
         if ($result) {
             // Llama a la función generarFacturaPDF pasando el ID de la orden y el nombre de usuario
-            $pdfGenerado = generarFacturaPDF($id_orden, $nombre_usuario);
+            $rutaPDF = generarFacturaPDF($id_orden, $nombre_usuario);
             
-            if ($pdfGenerado) {
-                echo json_encode(['success' => true, 'message' => 'La entrega se ha registrado correctamente y la factura ha sido generada.']);
+            if ($rutaPDF) {
+                // Aquí puedes manejar el envío del PDF a WhatsApp o cualquier otra acción
+                echo json_encode(['success' => true, 'message' => 'La entrega se ha registrado correctamente y la factura ha sido generada.', 'pdf' => $rutaPDF]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'La entrega se ha registrado, pero no se pudo generar la factura.']);
             }
@@ -102,6 +103,7 @@ elseif ($action == 'entregaTotal') {
     } else {
         echo json_encode(['success' => false, 'message' => 'Faltan datos para procesar la entrega']);
     }
+    
 
     exit;
 }

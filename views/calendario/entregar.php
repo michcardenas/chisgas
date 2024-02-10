@@ -104,6 +104,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
         <hr>
         <input type="hidden" name="id_orden" id="id_orden" value="<?php echo $id_orden;?>">
         <input type="hidden" name="id_usuario" id="id_usuario" value="<?php echo $_SESSION['username'];?>">
+        <input type="hidden" name="telefono_cliente" id="telefono_cliente" value="<?php echo htmlspecialchars($primer_resultado['telefono_cliente']);?>">
 
         <hr>
         <div class="payments">

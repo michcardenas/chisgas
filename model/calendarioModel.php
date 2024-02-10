@@ -412,7 +412,8 @@ $pdf->writeHTML($html, true, false, true, false, '');
         // Guardar el PDF en el servidor
         $pdf->Output($rutaGuardado, 'F');
         
-        return $nombreArchivo; // Retorna el nombre del archivo para su uso posterior
+        return $rutaGuardado;
+        // Retorna el nombre del archivo para su uso posterior
     } else {
         return false; // No se encontraron datos
     }
