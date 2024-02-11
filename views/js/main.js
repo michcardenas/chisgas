@@ -738,8 +738,56 @@ $("#entrega_total").click(function(e) {
         var fileName = filePath.split('/').pop(); // Ajusta esto según sea necesario para obtener correctamente el nombre del archivo
 
         // Construye la URL final usando el nombre del archivo
-        var whatsappMessage = "Hola, aquí está la factura: http://localhost/chisgas/facturas/" + fileName;
-        var whatsappUrl =  `https://api.whatsapp.com/send?phone=+57${telefono}&text=${encodeURIComponent(whatsappMessage)}`;
+        var whatsappMessage = `¡Gracias por elegirnos para el arreglo de tu prenda! 🎉 Tu orden está completa y los detalles están disponibles en el siguiente enlace: http://localhost/chisgas/facturas/${fileName} 📝 Agradecemos tu confianza en nosotros y estamos aquí para cualquier otro servicio que necesites. 😊 ¡Esperamos verte pronto! 👋`;
+        var whatsappUrl = `https://api.whatsapp.com/send?phone=+57${telefono}&text=${encodeURIComponent(whatsappMessage)}`;
+        
+       
+
+        // Abre la URL de WhatsApp
+        window.open(whatsappUrl, '_blank');
+      } else {
+          alert("Hubo un problema al generar la factura. Por favor, inténtalo de nuevo.");
+      }
+  },
+  error: function(xhr, status, error) {
+      console.error("Error en AJAX:", status, error);
+      alert("Error al enviar la solicitud. Por favor, revisa tu conexión y vuelve a intentarlo.");
+  }
+});
+});
+$("#entrega_parcial").click(function(e) {
+  e.preventDefault();
+
+  var idOrden = $("#id_orden").val(); 
+  var id_usuario = $("#id_usuario").val(); 
+  console.log(telefono);
+
+
+  $.ajax({
+      url: '../../controllers/calendarioController.php',
+      type: 'post',
+      dataType: 'json',
+      data: {
+          action: 'entregaTotal',
+          idOrden: idOrden,
+          id_usuario: id_usuario,
+          forma_pago: forma_pago
+      },
+      beforeSend: function() {
+          // Opcional: Mostrar un loader o mensaje de "enviando..."
+      },
+    // Dentro de la función success de tu llamada AJAX
+    success: function(responseData) {
+      console.log(responseData);
+      if(responseData.success) {
+        // Extrae el nombre del archivo de la ruta completa del servidor
+        var filePath = responseData.pdf;
+        var fileName = filePath.split('/').pop(); // Ajusta esto según sea necesario para obtener correctamente el nombre del archivo
+
+        // Construye la URL final usando el nombre del archivo
+        var whatsappMessage = `¡Gracias por elegirnos para el arreglo de tu prenda! 🎉 Tu orden está completa y los detalles están disponibles en el siguiente enlace: http://localhost/chisgas/facturas/${fileName} 📝 Agradecemos tu confianza en nosotros y estamos aquí para cualquier otro servicio que necesites. 😊 ¡Esperamos verte pronto! 👋`;
+        var whatsappUrl = `https://api.whatsapp.com/send?phone=+57${telefono}&text=${encodeURIComponent(whatsappMessage)}`;
+        
        
 
         // Abre la URL de WhatsApp
