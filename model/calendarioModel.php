@@ -418,6 +418,39 @@ $pdf->writeHTML($html, true, false, true, false, '');
         return false; // No se encontraron datos
     }
 }
+function entregaParcial($id_orden, $nombre_usuario) {
+    global $conn; // Asegúrate de que tu conexión se llama $conn
+
+    // Este es el query que quieres ejecutar para obtener los datos de la orden
+    $query = "SELECT o.id, o.fecha_creacion, o.fecha_entrega, o.total_prendas, o.valor_total, 
+                     o.abono, o.saldo, c.nombre, c.telefono, p.nombre_ropa, 
+                     p.descripcion_arreglo, p.valor, p.prendas_numero 
+              FROM ordenes o 
+              JOIN prendas p on p.id_orden=o.id 
+              JOIN clientes c on p.id_cliente=c.id 
+              WHERE o.id=? "; // Asegúrate de definir el estado correcto
+
+    // Preparar la consulta y vincular los parámetros
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id_orden);
+
+    // Ejecutar la consulta y obtener los resultados
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            // Aquí puedes recoger los datos que quieres enviar de vuelta al AJAX
+            $datos = $result->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            return $datos; // Devuelve los datos de la orden si hay al menos una prenda arreglada
+        } else {
+            $stmt->close();
+            return false; // Devuelve false si no hay prendas arregladas
+        }
+    } else {
+        $stmt->close();
+        return false; // Devuelve false si hay un error en la consulta
+    }
+}
 
 
 

@@ -107,5 +107,24 @@ elseif ($action == 'entregaTotal') {
 
     exit;
 }
+elseif ($action == 'entregaParcial') {
+    $id_orden = isset($_POST['idOrden']) ? $_POST['idOrden'] : null;
+    $nombre_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : null;
+
+    if ($id_orden !== null && $nombre_usuario !== null) {
+        // Supongamos que entregaParcial() verifica si hay prendas arregladas
+        $result = entregaParcial($id_orden, $nombre_usuario);
+       
+        if ($result) {
+            echo json_encode(['success' => true, 'idOrden' => $id_orden, 'nombreUsuario' => $nombre_usuario]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Tiene que haber al menos una prenda arreglada para poder entregar la orden.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error no controlado']);
+    }
+    exit;
+}
+
 
 ?>

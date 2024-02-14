@@ -108,6 +108,7 @@ function prendas_por_entregar($id_orden) {
                 p.tiempo_estimado,
                 p.estado,
                 p.id,
+                p.prendas_numero,
                 c.nombre AS nombre_cliente,
                 c.telefono AS telefono_cliente,
                 u.login,
