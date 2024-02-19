@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  
   $('#atras_calendario').click(function(){  
     window.location.href = "calendario.php";
   });
@@ -61,6 +62,9 @@ var changingValue = false;
         // Indicar que se ha terminado de cambiar el valor
         changingValue = false;
     });
+  
+    
+  
     // Función para buscar clientes
     $(".button-buscar").click(function(e){
         e.preventDefault();
@@ -755,6 +759,7 @@ $("#entrega_total").click(function(e) {
   }
 });
 });
+
 $("#entrega_parcial").click(function(e) {
   e.preventDefault();
 
