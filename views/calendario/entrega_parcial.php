@@ -227,8 +227,36 @@ $("#entrega_parcial_entregar").click(function(e){
     }
 
     console.log(id_orden, id_usuario, telefono_cliente, abono, saldo, forma_pago, prendas_datos); 
-
-    // Aquí iría tu código AJAX si todas las validaciones son correctas
+    $.ajax({
+        type: "POST",
+        url: '../../controllers/calendarioController.php',
+        data: JSON.stringify({
+            action: "entrega_parcial_en",
+            id_orden: id_orden,
+            id_usuario: id_usuario,
+            telefono_cliente: telefono_cliente,
+            abono: abono,
+            saldo: saldo,
+            forma_pago: forma_pago,
+            prendas_datos: prendas_datos
+        }),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                // Código para manejar una respuesta exitosa
+            } else {
+                // Código para manejar errores
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            // Si hay un error en la solicitud AJAX
+            console.error("Error en AJAX:", status, error);
+            alert("Error al actualizar la prenda.");
+        }
+    });
 });
 
 
