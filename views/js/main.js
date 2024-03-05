@@ -795,8 +795,7 @@ $("#entrega_parcial").click(function(e) {
       }
     },
   error: function(xhr, status, error) {
-      console.error("Error en AJAX:", status, error);
-      alert("Error al enviar la solicitud. Por favor, revisa tu conexión y vuelve a intentarlo.");
+    alert(responseData.message);
   }
 });
 });

@@ -452,6 +452,64 @@ function entregaParcial($id_orden, $nombre_usuario) {
     }
 }
 
+function entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abono, $saldo, $forma_pago, $prendas_datos) {
+    global $conn; // Asegúrate de que tu conexión se llama $conn
+
+    try {
+        // Iniciar transacción
+        $conn->begin_transaction();
+        // Convertir $saldo a tipo numérico para asegurar compatibilidad.
+        $saldoNum = (float)$abono; // Convierte a float ya que es compatible con 'decimal' en MySQL
+
+        // Actualizar la orden con el abono y el saldo
+        $sqlOrden = "UPDATE ordenes SET saldo = saldo - ?, estado = 7 WHERE id = ?";
+        $stmtOrden = $conn->prepare($sqlOrden);
+        // Vincular los parámetros: restar del saldo y actualizar el estado
+        $stmtOrden->bind_param("di", $saldoNum, $id_orden);
+        $stmtOrden->execute();
+        $stmtOrden->close();
+
+
+        // Asegurarse de que $prendas_datos sea un array ya está garantizado por cómo se maneja la función
+        // Recorrer $prendas_datos para manejar cada prenda
+        foreach ($prendas_datos as $prenda) {
+            // Extraer los valores para cada prenda
+            $id_prenda = $prenda['prenda_id']; // Asumiendo que siempre está presente
+            $cantidad_entregada = $prenda['prenda_numero_entregar']; // Asumiendo que siempre está presente
+
+            // Preparar la consulta para insertar en entregas_parciales
+            $sqlPrenda = "INSERT INTO entregas_parciales (id_orden, id_prenda, cantidad_entregada, abono, fecha_hora, forma_pago) VALUES (?, ?, ?, ?, NOW(), ?)";
+            $stmtPrenda = $conn->prepare($sqlPrenda);
+            $stmtPrenda->bind_param("iiids", $id_orden, $id_prenda, $cantidad_entregada, $abono, $forma_pago);
+
+            // Ejecutar el statement
+            if (!$stmtPrenda->execute()) {
+                // Si hay un error, revertir la transacción y manejar el error
+                $conn->rollback();
+                $stmtPrenda->close();
+                return false; // Puedes optar por manejar el error de otra manera si lo prefieres
+            }
+
+            // Cerrar el statement
+            $stmtPrenda->close();
+        }
+
+        // Si todo sale bien, confirmar la transacción
+        $conn->commit();
+        return true;
+    } catch (Exception $e) {
+        // Si algo sale mal, revertir la transacción
+        $conn->rollback();
+
+        // Registrar el error si es necesario
+        error_log("Error en entrega_parcial_en: " . $e->getMessage());
+        return false;
+    }
+}
+
+
+
+
 
 
 

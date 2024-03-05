@@ -5,7 +5,7 @@
 include '../model/calendarioModel.php';
 
 // Comprobar el tipo de acción que se va a realizar (crear o buscar)
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+$action = $_REQUEST['action'] ?? null;
 if($action == 'ver_calendario') {
     $ver_calendario = ver_calendario();
     if ($ver_calendario) {
@@ -107,73 +107,62 @@ elseif ($action == 'entregaTotal') {
 
     exit;
 }
+elseif ($action == 'entregaParcial') {
+    $id_orden = isset($_POST['idOrden']) ? $_POST['idOrden'] : null;
+    $nombre_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : null;
 
-
-// Primero, determina si los datos vienen en formato JSON
-$contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
-
-if ($contentType === "application/json") {
-    // Es una petición JSON
-    $json = file_get_contents('php://input');
-    $data = json_decode($json);
-
-    $action = $data->action ?? null; 
-
-} else {
-    $action = $_POST['action'] ?? null; 
-}
-
-
-
-// Continúa con las demás partes de tu controlador...
-
-// Si $action no está definido y el cuerpo de la solicitud contiene JSON, procesa el JSON
-if (!$action && str_contains($_SERVER["CONTENT_TYPE"] ?? '', 'application/json')) {
-    // Leer el cuerpo de la solicitud (datos JSON crudos)
-    $json = file_get_contents('php://input');
-    // Decodificar el JSON a un objeto PHP
-    $data = json_decode($json);
-
-    // Ahora puedes establecer $action basado en los datos decodificados
-    $action = $data->action ?? null;
-}
-
-if ($action) {
-    // Ahora procesa según el valor de $action
-    if ($action == 'entrega_parcial_en') {
-      // Leer el cuerpo de la solicitud (datos JSON crudos)
-      $json = file_get_contents('php://input');
-      // Decodificar el JSON a un objeto PHP
-      $data = json_decode($json);
-  
-      // Extraer los parámetros enviados vía AJAX
-      $id_orden = isset($data->id_orden) ? $data->id_orden : null;
-      $id_usuario = isset($data->id_usuario) ? $data->id_usuario : null;
-      $telefono_cliente = isset($data->telefono_cliente) ? $data->telefono_cliente : null;
-      $abono = isset($data->abono) ? $data->abono : null;
-      $saldo = isset($data->saldo) ? $data->saldo : null;
-      $forma_pago = isset($data->forma_pago) ? $data->forma_pago : null;
-      $prendas_datos = isset($data->prendas_datos) ? $data->prendas_datos : [];
-        // Supongamos que tienes una función llamada entrega_parcial_en() que procesa los datos y devuelve true si tuvo éxito.
-        if (entrega_parcial_en($id_orden, $id_usuario, $telefono_cliente, $abono, $saldo, $forma_pago, $prendas_datos)) {
-            echo json_encode(['success' => true, 'message' => 'Entrega parcial registrada con éxito']);
+    if ($id_orden !== null && $nombre_usuario !== null) {
+        // Supongamos que entregaParcial() verifica si hay prendas arregladas
+        $result = entregaParcial($id_orden, $nombre_usuario);
+       
+        if ($result) {
+            echo json_encode(['success' => true, 'idOrden' => $id_orden, 'nombreUsuario' => $nombre_usuario]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Error al registrar la entrega parcial']);
-        } 
-    
+            echo json_encode(['success' => false, 'message' => 'Tiene que haber al menos una prenda arreglada para poder entregar la orden.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error no controlado']);
     }
-    // Agrega más condiciones según sea necesario
-} else {
-    // Maneja el caso de que no se haya especificado una acción
-    echo json_encode(['success' => false, 'message' => 'Acción no especificada']);
+    exit;
+}
+
+
+// Leer el cuerpo de la solicitud
+elseif($content = file_get_contents("php://input")){ 
+
+// Decodificar el JSON a un array asociativo
+$data = json_decode($content, true);
+
+// Ahora puedes acceder a 'action' y otros valores usando $data
+$action = isset($data['action']) ? $data['action'] : null;
+
+
+
+if ($action == 'entrega_parcial_en') {
+ 
+    $id_orden = isset($data['id_orden']) ? $data['id_orden'] : null;
+    $nombre_usuario = isset($data['id_usuario']) ? $data['id_usuario'] : null;
+    $telefono_cliente = isset($data['telefono_cliente']) ? $data['telefono_cliente'] : null;
+    $abono = isset($data['abono']) ? $data['abono'] : null;
+    $saldo = isset($data['saldo']) ? $data['saldo'] : null;
+    $forma_pago = isset($data['forma_pago']) ? $data['forma_pago'] : null;
+    $prendas_datos = isset($data['prendas_datos']) ? $data['prendas_datos'] : null;
+    if ($id_orden !== null && $nombre_usuario !== null) {
+        // Supongamos que entregaParcial() verifica si hay prendas arregladas
+      $result = entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abono, $saldo, $forma_pago, $prendas_datos);
+       
+        if ($result) {
+            echo json_encode(['success' => true, 'idOrden' => $id_orden, 'nombreUsuario' => $nombre_usuario]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Ha ocurrido un error al registrar la entrega parcial.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error no controlado']);
+    }
     exit;
 }
 
 
 
-
-
-
-
-
+}
 ?>

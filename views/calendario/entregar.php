@@ -47,7 +47,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
     <thead>
         <tr>
             <th>Prenda</th>
-            <th>Asignado</th>
+            <th>Numero</th>
             <th>Valor </th>
         </tr>
     </thead>
@@ -62,7 +62,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
                     <?php echo htmlspecialchars($prenda['nombre_ropa']); ?>
         </p>
             </td>
-            <td><?php echo htmlspecialchars($prenda['login']); ?>  </td>
+            <td><?php echo htmlspecialchars($prenda['prendas_numero']); ?>  </td>
             
             <td><?php echo "$" . number_format($prenda['valor'], 0, ',', '.'); ?></td>
 
@@ -115,7 +115,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
             <span>Subtotal:</span>
             <label class="price"><?php echo "$" . number_format($prenda['valor_total'], 0, ',', '.'); ?></label>     
             <span>Abono:</span>
-            <label class="price"><?php echo "$" . number_format($prenda['abono'], 0, ',', '.'); ?></label> 
+            <label class="price"><?php echo "$" . number_format($prenda['abono_total'], 0, ',', '.'); ?></label> 
   
           </div>
         </div>
@@ -125,7 +125,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
 
   <div class="card checkout">
    
-    <label for="total">Total</label>  <h1 class="price"><?php echo "$" . number_format($prenda['saldo'], 0, ',', '.'); ?></h1>
+    <label for="total">Total</label>  <h1 class="price"><?php echo "$" . number_format($prenda['saldo_actualizado'], 0, ',', '.'); ?></h1>
     
   </div>
 </div>
@@ -136,7 +136,7 @@ $arreglos_prendas = prendas_por_entregar($id_orden);
  
 <div class=" flex">
 <button id="entrega_total"  class="button">Entrega total &#128722;</button>
-<button id="entrega_parcial"  class="button">Entrega parcial  &#9203;</button>
+<button id="entrega_parcial"  class="button">Entrega parcial o abonos  &#9203;</button>
 
 </div>
 

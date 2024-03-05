@@ -109,12 +109,14 @@ function prendas_por_entregar($id_orden) {
                 p.estado,
                 p.id,
                 p.prendas_numero,
+                SUM(ep.cantidad_entregada) AS cantidad_entregada_total, -- Suma de cantidad entregada
                 c.nombre AS nombre_cliente,
                 c.telefono AS telefono_cliente,
                 u.login,
                 p.valor,
                 o.valor_total,
-                o.saldo,
+                (o.saldo + SUM(ep.abono)) AS saldo_actualizado, -- Actualización de saldo con suma de abonos
+                (o.abono + SUM(ep.abono)) AS abono_total, -- Suma de abonos
                 o.abono
             FROM 
                 prendas p
@@ -124,9 +126,54 @@ function prendas_por_entregar($id_orden) {
                 usuarios u ON p.id_asignacion = u.id
             LEFT JOIN 
                 ordenes o ON o.id = p.id_orden
+            LEFT JOIN 
+                entregas_parciales ep ON ep.id_prenda = p.id AND ep.id_orden = o.id -- JOIN con entregas_parciales
             WHERE 
                 p.id_orden = ?
-                AND P.estado = 5
+                AND p.estado = 5
+            GROUP BY 
+                p.id -- Agrupar por id de prenda para sumar correctamente
+    ";
+
+    // Preparar la consulta y vincular el parámetro
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id_orden); // "i" significa que es un entero (integer)
+
+    // Ejecutar la consulta
+    $stmt->execute();
+
+    // Obtener los resultados
+    $result = $stmt->get_result();
+
+    // Verificar si la consulta devuelve resultados
+    if ($result->num_rows > 0) {
+        $data = [];
+        while($row = $result->fetch_assoc()) {
+            // Ajustar las cantidades según las entregas parciales
+            $row['prendas_numero'] -= $row['cantidad_entregada_total']; // Restar cantidad entregada
+            $data[] = $row;
+        }
+        return $data;
+    } else {
+        return false;  // O podrías devolver un array vacío dependiendo de lo que necesites
+    }
+
+    // Cerrar el statement y la conexión
+    $stmt->close();
+}
+
+function entregas_parciales_datos($id_orden) {
+    global $conn;  // Asegúrate de que tu conexión se llama $conn
+
+    $query = "
+                SELECT 
+              *
+            FROM 
+                entregas_parciales
+         
+            WHERE 
+                id_orden = ?
+               
     ";
 
     // Preparar la consulta y vincular el parámetro
