@@ -47,7 +47,11 @@ function convertirMinutosAHoras($minutos) {
 <div class="centrar">
     <h4  class="form_heading">Busca tu cliente aqui!</h4>
 <div class="search">
-        <input placeholder="Buscar cliente..." type="text">
+        <select name="nombre" id="nombre_telefono"> 
+            <option value="nombre">Nombre</option>
+            <option value="telefono">Telefono</option>
+        </select>
+        <input placeholder="Buscar cliente..."  id="nombre_cliente" type="text">
         <button class="button-buscar_orden">Buscar</button>
       </div>
       <div id="resultados" class="lista-nombres">

@@ -70,7 +70,6 @@ var changingValue = false;
         e.preventDefault();
         var telefono_cliente = $("#telefono_cliente").val();
         var nombre_cliente = $("#nombre_cliente").val();
-        
         $.ajax({
             url: '../../controllers/clientesController.php',
             type: 'post',
@@ -124,17 +123,23 @@ var changingValue = false;
     });
     $(".button-buscar_orden").click(function(e) {
       e.preventDefault();
-  
+      var nombre_telefono = $("#nombre_telefono").val();
+
       // Obtén el valor del campo de entrada
-      var nombre_cliente = $("#nombre_cliente").val();
-  
+      if (nombre_telefono == "telefono") {
+        var telefono_cliente = $("#nombre_cliente").val();
+
+      }else{
+        var nombre_cliente = $("#nombre_cliente").val();
+      }
       // Realiza la solicitud AJAX
       $.ajax({
           url: '../../controllers/clientesController.php',
           type: 'post',
           data: {
               action: 'buscar',
-              nombre_cliente: nombre_cliente
+              nombre_cliente: nombre_cliente,
+              telefono_cliente: telefono_cliente
           },
           success: function(response) {
             // Vacía cualquier tabla existente
@@ -718,7 +723,11 @@ $("#entrega_total").click(function(e) {
   var forma_pago = $("#forma_pago").val(); // Esto debería ser 'forma_pago', no 'id_usuario'
   var telefono = $("#telefono_cliente").val(); 
   console.log(telefono);
-
+  var confirmar = confirm("¿Quieres entregar toda la orden?");
+    if (!confirmar) {
+        // Si el usuario hace clic en "Cancelar", detén la ejecución
+        return; // Detiene la ejecución del código restante en el controlador del evento click
+    }
 
   $.ajax({
       url: '../../controllers/calendarioController.php',
@@ -750,7 +759,8 @@ $("#entrega_total").click(function(e) {
         // Abre la URL de WhatsApp
         window.open(whatsappUrl, '_blank');
       } else {
-          alert("Hubo un problema al generar la factura. Por favor, inténtalo de nuevo.");
+          alert("La orden ya se encuentra entregada.");
+          window.location.href = "../menu.php";
       }
   },
   error: function(xhr, status, error) {

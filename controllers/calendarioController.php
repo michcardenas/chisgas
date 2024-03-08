@@ -82,31 +82,30 @@ elseif ($action == 'entregaTotal') {
     $id_orden = isset($_POST['idOrden']) ? $_POST['idOrden'] : null;
     $forma_pago = isset($_POST['forma_pago']) ? $_POST['forma_pago'] : null;
     $nombre_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : null;
-  
 
     if ($id_orden !== null && $forma_pago !== null && $nombre_usuario !== null) {
         $result = registrarEntrega($id_orden, $nombre_usuario, $forma_pago);
        
-        if ($result) {
-            // Llama a la función generarFacturaPDF pasando el ID de la orden y el nombre de usuario
+        if ($result === "ya_entregado") {
+            echo json_encode(['success' => false, 'message' => 'La entrega no se puede registrar porque ya se encuentra en estado entregado.']);
+        } elseif ($result) {
             $rutaPDF = generarFacturaPDF($id_orden, $nombre_usuario);
-            
             if ($rutaPDF) {
-                // Aquí puedes manejar el envío del PDF a WhatsApp o cualquier otra acción
                 echo json_encode(['success' => true, 'message' => 'La entrega se ha registrado correctamente y la factura ha sido generada.', 'pdf' => $rutaPDF]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'La entrega se ha registrado, pero no se pudo generar la factura.']);
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'No se pudo registrar la entrega']);
+            echo json_encode(['success' => false, 'message' => 'No se pudo registrar la entrega.']);
         }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Faltan datos para procesar la entrega']);
+        echo json_encode(['success' => false, 'message' => 'Faltan datos para procesar la entrega.']);
     }
-    
-
     exit;
 }
+
+
+
 elseif ($action == 'entregaParcial') {
     $id_orden = isset($_POST['idOrden']) ? $_POST['idOrden'] : null;
     $nombre_usuario = isset($_POST['id_usuario']) ? $_POST['id_usuario'] : null;

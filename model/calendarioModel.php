@@ -5,18 +5,21 @@ function ver_calendario() {
     global $conn;  // Asegúrate de que tu conexión se llama $conn
 
     $query = "
-        SELECT 
-            o.fecha_entrega,
-            COUNT(DISTINCT p.id_cliente) AS numero_clientes,
-            SUM(p.tiempo_estimado) AS tiempo_estimado_total
-        FROM 
-            ordenes o
-        JOIN 
-            prendas p ON o.id = p.id_orden
-        GROUP BY 
-            o.fecha_entrega
-        ORDER BY 
-            o.fecha_entrega
+    SELECT 
+    o.fecha_entrega,
+    COUNT(DISTINCT p.id_cliente) AS numero_clientes,
+    SUM(p.tiempo_estimado) AS tiempo_estimado_total
+FROM 
+    ordenes o
+JOIN 
+    prendas p ON o.id = p.id_orden
+WHERE 
+    o.estado != 6
+GROUP BY 
+    o.fecha_entrega
+ORDER BY 
+    o.fecha_entrega;
+
     ";
 
     $result = $conn->query($query);
@@ -204,13 +207,27 @@ function registrarEntrega($id_orden, $nombre_usuario, $forma_pago) {
     $id_usuario = $filaUsuario['id'];
     $stmtUsuario->close();
 
-    // Primero, actualizamos el estado de la orden a entregado (estado 6)
-    $queryOrdenes = "
-        UPDATE ordenes
-        SET estado = 6, forma_pago = ?
-        WHERE id = ?
-    ";
-    
+    // Verificar el estado actual de la orden antes de actualizar
+// Verificar el estado actual de la orden
+        $queryVerificar = "SELECT estado FROM ordenes WHERE id = ?";
+        $stmtVerificar = $conn->prepare($queryVerificar);
+        if (!$stmtVerificar) {
+            echo "Error preparando la consulta de verificación: " . $conn->error;
+            return false;
+        }
+        $stmtVerificar->bind_param("i", $id_orden);
+        $stmtVerificar->execute();
+        $resultadoVerificar = $stmtVerificar->get_result();
+        $filaVerificar = $resultadoVerificar->fetch_assoc();
+        if ($filaVerificar['estado'] == 6) {
+            $stmtVerificar->close();
+            return "ya_entregado"; // Indicativo de que la orden ya está en estado entregado
+        }
+        $stmtVerificar->close();
+
+
+    // Actualizar el estado de la orden a entregado (estado 6)
+    $queryOrdenes = "UPDATE ordenes SET estado = 6, forma_pago = ? WHERE id = ?";
     $stmtOrdenes = $conn->prepare($queryOrdenes);
     if (!$stmtOrdenes) {
         echo "Error preparando la consulta: " . $conn->error;
@@ -220,16 +237,12 @@ function registrarEntrega($id_orden, $nombre_usuario, $forma_pago) {
     if (!$stmtOrdenes->execute()) {
         echo "Error ejecutando la consulta: " . $stmtOrdenes->error;
         $stmtOrdenes->close();
-        return false; // Devuelve false si hay un error actualizando la orden
+        return false;
     }
     $stmtOrdenes->close();
-    
-    // Ahora, registramos la entrega en la nueva tabla
-    $queryEntregas = "
-        INSERT INTO entregas (orden_id, usuario_id, fecha, hora)
-        VALUES (?, ?, CURDATE(), CURTIME())
-    ";
 
+    // Registrar la entrega en la nueva tabla
+    $queryEntregas = "INSERT INTO entregas (orden_id, usuario_id, fecha, hora) VALUES (?, ?, CURDATE(), CURTIME())";
     $stmtEntregas = $conn->prepare($queryEntregas);
     if (!$stmtEntregas) {
         echo "Error preparando la consulta: " . $conn->error;
@@ -239,11 +252,12 @@ function registrarEntrega($id_orden, $nombre_usuario, $forma_pago) {
     if (!$stmtEntregas->execute()) {
         echo "Error ejecutando la consulta: " . $stmtEntregas->error;
         $stmtEntregas->close();
-        return false; // Devuelve false si hay un error en el registro de la entrega
+        return false;
     }
     $stmtEntregas->close();
-    return true; // Devuelve true si todo salió bien
+    return true; // Todo salió bien
 }
+
 
 function generarFacturaPDF($id_orden, $nombre_usuario) {
     global $conn; // Asume la conexión a la base de datos

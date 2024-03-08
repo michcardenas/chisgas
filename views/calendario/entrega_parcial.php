@@ -193,9 +193,9 @@ if (file_exists($ruta)) {
 <script  >
     $(document).ready(function(){
 
-        let changingValue = false; // Asegúrate de definir esto fuera de tu función de evento para que tenga un ámbito global
+        let changingValue = false; // Asegúrate de que esta variable esté definida fuera de tu función para controlar el estado
 
-        $('#abono2').on('change', function() {
+$('#abono2').on('change', function() {
     if (changingValue) return;
 
     changingValue = true;
@@ -209,11 +209,11 @@ if (file_exists($ruta)) {
 
     let saldo = valorTotal - numericValue; // Cálculo del saldo
 
-    // Actualizar el saldo en el formato deseado
-    $('#saldo2').text(saldo.toLocaleString('es-CO'));
+    // Actualizar el saldo en el formato deseado, incluyendo el signo de dólar
+    $('#saldo2').text("$" + saldo.toLocaleString('es-CO'));
 
-    // Volver a formatear el valor introducido al formato de moneda
-    $(this).val(numericValue.toLocaleString('es-CO'));
+    // Volver a formatear el valor introducido al formato de moneda, incluyendo el signo de dólar
+    $(this).val("$" + numericValue.toLocaleString('es-CO'));
 
     changingValue = false;
 });
@@ -232,7 +232,7 @@ $("#entrega_parcial_entregar").click(function(e){
 
     var abonos_totales = $("#abonos_totales").val().replace(/[^0-9]/g, ''); // Usar .val() en lugar de .text()
     var forma_pago = $("#forma_pago").val();
-
+    var abono_total = abono + abonos_totales;
     var prendas_datos = [];
     var validacionCorrecta = true; // Asunción inicial de que todas las validaciones son correctas
 
@@ -244,15 +244,25 @@ $("#entrega_parcial_entregar").click(function(e){
         var nombre_prenda = $(this).closest('tr').find('td:first').text().trim(); // Asumiendo que el nombre de la prenda está en el primer <td>
 
     
+       // Sumar las prendas a entregar
+        var totalPrendasAEntregar = prendas_datos.reduce((acc, cur) => acc + (cur.prenda_numero_entregar || 0), 0);
+
+        if (saldo >= abono_total) {
+            alert(`El valor de los abonos nos pueden superar el valor total de la prenda.`);
+            validacionCorrecta = false;
+            return false; // Salir del bucle .each
+        }
 
         if (prenda_numero_entregar > prenda_numero_real) {
             alert(`En la prenda ${nombre_prenda}, estás intentando entregar un número mayor de prendas al recibido. Puede ser menor o igual.`);
             validacionCorrecta = false;
             return false; // Salir del bucle .each
         }
-        console.log(abono);
-        console.log(abonos_totales);
-        console.log(total_completo);
+        if (abonos_totales > total) {
+            alert(`En la prenda ${nombre_prenda}, el número de prendas a entregar debe ser mayor a 0.`);
+            validacionCorrecta = false;
+            return false; // Salir del bucle .each
+        }
 
      // Convertir a números enteros para la comparación
             var abonoNumerico = parseInt(abono, 10) || 0; // Usa 0 como valor predeterminado si el parseo falla
@@ -274,6 +284,14 @@ $("#entrega_parcial_entregar").click(function(e){
     }
 
     console.log(id_orden, id_usuario, telefono_cliente, abono, saldo, forma_pago, prendas_datos); 
+    var numero_prendas_entregar = prendas_datos.reduce(function(acumulador, prenda) {
+        return acumulador + (isNaN(prenda.prenda_numero_entregar) ? 0 : prenda.prenda_numero_entregar);
+    }, 0);
+    var mensajeConfirmacion = "¿Estás seguro de que deseas entregar " + numero_prendas_entregar + " prenda(s) y abonar $" + abono + "?";
+
+    var confirmar = confirm(mensajeConfirmacion);
+
+    if (confirmar) {
     $.ajax({
         type: "POST",
         url: '../../controllers/calendarioController.php',
@@ -290,13 +308,8 @@ $("#entrega_parcial_entregar").click(function(e){
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function(response) {
-            if (response.success) {
-                alert(response.message);
-                // Código para manejar una respuesta exitosa
-            } else {
-                // Código para manejar errores
-                alert(response.message);
-            }
+            alert("Se ha realizado de manera correcta la entrega parcialo abono.");
+
         },
         error: function(xhr, status, error) {
             // Si hay un error en la solicitud AJAX
@@ -304,6 +317,10 @@ $("#entrega_parcial_entregar").click(function(e){
             alert("Error al actualizar la prenda.");
         }
     });
+    } else {
+                // El usuario hizo clic en "Cancelar", no hacer nada
+                console.log("Acción cancelada por el usuario.");
+            }
 });
 
 
