@@ -28,6 +28,10 @@ $id_orden = isset($_GET['id_orden']) ? htmlspecialchars($_GET['id_orden']) : '';
 $arreglos_prendas = prendas_por_entregar($id_orden);
 
 $entregas_parciales=entregas_parciales_datos($id_orden);
+
+$entregas_total=total_entrega($id_orden);
+
+
 // Asegúrate de que $entregas_parciales sea un array
 if (is_array($entregas_parciales)) {
     $total_abonos = array_sum(array_column($entregas_parciales, 'abono'));
@@ -61,40 +65,44 @@ foreach ($entregas_parciales as $entrega) {
     }
     ?>
        
-       <table>
-    <thead>
-        <tr>
-            <th>Prenda</th>
-            <th># prendas a entregar</th>
-            <th>Valor </th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($arreglos_prendas as $index => $prenda): ?>
-    <tr>
-        <td>
-            <p href="detalle_arreglo.php?id=<?php echo htmlspecialchars($prenda['id']); ?>">
-                <?php echo htmlspecialchars($prenda['nombre_ropa']); ?>
-            </p>
-        </td>
-        <td>
+    <table>
+        <thead>
+            <tr>
+                <th>Prenda</th>
+                <th># prendas a entregar</th>
+                <th>Valor </th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($arreglos_prendas as $index => $prenda): ?>
             <?php
             // Calcular la cantidad ajustada de prendas
             $cantidad_original = $prenda['prendas_numero'];
             $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
             $cantidad_ajustada = max(0, $cantidad_original - $cantidad_entregada);
+            
+            // Si la cantidad ajustada es 0, no generamos la fila
+            if ($cantidad_ajustada > 0):
             ?>
-            <input readonly class="input_file" type="number" name="prendas_numero[<?php echo $prenda['id']; ?>]" placeholder="<?php echo $cantidad_ajustada; ?>" min="1" />
-        </td>
-        
-        <td><?php echo "$" . number_format($prenda['valor'], 0, ',', '.'); ?></td>
-        
-        <input type="hidden" name="id_usuario" id="prendas_numero_real" value="<?php echo htmlspecialchars($prenda['prendas_numero']); ?>">
-    </tr>
-<?php endforeach;  ?>
+            <tr>
+                <td>
+                    <p href="detalle_arreglo.php?id=<?php echo htmlspecialchars($prenda['id']); ?>">
+                        <?php echo htmlspecialchars($prenda['nombre_ropa']); ?>
+                    </p>
+                </td>
+                <td>
+                    <input readonly class="input_file" type="number" name="prendas_numero[<?php echo $prenda['id']; ?>]" placeholder="<?php echo $cantidad_ajustada; ?>" min="1" />
+                </td>
+                
+                <td><?php echo "$" . number_format($prenda['valor'], 0, ',', '.'); ?></td>
+                
+                <input type="hidden" name="id_usuario" id="prendas_numero_real" value="<?php echo htmlspecialchars($prenda['prendas_numero']); ?>">
+            </tr>
+            <?php endif; ?>
+        <?php endforeach;  ?>
 
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
 <div class="container_rosa">
   <div class="card cart">
@@ -125,7 +133,7 @@ foreach ($entregas_parciales as $entrega) {
         </div>
         <hr>
         <input type="hidden" name="id_orden" id="id_orden" value="<?php echo $id_orden;?>">
-        <input type="hidden" name="valor_total22" id="valor_total22" value="<?php echo $prenda['valor']-$total_abonos- $prenda['abono'];?>">
+        <input type="hidden" name="valor_total22" id="valor_total22" value="<?php echo $prenda['valor_total']-$total_abonos- $prenda['abono'];?>">
         <input type="hidden" name="valor_total1" id="valor_total1" value="<?php echo $prenda['valor_total'] ;?>">
 
         <input type="hidden" name="abonos_totales" id="abonos_totales" value="<?php echo number_format($prenda['abono']+$total_abonos); ?>">
@@ -160,7 +168,7 @@ foreach ($entregas_parciales as $entrega) {
 
   <div class="card checkout">
    
-    <label for="total">Total</label>  <h1 class="price"><?php echo "$" . number_format($prenda['valor']-$total_abonos-$prenda['abono'], 0, ',', '.'); ?></h1>
+    <label for="total">Total</label>  <h1 class="price"><?php echo "$" . number_format($prenda['valor_total']-$total_abonos-$prenda['abono'], 0, ',', '.'); ?></h1>
     
   </div>
 </div>
@@ -170,9 +178,13 @@ foreach ($entregas_parciales as $entrega) {
         
  
 <div class=" flex">
-<button id="entrega_total"  class="button">Entrega total &#128722;</button>
-<button id="entrega_parcial"  class="button">Entrega parcial o abonos  &#9203;</button>
+    <?php if($entregas_total == true) { ?>
+        <button id="entrega_total"  class="button">Entrega total &#128722;</button> 
+    <?php } ?>
+    <?php if (count($arreglos_prendas) > 1 || $arreglos_prendas[0]['prendas_numero'] > 1) { ?>
 
+<button id="entrega_parcial"  class="button">Entrega parcial o abonos  &#9203;</button>
+<?php  } ?>
 </div>
 
 

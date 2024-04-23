@@ -81,6 +81,7 @@ foreach ($entregas_parciales as $entrega) {
             <?php
             // Calcular la cantidad ajustada de prendas
             $cantidad_original = $prenda['prendas_numero'];
+
             $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
             $cantidad_ajustada = max(0, $cantidad_original - $cantidad_entregada);
             ?>
@@ -89,7 +90,7 @@ foreach ($entregas_parciales as $entrega) {
         
         <td><?php echo "$" . number_format($prenda['valor'], 0, ',', '.'); ?></td>
         
-        <input type="hidden" name="id_usuario" id="prendas_numero_real" value="<?php echo htmlspecialchars($prenda['prendas_numero']); ?>">
+        <input type="hidden" name="id_usuario" id="prendas_numero_real" value="<?php echo $prenda['prendas_numero']; ?>">
     </tr>
 <?php endforeach;  ?>
 
@@ -125,7 +126,7 @@ foreach ($entregas_parciales as $entrega) {
         </div>
         <hr>
         <input type="hidden" name="id_orden" id="id_orden" value="<?php echo $id_orden;?>">
-        <input type="hidden" name="valor_total22" id="valor_total22" value="<?php echo $prenda['valor']-$total_abonos- $prenda['abono'];?>">
+        <input type="hidden" name="valor_total22" id="valor_total22" value="<?php echo $prenda['valor_total']-$total_abonos- $prenda['abono'];?>">
         <input type="hidden" name="valor_total1" id="valor_total1" value="<?php echo $prenda['valor_total'] ;?>">
 
         <input type="hidden" name="abonos_totales" id="abonos_totales" value="<?php echo number_format($prenda['abono']+$total_abonos); ?>">
@@ -162,7 +163,7 @@ foreach ($entregas_parciales as $entrega) {
 
   <div class="card checkout">
    
-    <label for="total">Total</label>  <h1 class="price" id="saldo2"><?php echo "$" . number_format($prenda['valor']-$total_abonos-$prenda['abono'], 0, ',', '.'); ?></h1>
+    <label for="total">Total</label>  <h1 class="price" id="saldo2"><?php echo "$" . number_format($prenda['valor_total']-$total_abonos-$prenda['abono'], 0, ',', '.'); ?></h1>
     <button id="entrega_parcial_entregar"  class="button">Entregar  &#9203;</button>
 
   </div>
@@ -247,7 +248,7 @@ $("#entrega_parcial_entregar").click(function(e){
        // Sumar las prendas a entregar
         var totalPrendasAEntregar = prendas_datos.reduce((acc, cur) => acc + (cur.prenda_numero_entregar || 0), 0);
 
-        if (saldo >= abono_total) {
+        if (saldo <= abono_total) {
             alert(`El valor de los abonos nos pueden superar el valor total de la prenda.`);
             validacionCorrecta = false;
             return false; // Salir del bucle .each

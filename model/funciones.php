@@ -200,6 +200,39 @@ function entregas_parciales_datos($id_orden) {
     // Cerrar el statement y la conexión
     $stmt->close();
 }
+// estados
+// 3 ingresado
+// 4 en proceso 
+// 5 arreglada
+function total_entrega($id_orden) {
+    global $conn;  // se sabe si todo esta arreglado o no 
+
+    // Primero, obtener el total de prendas para la orden
+    $queryTotal = "SELECT COUNT(*) as totalPrendas FROM prendas WHERE id_orden = ?";
+    $stmtTotal = $conn->prepare($queryTotal);
+    $stmtTotal->bind_param("i", $id_orden);
+    $stmtTotal->execute();
+    $resultTotal = $stmtTotal->get_result()->fetch_assoc();
+    $totalPrendas = $resultTotal['totalPrendas'];
+    $stmtTotal->close();
+
+    // Luego, contar cuántas de esas prendas están en estado 5
+    $queryEstado = "SELECT COUNT(*) as prendasEnEstado5 FROM prendas WHERE id_orden = ? AND estado = 5";
+    $stmtEstado = $conn->prepare($queryEstado);
+    $stmtEstado->bind_param("i", $id_orden);
+    $stmtEstado->execute();
+    $resultEstado = $stmtEstado->get_result()->fetch_assoc();
+    $prendasEnEstado5 = $resultEstado['prendasEnEstado5'];
+    $stmtEstado->close();
+
+    // Comparar si el total de prendas coincide con las prendas en estado 5
+    if ($totalPrendas == $prendasEnEstado5) {
+        return true; // Todas las prendas están en estado 5
+    } else {
+        return false; // Hay prendas que no están en estado 5
+    }
+}
+
 function ver_arreglo($prenda_id) {
     global $conn;  // Asegúrate de que tu conexión se llama $conn
 
