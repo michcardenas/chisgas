@@ -127,7 +127,6 @@ foreach ($entregas_parciales as $entrega) {
       <select class="input" name="forma_pago" id="forma_pago">
           <option value="efectivo">Efectivo</option>
           <option value="nequi">Nequi</option>
-          <option value="daviplata">Daviplata</option>
       </select>
   </div>
         </div>
