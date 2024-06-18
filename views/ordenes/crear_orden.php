@@ -89,8 +89,6 @@ if (file_exists($ruta)) {
       <label for="valor_prenda">Valor Total</label>
       <input class="input" name="valor_prenda" type="text" data-real-value="" placeholder="$" value="0" id="valor_prenda" >
     </div>  
-   
-
   
     </form> 
     <div class=" flex">

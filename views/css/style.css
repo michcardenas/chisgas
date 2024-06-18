@@ -248,10 +248,23 @@
   width: 4rem; 
   margin-top: 5px;
   /* quiero que la imagen aparesca abajo del texto */
-
-
 }
 
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px; /* Espacio inferior para separación */
+}
+
+.input-group input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.input-group button {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
 
 /* INCIO ESTILOS ORDENES */
 .spacing{
@@ -719,3 +732,22 @@ then set the desired styles for .card-img. */
   flex: 1;
 }
 
+
+.progress-container {
+  width: 100%;
+  height: 30px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #4caf50;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+  font-weight: bold;
+}
