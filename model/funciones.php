@@ -11,7 +11,7 @@ function obtener_ordenes_del_dia($fecha_entrega) {
             o.total_prendas AS total_prendas_por_orden,
             (
                 CASE
-                    WHEN SUM(CASE WHEN p.estado = 4 THEN 1 ELSE 0 END) > 0 THEN 'Pendiente'
+                    WHEN SUM(CASE WHEN p.estado = 4 THEN 1 ELSE 0 END) > 0 THEN 'En Proceso'
                     WHEN SUM(CASE WHEN p.estado = 5 THEN 1 ELSE 0 END) = COUNT(p.id) THEN 'Arreglado'
                     WHEN SUM(CASE WHEN p.estado = 6 THEN 1 ELSE 0 END) = COUNT(p.id) THEN 'Entregadas'
                     ELSE 'Ingresada'
@@ -368,4 +368,18 @@ GROUP BY
 
     // Cerrar el statement y la conexión
     $stmt->close();
+}
+
+function calcularPorcentaje($estado) {
+    switch ($estado) {
+        case 1:
+        case 3:
+            return 0; // 0% para Ingresado
+        case 4:
+            return 50; // 50% para En proceso
+        case 5:
+            return 100; // 100% para Arreglado
+        default:
+            return 0; // Estado desconocido se trata como 0%
+    }
 }
