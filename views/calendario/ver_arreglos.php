@@ -88,6 +88,7 @@ $porcentajeOrden = 0;
 if ($totalPrendas > 0) {
     $porcentajeOrden = $totalPorcentaje / $totalPrendas;
 }
+
 ?>
 
 <table>

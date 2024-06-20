@@ -33,6 +33,8 @@ if (isset($_GET['fecha_entrega'])) {
     echo "Fecha no proporcionada.";
 }
 $ordenes_del_dia = obtener_ordenes_del_dia($fecha_entrega);
+
+
 echo '
 <div class="p_centrar">
 <div class="centrar">';
@@ -47,7 +49,18 @@ echo '</thead>';
 echo '<tbody>';
 
 foreach ($ordenes_del_dia as $orden) {
-    echo '<tr>';
+     $arreglos_prendas = prendas_por_orden_con_cliente($orden["id_orden"]);
+    $totalPrendas = count($arreglos_prendas);
+$totalPorcentaje = 0;
+
+foreach ($arreglos_prendas as $prenda) {
+    $totalPorcentaje += calcularPorcentaje($prenda['estado']);
+}
+
+$porcentajeOrden = 0;
+if ($totalPrendas > 0) {
+    $porcentajeOrden = $totalPorcentaje / $totalPrendas;
+}
 
     // Si el nombre del cliente es NULL o vacío, muestra un mensaje predeterminado o lo que quieras mostrar
     $nombre_cliente = $orden["nombre_cliente"] ? $orden["nombre_cliente"] : "Cliente Desconocido";
@@ -56,7 +69,7 @@ foreach ($ordenes_del_dia as $orden) {
     echo '</td>';
 
     echo '<td>' . htmlspecialchars($orden["total_prendas_por_orden"]) . '</td>';
-    echo '<td>' . htmlspecialchars($orden["estado_general"]) . '</td>'; // Mostramos el estado general
+    echo '<td>' . htmlspecialchars($porcentajeOrden) . '%</td>'; // Mostramos el estado general
     echo '</tr>';
 }
 
