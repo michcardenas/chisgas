@@ -47,7 +47,13 @@ echo '</thead>';
 echo '<tbody>';
 
 foreach ($ordenes_del_dia as $orden) {
+<<<<<<< Updated upstream
     echo '<tr>';
+=======
+    $resultado = obtenerPorcentajeYClase($orden["id_orden"]);
+    $porcentajeOrden = $resultado['porcentajeOrden'];
+    $progressBarClass = $resultado['progressBarClass'];
+>>>>>>> Stashed changes
 
     // Si el nombre del cliente es NULL o vacío, muestra un mensaje predeterminado o lo que quieras mostrar
     $nombre_cliente = $orden["nombre_cliente"] ? $orden["nombre_cliente"] : "Cliente Desconocido";
@@ -56,7 +62,19 @@ foreach ($ordenes_del_dia as $orden) {
     echo '</td>';
 
     echo '<td>' . htmlspecialchars($orden["total_prendas_por_orden"]) . '</td>';
+<<<<<<< Updated upstream
     echo '<td>' . htmlspecialchars($orden["estado_general"]) . '</td>'; // Mostramos el estado general
+=======
+    
+    // Aquí añadimos la barra de progreso con la clase dinámica
+    echo '<td>';
+    echo '<div class="progress-container">';
+    echo '<div class="progress-bar ' . htmlspecialchars($progressBarClass) . '" style="width:' . htmlspecialchars($porcentajeOrden) . '%;"></div>';
+    echo '<span>' . htmlspecialchars($porcentajeOrden) . '%</span>';
+    echo '</div>';
+    echo '</td>';
+    
+>>>>>>> Stashed changes
     echo '</tr>';
 }
 
@@ -65,6 +83,49 @@ echo '</table>';
 echo '</div>';
 echo '</div>';
 ?>
+
+<style>
+.progress-container {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    border-radius: 5px 0 0 5px;
+}
+
+/* Different color classes for the progress bar */
+.progress-bar-red {
+    background-color: #f44336; /* Red */
+}
+
+.progress-bar-orange {
+    background-color: #ff9800; /* Orange */
+}
+
+.progress-bar-green {
+    background-color: #4caf50; /* Green */
+}
+
+.progress-container span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 0;
+    left: 0;
+    line-height: 20px;
+    color: #000;
+}
+</style>
+
 
 <?php
 
