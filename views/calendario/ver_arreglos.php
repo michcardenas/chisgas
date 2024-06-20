@@ -54,14 +54,14 @@ $arreglos_prendas = prendas_por_orden_con_cliente($id_orden);
         $primer_resultado = $arreglos_prendas[0];
     ?>
         <input type="hidden" name="cliente_id" id="cliente_id" value="<?php echo htmlspecialchars($primer_resultado['id']); ?>">
-        <input type="hidden" name="id_orden" id="id_orden" value="<?php echo $id_orden; ?>">
+        <input type="hidden" name="id_orden" id="id_orden" value="<?php echo htmlspecialchars($id_orden); ?>">
 
         <div class="field">
             <label for="nombre_cliente">Nombre</label>
             <input class="input" readonly name="nombre_cliente" type="text" placeholder="nombre" id="nombre_cliente" value="<?php echo htmlspecialchars($primer_resultado['nombre_cliente']); ?>">
         </div>
         <div class="field">
-            <label for="telefono_cliente">Telefono</label>
+            <label for="telefono_cliente">Teléfono</label>
             <input class="input" readonly name="telefono_cliente" type="number" placeholder="telefono" id="telefono_cliente" value="<?php echo htmlspecialchars($primer_resultado['telefono_cliente']); ?>">
         </div>
         
@@ -75,59 +75,77 @@ $arreglos_prendas = prendas_por_orden_con_cliente($id_orden);
     <h1 class="form_heading" id="resultado_editar"></h1>
 </form>
 
+<?php
+
+$totalPrendas = count($arreglos_prendas);
+$totalPorcentaje = 0;
+
+foreach ($arreglos_prendas as $prenda) {
+    $totalPorcentaje += calcularPorcentaje($prenda['estado']);
+}
+
+$porcentajeOrden = 0;
+if ($totalPrendas > 0) {
+    $porcentajeOrden = $totalPorcentaje / $totalPrendas;
+}
+?>
+
 <table>
     <thead>
         <tr>
             <th>Prenda</th>
             <th>Asignado a</th>
             <th>Estado</th>
+            <th>Progreso</th>
         </tr>
     </thead>
     <tbody>
-        <?php 
-        foreach ($arreglos_prendas as $prenda) {
-        
-        ?>
+        <?php foreach ($arreglos_prendas as $prenda) { ?>
         <tr>
             <td>
                 <a href="detalle_arreglo.php?id=<?php echo htmlspecialchars($prenda['id']); ?>">
                     <?php echo htmlspecialchars($prenda['nombre_ropa']); ?>
                 </a>
             </td>
-            <td><?php echo htmlspecialchars($prenda['login']); ?>  </td>
+            <td><?php echo htmlspecialchars($prenda['login']); ?></td>
             <td>
-    <?php 
-    switch ($prenda['estado']) {
-        case 1:
-        case 3:
-            echo 'Ingresado';
-            break;
-        case 4:
-            echo 'En proceso';
-            break;
-        case 5:
-            echo 'Arreglado';
-            break;
-        default:
-            echo 'Estado desconocido'; // O puedes dejarlo vacío si prefieres
-            break;
-    }
-    ?>
-</td>
-
+                <?php 
+                switch ($prenda['estado']) {
+                    case 1:
+                    case 3:
+                        echo 'Ingresado';
+                        break;
+                    case 4:
+                        echo 'En Proceso';
+                        break;
+                    case 5:
+                        echo 'Arreglado';
+                        break;
+                    default:
+                        echo 'Estado desconocido'; // O puedes dejarlo vacío si prefieres
+                        break;
+                }
+                ?>
+            </td>
+            <td>
+                <?php echo calcularPorcentaje($prenda['estado']) . '%'; ?>
+            </td>
         </tr>
-        <?php 
-        } 
-        ?>
+        <?php } ?>
     </tbody>
 </table>
-<div class=" flex">
-<button id="entregar"  class="button">Entregar &#128722;</button>
+
+<div id="porcentajeOrden">
+    <p>Porcentaje de la orden: <?php echo htmlspecialchars($porcentajeOrden); ?>%</p>
 </div>
 
+<div class="flex">
+    <button id="entregar" class="button">Entregar &#128722;</button>
+</div>
 
 </div>
 </div>
+
 
 
 <?php

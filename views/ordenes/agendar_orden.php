@@ -131,69 +131,106 @@ if (isset($_SESSION['cliente_consultar'])) {
         
     }
 }
-?>
-    <h1 class="form_heading">Ahora vamos agendar!</h1>
+?> 
+
+        <h1 class="form_heading">Ahora vamos agendar!</h1>
     <p>Sigue bajando 🢃</p>
 
-        </tbody>
-    </table>
-    <form class=" card">
-  <div class="card_header">
-  </div>
-  
-  <div class="field">
-    <label for="Fecha">Ingresa  Fecha de entrega: </label>
-    <input class="input" name="fecha_entrega" type="date" placeholder="fecha_entrega" id="fecha_entrega">
-  </div>
-
-  <div class="field">
-    <label for="franja_horaria">Franja Horaria</label>
-    <select class="input" name="franja_horaria" id="franja_horaria">
-    <option value="PM">PM</option>
-      <option value="AM">AM</option>
-    </select>
-  </div>
-  <div class="field">
-    <label  for="total_prendas">Total de Prendas</label>
-    <input readonly class="input input_readonly" name="total_prendas" type="text" placeholder="Total de Prendas" id="total_prendas" readonly value="<?php echo $total_prendas; ?>">
-  </div>
-
-  <div class="field">
-    <label for="valor_total">Valor Total</label>
-    <input readonly class="input input_readonly" name="valor_total" type="text" placeholder="Valor Total" id="valor_total" readonly value="$ <?php echo number_format($valor_total); ?>">
-  </div>
- 
-
-    <div class="field">
-      <label for="abono">Abono</label>
-      <input  class="input" name="abono" type="text"  id="abono">
-    </div>
-    <div class="field">
-      <label for="forma_pago">Forma de Pago</label>
-      <select class="input" name="forma_pago" id="forma_pago">
-          <option value="efectivo">Efectivo</option>
-          <option value="nequi">Nequi</option>
-      </select>
-  </div>
-  <div class="field">
-    <label for="saldo">Saldo</label>
-    <input readonly class="input input_readonly" name="saldo" type="text" placeholder="Saldo" id="saldo">
-  </div>
-
-  
-</form>
-<h1 class="form_heading" id="resultado_editar"></h1>
-
-<div class="field_boton_editar">
-  <button value="generar_orden" id="generar_orden" class="button">Generar Orden &#10133;</button>
-  <button  onclick="goBack()"  class="button atras">Atras</button>
+</tbody>
+</table>
+<tr>
+<div class="input-group">
+    <form id="calendario_form" action="../calendario/calendario.php" method="post" style="display: flex; justify-content: space-between;">
+        <button type="button" class="button" onclick="guardarDatosYConsultar()">&#128197; Consultar Calendario</button>
+    </form>
 </div>
+      </tr>
+    <form id="orden_form" class="card">
+        <div class="card_header"></div>
 
+        <div class="field">
+            <label for="fecha_entrega">Ingresa Fecha de entrega: </label>
+            <input class="input" name="fecha_entrega" type="date" id="fecha_entrega">
+        </div>
 
+        <div class="field">
+            <label for="franja_horaria">Franja Horaria</label>
+            <select class="input" name="franja_horaria" id="franja_horaria">
+                <option value="PM">PM</option>
+                <option value="AM">AM</option>
+            </select>
+        </div>
 
-    
-  
+        <div class="field">
+            <label for="total_prendas">Total de Prendas</label>
+            <input readonly class="input input_readonly" name="total_prendas" type="text" id="total_prendas" value="<?php echo $total_prendas; ?>">
+        </div>
 
+        <div class="field">
+            <label for="valor_total">Valor Total</label>
+            <input readonly class="input input_readonly" name="valor_total" type="text" id="valor_total" value="$ <?php echo number_format($valor_total); ?>">
+        </div>
+
+        <div class="field">
+            <label for="abono">Abono</label>
+            <input class="input" name="abono" type="text" id="abono">
+        </div>
+
+        <div class="field">
+            <label for="forma_pago">Forma de Pago</label>
+            <select class="input" name="forma_pago" id="forma_pago">
+                <option value="efectivo">Efectivo</option>
+                <option value="nequi">Nequi</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="saldo">Saldo</label>
+            <input readonly class="input input_readonly" name="saldo" type="text" id="saldo">
+        </div>
+    </form>
+
+    <div class="field_boton_editar">
+        <button value="generar_orden" id="generar_orden" class="button">Generar Orden &#10133;</button>
+        <button onclick="goBack()" class="button atras">Atras</button>
+    </div>
+
+    <script>
+        function guardarDatosYConsultar() {
+            // Obtener el formulario de orden
+            const form = document.getElementById('orden_form');
+            if (form) {
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                // Guardar los datos en localStorage
+                localStorage.setItem('ordenData', JSON.stringify(data));
+
+                // Enviar el formulario para consultar calendario
+                document.getElementById('calendario_form').submit();
+            } else {
+                console.error('Formulario de orden no encontrado.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedData = localStorage.getItem('ordenData');
+            if (storedData) {
+                const data = JSON.parse(storedData);
+                for (const key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const input = document.querySelector(`[name="${key}"]`);
+                        if (input) {
+                            input.value = data[key];
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 
 </div>
 

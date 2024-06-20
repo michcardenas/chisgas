@@ -76,7 +76,9 @@ function convertirMinutosAHoras($minutos) {
 </tbody>
 
 </table>
-
+<form action="../ordenes/agendar_orden.php" method="POST" style="display: inline;">
+        <button type="submit" class="button">Volver</button>
+    </form>
 
 </div>
 </div>

@@ -5,7 +5,7 @@ function ver_calendario() {
     global $conn;  // Asegúrate de que tu conexión se llama $conn
 
     $query = "
-    SELECT 
+SELECT 
     o.fecha_entrega,
     COUNT(DISTINCT p.id_cliente) AS numero_clientes,
     SUM(p.tiempo_estimado) AS tiempo_estimado_total
@@ -13,13 +13,10 @@ FROM
     ordenes o
 JOIN 
     prendas p ON o.id = p.id_orden
-WHERE 
-    o.estado != 6
 GROUP BY 
     o.fecha_entrega
 ORDER BY 
     o.fecha_entrega;
-
     ";
 
     $result = $conn->query($query);

@@ -29,6 +29,10 @@ if (file_exists($ruta)) {
     <input type="submit" id="hiddenSubmit">
 </form>
 
+<form action="agendar_orden.php" method="GET" style="display: inline;">
+        <button type="submit" class="button">Volver</button>
+    </form>
+
 <script>
     const calendarioData = JSON.parse(sessionStorage.getItem('calendarioData'));
     if (calendarioData) {
@@ -39,6 +43,8 @@ if (file_exists($ruta)) {
         document.getElementById('hiddenForm').submit();
     }
 </script>
+
+
 
 <?php 
 $ruta_footer = '../footer.php';
