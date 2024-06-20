@@ -383,3 +383,33 @@ function calcularPorcentaje($estado) {
             return 0; // Estado desconocido se trata como 0%
     }
 }
+
+function obtenerPorcentajeYClase($id_orden) {
+    $arreglos_prendas = prendas_por_orden_con_cliente($id_orden);
+    $totalPrendas = count($arreglos_prendas);
+    $totalPorcentaje = 0;
+
+    foreach ($arreglos_prendas as $prenda) {
+        $totalPorcentaje += calcularPorcentaje($prenda['estado']);
+    }
+
+    $porcentajeOrden = 0;
+    if ($totalPrendas > 0) {
+        $porcentajeOrden = $totalPorcentaje / $totalPrendas;
+    }
+
+    // Determine the class for the progress bar based on the percentage
+    $progressBarClass = '';
+    if ($porcentajeOrden == 100) {
+        $progressBarClass = 'progress-bar-green';
+    } elseif ($porcentajeOrden > 0 && $porcentajeOrden < 100) {
+        $progressBarClass = 'progress-bar-orange';
+    } else {
+        $progressBarClass = 'progress-bar-red';
+    }
+
+    return [
+        'porcentajeOrden' => $porcentajeOrden,
+        'progressBarClass' => $progressBarClass
+    ];
+}
