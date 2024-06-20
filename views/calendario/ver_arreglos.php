@@ -147,7 +147,6 @@ if ($totalPrendas > 0) {
 </div>
 
 
-
 <?php
 
 $ruta_footer = '../footer.php';
