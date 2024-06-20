@@ -33,6 +33,8 @@ if (isset($_GET['fecha_entrega'])) {
     echo "Fecha no proporcionada.";
 }
 $ordenes_del_dia = obtener_ordenes_del_dia($fecha_entrega);
+
+
 echo '
 <div class="p_centrar">
 <div class="centrar">';
@@ -47,13 +49,9 @@ echo '</thead>';
 echo '<tbody>';
 
 foreach ($ordenes_del_dia as $orden) {
-<<<<<<< Updated upstream
-    echo '<tr>';
-=======
     $resultado = obtenerPorcentajeYClase($orden["id_orden"]);
     $porcentajeOrden = $resultado['porcentajeOrden'];
     $progressBarClass = $resultado['progressBarClass'];
->>>>>>> Stashed changes
 
     // Si el nombre del cliente es NULL o vacío, muestra un mensaje predeterminado o lo que quieras mostrar
     $nombre_cliente = $orden["nombre_cliente"] ? $orden["nombre_cliente"] : "Cliente Desconocido";
@@ -62,9 +60,6 @@ foreach ($ordenes_del_dia as $orden) {
     echo '</td>';
 
     echo '<td>' . htmlspecialchars($orden["total_prendas_por_orden"]) . '</td>';
-<<<<<<< Updated upstream
-    echo '<td>' . htmlspecialchars($orden["estado_general"]) . '</td>'; // Mostramos el estado general
-=======
     
     // Aquí añadimos la barra de progreso con la clase dinámica
     echo '<td>';
@@ -74,7 +69,6 @@ foreach ($ordenes_del_dia as $orden) {
     echo '</div>';
     echo '</td>';
     
->>>>>>> Stashed changes
     echo '</tr>';
 }
 
