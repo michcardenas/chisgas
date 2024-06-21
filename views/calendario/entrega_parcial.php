@@ -248,7 +248,7 @@ $("#entrega_parcial_entregar").click(function(e){
         var totalPrendasAEntregar = prendas_datos.reduce((acc, cur) => acc + (cur.prenda_numero_entregar || 0), 0);
 
         if (saldo <= abono_total) {
-            alert(`El valor de los abonos nos pueden superar el valor total de la prenda.`);
+            alert(`El valor de los abonos no pueden superar el valor total de la prenda.`);
             validacionCorrecta = false;
             return false; // Salir del bucle .each
         }

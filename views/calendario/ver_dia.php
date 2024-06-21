@@ -47,7 +47,6 @@ echo '<th>Estado General</th>'; // Agregamos esta columna para mostrar el estado
 echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
-
 foreach ($ordenes_del_dia as $orden) {
     $resultado = obtenerPorcentajeYClase($orden["id_orden"]);
     $porcentajeOrden = $resultado['porcentajeOrden'];
@@ -55,23 +54,33 @@ foreach ($ordenes_del_dia as $orden) {
 
     // Si el nombre del cliente es NULL o vacío, muestra un mensaje predeterminado o lo que quieras mostrar
     $nombre_cliente = $orden["nombre_cliente"] ? $orden["nombre_cliente"] : "Cliente Desconocido";
+    echo '<tr>';
     echo '<td>';
     echo '<a href="ver_arreglos.php?id_orden=' . $orden["id_orden"] . '">' . htmlspecialchars($nombre_cliente) . '</a>';
     echo '</td>';
 
     echo '<td>' . htmlspecialchars($orden["total_prendas_por_orden"]) . '</td>';
     
-    // Aquí añadimos la barra de progreso con la clase dinámica
+    // Mostrar el estado general
     echo '<td>';
-    echo '<div class="progress-container">';
-    echo '<div class="progress-bar ' . htmlspecialchars($progressBarClass) . '" style="width:' . htmlspecialchars($porcentajeOrden) . '%;"></div>';
-    echo '<span>' . htmlspecialchars($porcentajeOrden) . '%</span>';
-    echo '</div>';
+    $estadoGeneral = obtenerEstadoGeneral($orden["estado_orden"]);
+    echo htmlspecialchars($estadoGeneral);
     echo '</td>';
     
     echo '</tr>';
-}
 
+    // Mostrar la barra de progreso solo si no es "Entregado" ni "Entrega parcial"
+    if ($orden["estado_orden"] != 6 && $orden["estado_orden"] != 7) {
+        echo '<tr>';
+        echo '<td colspan="3">'; // Colspan para ocupar toda la fila
+        echo '<div class="progress-container">';
+        echo '<div class="progress-bar ' . htmlspecialchars($progressBarClass) . '" style="width:' . htmlspecialchars($porcentajeOrden) . '%;"></div>';
+        echo '<span>' . htmlspecialchars($porcentajeOrden) . '%</span>';
+        echo '</div>';
+        echo '</td>';
+        echo '</tr>';
+    }
+}
 echo '</tbody>';
 echo '</table>';
 echo '</div>';

@@ -137,8 +137,9 @@ if ($totalPrendas > 0) {
 </table>
 
 <div id="porcentajeOrden">
-    <p>Porcentaje de la orden: <?php echo htmlspecialchars($porcentajeOrden); ?>%</p>
+    <p>Porcentaje de la orden: <?php echo number_format($porcentajeOrden, 0); ?>%</p>
 </div>
+
 
 <div class="flex">
     <button id="entregar" class="button">Entregar &#128722;</button>

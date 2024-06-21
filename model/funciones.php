@@ -6,6 +6,7 @@ function obtener_ordenes_del_dia($fecha_entrega) {
 
     $query = "
         SELECT
+            o.estado AS estado_orden,
             o.id AS id_orden,
             c.nombre AS nombre_cliente,
             o.total_prendas AS total_prendas_por_orden,
@@ -26,7 +27,7 @@ function obtener_ordenes_del_dia($fecha_entrega) {
         WHERE
             o.fecha_entrega = ?
         GROUP BY
-            o.id, c.nombre, o.total_prendas;
+            o.id, c.nombre, o.total_prendas, o.estado;
     ";
 
     // Preparar la consulta y vincular el parámetro
@@ -412,4 +413,15 @@ function obtenerPorcentajeYClase($id_orden) {
         'porcentajeOrden' => $porcentajeOrden,
         'progressBarClass' => $progressBarClass
     ];
+}
+
+function obtenerEstadoGeneral($estadoOrden) {
+    switch ($estadoOrden) {
+        case 6:
+            return 'Entregado ✔';
+        case 7:
+            return 'Entrega parcial 📦';
+        default:
+            return ''; // No agregamos nada si no es 6 ni 7
+    }
 }

@@ -147,7 +147,7 @@ foreach ($entregas_parciales as $entrega) {
           <div class="details">
           <br>
             <span>Subtotal:</span>
-            <label id="valor_total2" class="price"><?php echo "$" . number_format($prenda['valor_total'], 0, ',', '.'); ?></label>     
+            <label id="valor_total2" class="price"><?php echo "$" . number_format($prenda['abono_total'], 0, ',', '.'); ?></label>     
             <?php
             if($prenda['abono'] > 0){
             ?>
