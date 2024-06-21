@@ -173,9 +173,6 @@ foreach ($entregas_parciales as $entrega) {
 </div>
 
 
-
-        
- 
 <div class=" flex">
     <?php if($entregas_total == true) { ?>
         <button id="entrega_total"  class="button">Entrega total &#128722;</button> 
