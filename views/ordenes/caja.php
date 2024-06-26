@@ -1,0 +1,45 @@
+<?php
+// Iniciar la sesión
+session_start();
+
+// Comprobar si el usuario ha iniciado sesión
+if (!isset($_SESSION['username'])) {
+    // Si no ha iniciado sesión, redirigir al login
+    header("Location: login/login.php");
+    exit();
+}
+
+$ruta = '../template.php';
+
+if (file_exists($ruta)) {
+    $ruta_css = '../css/style.css';
+    $ruta_icon = '../img/aguja.png';
+    $ruta_image_menu = "../menu.php";
+    $ruta_image = "../img/chisgas_fondo_blanco.png";
+    include $ruta;
+} else {
+    echo "El archivo $ruta no existe.";
+}
+?>
+
+<div class="centrar_botones_menu">
+    <!-- Botón para abrir caja -->
+    <form method="post">
+        <button type="submit" name="accion" value="abrir" class="button2">Abrir caja &#x1F6E0;</button>
+    </form>
+
+    <!-- Botón para cerrar caja -->
+    <form method="post">
+        <button type="submit" name="accion" value="cerrar" class="button2">Cerrar caja &#x1F6AC;</button>
+    </form>
+</div>
+
+<?php 
+$ruta_footer = '../footer.php';
+if (file_exists($ruta_footer)) {
+    $ruta_js = "../js/main.js";
+    include $ruta_footer;
+} else {
+    echo "El archivo $ruta_footer no existe.";
+}
+?>

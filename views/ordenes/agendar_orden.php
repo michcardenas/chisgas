@@ -133,104 +133,124 @@ if (isset($_SESSION['cliente_consultar'])) {
 }
 ?> 
 
-        <h1 class="form_heading">Ahora vamos agendar!</h1>
-    <p>Sigue bajando 🢃</p>
+<h1 class="form_heading">Ahora vamos agendar!</h1>
+<p>Sigue bajando 🢃</p>
 
 </tbody>
 </table>
 <tr>
-<div class="input-group">
-    <form id="calendario_form" action="../calendario/calendario.php" method="post" style="display: flex; justify-content: space-between;">
-        <button type="button" class="button" onclick="guardarDatosYConsultar()">&#128197; Consultar Calendario</button>
-    </form>
-</div>
-      </tr>
-    <form id="orden_form" class="card">
-        <div class="card_header"></div>
 
-        <div class="field">
-            <label for="fecha_entrega">Ingresa Fecha de entrega: </label>
-            <input class="input" name="fecha_entrega" type="date" id="fecha_entrega">
-        </div>
+<form id="calendario_form" action="../calendario/calendario.php" method="post" style="display: flex; justify-content: space-between;">
+    <button type="button" class="button" onclick="guardarDatosYConsultar()">&#128197; Consultar Calendario</button>
+</form>
 
-        <div class="field">
-            <label for="franja_horaria">Franja Horaria</label>
-            <select class="input" name="franja_horaria" id="franja_horaria">
-                <option value="PM">PM</option>
-                <option value="AM">AM</option>
-            </select>
-        </div>
+<form id="orden_form" class="card">
+    <div class="card_header"></div>
 
-        <div class="field">
-            <label for="total_prendas">Total de Prendas</label>
-            <input readonly class="input input_readonly" name="total_prendas" type="text" id="total_prendas" value="<?php echo $total_prendas; ?>">
-        </div>
-
-        <div class="field">
-            <label for="valor_total">Valor Total</label>
-            <input readonly class="input input_readonly" name="valor_total" type="text" id="valor_total" value="$ <?php echo number_format($valor_total); ?>">
-        </div>
-
-        <div class="field">
-            <label for="abono">Abono</label>
-            <input class="input" name="abono" type="text" id="abono">
-        </div>
-
-        <div class="field">
-            <label for="forma_pago">Forma de Pago</label>
-            <select class="input" name="forma_pago" id="forma_pago">
-                <option value="efectivo">Efectivo</option>
-                <option value="nequi">Nequi</option>
-            </select>
-        </div>
-
-        <div class="field">
-            <label for="saldo">Saldo</label>
-            <input readonly class="input input_readonly" name="saldo" type="text" id="saldo">
-        </div>
-    </form>
-
-    <div class="field_boton_editar">
-        <button value="generar_orden" id="generar_orden" class="button">Generar Orden &#10133;</button>
-        <button onclick="goBack()" class="button atras">Atras</button>
+    <!-- Campos de formulario para la orden -->
+    <div class="field">
+        <label for="fecha_entrega">Ingresa Fecha de entrega: </label>
+        <input class="input" name="fecha_entrega" type="date" id="fecha_entrega">
     </div>
 
-    <script>
-        function guardarDatosYConsultar() {
-            // Obtener el formulario de orden
-            const form = document.getElementById('orden_form');
-            if (form) {
-                const formData = new FormData(form);
-                const data = {};
-                formData.forEach((value, key) => {
-                    data[key] = value;
-                });
+    <div class="field">
+        <label for="franja_horaria">Franja Horaria</label>
+        <select class="input" name="franja_horaria" id="franja_horaria">
+            <option value="PM">PM</option>
+            <option value="AM">AM</option>
+        </select>
+    </div>
 
-                // Guardar los datos en localStorage
-                localStorage.setItem('ordenData', JSON.stringify(data));
+    <div class="field">
+        <label for="total_prendas">Total de Prendas</label>
+        <input class="input" name="total_prendas" type="number" id="total_prendas">
+    </div>
 
-                // Enviar el formulario para consultar calendario
-                document.getElementById('calendario_form').submit();
-            } else {
-                console.error('Formulario de orden no encontrado.');
-            }
+    <div class="field">
+        <label for="valor_total">Valor Total</label>
+        <input readonly class="input input_readonly" name="valor_total" type="text" id="valor_total" value="$ <?php echo number_format($valor_total); ?>">
+    </div>
+
+    <div class="field">
+        <label for="abono">Abono</label>
+        <input class="input" name="abono" type="text" id="abono">
+    </div>
+
+    <div class="field">
+        <label for="forma_pago">Forma de Pago</label>
+        <select class="input" name="forma_pago" id="forma_pago">
+            <option value="efectivo">Efectivo</option>
+            <option value="nequi">Nequi</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="saldo">Saldo</label>
+        <input readonly class="input input_readonly" name="saldo" type="text" id="saldo">
+    </div>
+
+
+<div class="field_boton_editar">
+    <button value="generar_orden" id="generar_orden" class="button">Generar Orden &#10133;</button>
+    <button onclick="goBack()" class="button atras">Atras</button>
+</div>
+
+<script>
+    // Función para guardar los datos y consultar el calendario
+    function guardarDatosYConsultar() {
+        const totalPrendas = document.getElementById('total_prendas').value;
+        const formData = {
+            fecha_entrega: document.getElementById('fecha_entrega').value,
+            franja_horaria: document.getElementById('franja_horaria').value,
+            total_prendas: totalPrendas,
+            abono: document.getElementById('abono').value,
+            forma_pago: document.getElementById('forma_pago').value
+            // Agrega más campos según sea necesario
+        };
+
+        localStorage.setItem(`ordenData_${totalPrendas}`, JSON.stringify(formData)); // Almacena los datos usando el número de prendas como clave
+        document.getElementById('calendario_form').submit();
+    }
+
+    // Cargar datos almacenados al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+        const totalPrendas = document.getElementById('total_prendas').value;
+        const storedData = localStorage.getItem(`ordenData_${totalPrendas}`);
+        if (storedData) {
+            const data = JSON.parse(storedData);
+            document.getElementById('fecha_entrega').value = data.fecha_entrega;
+            document.getElementById('franja_horaria').value = data.franja_horaria;
+            document.getElementById('abono').value = data.abono;
+            document.getElementById('forma_pago').value = data.forma_pago;
+            // Carga más campos según sea necesario
         }
+    });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const storedData = localStorage.getItem('ordenData');
-            if (storedData) {
-                const data = JSON.parse(storedData);
-                for (const key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        const input = document.querySelector(`[name="${key}"]`);
-                        if (input) {
-                            input.value = data[key];
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+    // Función para limpiar datos de la orden actual del localStorage si es necesario
+    function limpiarDatos() {
+        const totalPrendas = document.getElementById('total_prendas').value;
+        localStorage.removeItem(`ordenData_${totalPrendas}`);
+    }
+
+    // Función para actualizar el saldo (ejemplo)
+    function actualizarSaldo() {
+        const valorTotal = parseFloat(document.getElementById('valor_total').value.replace('$', '').replace(',', ''));
+        const abono = parseFloat(document.getElementById('abono').value);
+        if (!isNaN(valorTotal) && !isNaN(abono)) {
+            const saldo = valorTotal - abono;
+            document.getElementById('saldo').value = `$ ${saldo.toLocaleString()}`;
+        }
+    }
+
+    // Evento cuando se carga la página para escuchar cambios en el abono y actualizar el saldo
+    document.addEventListener('DOMContentLoaded', () => {
+        const abonoInput = document.getElementById('abono');
+        if (abonoInput) {
+            abonoInput.addEventListener('input', actualizarSaldo);
+        }
+    });
+</script>
+</form>
 
 </div>
 
