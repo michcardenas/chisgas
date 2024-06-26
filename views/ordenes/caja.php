@@ -24,14 +24,14 @@ if (file_exists($ruta)) {
 
 <div class="centrar_botones_menu">
     <!-- Botón para abrir caja -->
-    <form method="post">
+        <a href="../ordenes/abrir_caja.php">
         <button type="submit" name="accion" value="abrir" class="button2">Abrir caja &#x1F6E0;</button>
-    </form>
+        </a>
 
     <!-- Botón para cerrar caja -->
-    <form method="post">
+    <a href="../ordenes/cerrar_caja.php">
         <button type="submit" name="accion" value="cerrar" class="button2">Cerrar caja &#x1F6AC;</button>
-    </form>
+    </a>
 </div>
 
 <?php 
