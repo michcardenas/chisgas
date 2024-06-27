@@ -27,30 +27,48 @@ include '../../conexion/db_connection.php';
 include '../../model/funciones.php';
 
 $mensaje = ''; // Variable para almacenar el mensaje de éxito o error
+$base = ''; // Variable para almacenar el valor de la base de caja predeterminada
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['base'])) {
-    // Obtener la base de caja sin formato
-    $base = $_POST['base'];
-    // Remover cualquier formato de miles para obtener el valor sin formato
-    $base = preg_replace('/[^\d.]/', '', $base); // Esto elimina todo excepto dígitos y el punto decimal si lo hubiera
+// Verificar si ya se abrió una caja hoy
+$fecha_hoy = date('Y-m-d');
+$sql_check = "SELECT * FROM caja WHERE DATE(fecha) = '$fecha_hoy'";
+$result_check = mysqli_query($conn, $sql_check);
 
-    $fecha = date('Y-m-d H:i:s');
+if (mysqli_num_rows($result_check) > 0) {
+    $mensaje = "Ya se ha abierto una caja hoy.";
+} else {
+    // Obtener el valor del dinero final del día anterior
+    $sql_select = "SELECT dinero_final FROM caja WHERE DATE(fecha) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)";
+    $result_select = mysqli_query($conn, $sql_select);
+    $row_select = mysqli_fetch_assoc($result_select);
 
-    // Insertar los datos en la tabla caja
-    $sql = "INSERT INTO caja (fecha, base) VALUES ('$fecha', '$base')";
-    if (mysqli_query($conn, $sql)) {
-        $mensaje = "Caja iniciada con éxito con una base de $base el $fecha";
-        // Redirigir a caja.php después de la inserción exitosa
-        header("Location: caja.php");
-        exit();
-    } else {
-        $mensaje = "Error: " . mysqli_error($conn);
+    if ($row_select) {
+        $base = number_format($row_select['dinero_final'], 0, ',', '.');
     }
 
-    // Cerrar la conexión a la base de datos
-    mysqli_close($conn);
-}
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['base'])) {
+        // Obtener la base de caja sin formato
+        $base = $_POST['base'];
+        // Remover cualquier formato de miles para obtener el valor sin formato
+        $base = preg_replace('/[^\d.]/', '', $base); // Esto elimina todo excepto dígitos y el punto decimal si lo hubiera
 
+        $fecha = date('Y-m-d H:i:s');
+
+        // Insertar los datos en la tabla caja
+        $sql = "INSERT INTO caja (fecha, base) VALUES ('$fecha', '$base')";
+        if (mysqli_query($conn, $sql)) {
+            $mensaje = "Caja iniciada con éxito con una base de $base el $fecha";
+            // Redirigir a caja.php después de la inserción exitosa
+            header("Location: caja.php");
+            exit();
+        } else {
+            $mensaje = "Error: " . mysqli_error($conn);
+        }
+
+        // Cerrar la conexión a la base de datos
+        mysqli_close($conn);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -69,19 +87,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['base'])) {
                 <p><?php echo $mensaje; ?></p>
             <?php endif; ?>
 
-            <form id="caja_form" class="card" method="post">
-                <div class="card_header"></div>
+            <?php if (empty($mensaje)) : ?>
+                <form id="caja_form" class="card" method="post">
+                    <div class="card_header"></div>
 
-                <div class="field">
-                    <label for="base">Base de Caja:</label>
-                    <input class="input" type="text" id="base" name="base" placeholder="$" value="<?php echo isset($_POST['base']) ? number_format($_POST['base'], 0, ',') : ''; ?>" required>
-                </div>
+                    <div class="field">
+                        <label for="base">Base de Caja:</label>
+                        <input class="input" type="text" id="base" name="base" placeholder="$" value="<?php echo isset($_POST['base']) ? number_format($_POST['base'], 0, ',') : $base; ?>" required>
+                    </div>
 
-                <div class="field_boton_editar">
-                    <button type="submit" class="button">Iniciar</button>
-                    <button type="button" class="button atras" onclick="goBack()">Volver</button>
-                </div>
-            </form>
+                    <div class="field_boton_editar">
+                        <button type="submit" class="button">Iniciar</button>
+                        <button type="button" class="button atras" onclick="goBack()">Volver</button>
+                    </div>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -96,14 +116,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['base'])) {
     document.addEventListener('DOMContentLoaded', function() {
         const baseInput = document.getElementById('base');
 
+        if (dineroFinalInput) { // Verificar si el elemento existe antes de añadir el event listener
         function formatNumber(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
+
 
         baseInput.addEventListener('input', function(e) {
             let val = this.value.replace(/[^\d]/g, '');
             this.value = formatNumber(val);
         });
+    }
     });
 </script>
 
