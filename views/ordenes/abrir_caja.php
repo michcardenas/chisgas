@@ -93,7 +93,7 @@ if (mysqli_num_rows($result_check) > 0) {
 
                     <div class="field">
                         <label for="base">Base de Caja:</label>
-                        <input class="input" type="text" id="base" name="base" placeholder="$" value="<?php echo isset($_POST['base']) ? number_format($_POST['base'], 0, ',') : $base; ?>" required>
+                        <input class="input" type="text" id="base" name="base" placeholder="$" value="<?php echo isset($_POST['base']) ? number_format(preg_replace('/[^\d]/', '', $_POST['base']), 0, ',', '.') : $base; ?>" required>
                     </div>
 
                     <div class="field_boton_editar">
@@ -116,17 +116,18 @@ if (mysqli_num_rows($result_check) > 0) {
     document.addEventListener('DOMContentLoaded', function() {
         const baseInput = document.getElementById('base');
 
-        if (dineroFinalInput) { // Verificar si el elemento existe antes de añadir el event listener
         function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
-
 
         baseInput.addEventListener('input', function(e) {
             let val = this.value.replace(/[^\d]/g, '');
             this.value = formatNumber(val);
         });
-    }
+
+        if (baseInput) {
+            baseInput.value = formatNumber(baseInput.value.replace(/[^\d]/g, ''));
+        }
     });
 </script>
 

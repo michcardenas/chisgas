@@ -140,9 +140,14 @@ if (isset($_SESSION['cliente_consultar'])) {
 </table>
 <tr>
 
-<form id="calendario_form" action="../calendario/calendario.php" method="post" style="display: flex; justify-content: space-between;">
-    <button type="button" class="button" onclick="guardarDatosYConsultar()">&#128197; Consultar Calendario</button>
+<form id="calendario_form" style="display: flex; justify-content: space-between;">
+    <a href="../calendario/calendario.php" class="button" onclick="guardarDatosYConsultar()" style="display: flex; align-items: center;">
+        <span style="margin-right: 5px;">&#128197;</span>
+        <span>Consultar Calendario</span>
+    </a>
 </form>
+
+
 
 <form id="orden_form" class="card">
     <div class="card_header"></div>
@@ -208,7 +213,10 @@ if (isset($_SESSION['cliente_consultar'])) {
             // Agrega más campos según sea necesario
         };
 
-        localStorage.setItem(`ordenData_${totalPrendas}`, JSON.stringify(formData)); // Almacena los datos usando el número de prendas como clave
+        // Almacena los datos en localStorage usando el número de prendas como clave
+        localStorage.setItem(`ordenData_${totalPrendas}`, JSON.stringify(formData));
+        
+        // Enviar el formulario de forma segura y redirigir al calendario
         document.getElementById('calendario_form').submit();
     }
 
@@ -232,7 +240,7 @@ if (isset($_SESSION['cliente_consultar'])) {
         localStorage.removeItem(`ordenData_${totalPrendas}`);
     }
 
-    // Función para actualizar el saldo (ejemplo)
+    // Función para actualizar el saldo
     function actualizarSaldo() {
         const valorTotal = parseFloat(document.getElementById('valor_total').value.replace('$', '').replace(',', ''));
         const abono = parseFloat(document.getElementById('abono').value);
@@ -250,6 +258,7 @@ if (isset($_SESSION['cliente_consultar'])) {
         }
     });
 </script>
+
 </form>
 
 </div>

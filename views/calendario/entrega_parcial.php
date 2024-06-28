@@ -142,14 +142,14 @@ foreach ($entregas_parciales as $entrega) {
             <span>Subtotal:</span>
             <label id="valor_total2" class="price"><?php echo "$" . number_format($prenda['valor_total'], 0, ',', '.'); ?></label>     
             <?php
-            if($prenda['abono'] > 0){
+            if ($prenda['abono'] > 0) {
             ?>
-            <span>Abonos anteriores:</span>
-            <input  class="input"  value="<?php echo "$" . number_format($prenda['abono']+$total_abonos, 0, ',', '.'); ?>" type="text" readsonly  >
-
+             <span>Abonos anteriores:</span>
+            <input class="input" value="<?php echo "$" . number_format($prenda['abono'] + $total_abonos, 0, ',', '.'); ?>" type="text" readonly>
             <?php
             }
             ?>
+
 
             <span>Abono:</span>
             <input  class="input"  placeholder="<?php echo "Ingrese si aplica" ; ?>" name="abono" type="text"  id="abono2">
@@ -162,7 +162,7 @@ foreach ($entregas_parciales as $entrega) {
 
   <div class="card checkout">
    
-    <label for="total">Total</label>  <h1 class="price" id="saldo2"><?php echo "$" . number_format($prenda['valor_total']-$total_abonos-$prenda['abono'], 0, ',', '.'); ?></h1>
+    <label for="total">Saldo</label>  <h1 class="price" id="saldo2"><?php echo "$" . number_format($prenda['valor_total']-$total_abonos-$prenda['abono'], 0, ',', '.'); ?></h1>
     <button id="entrega_parcial_entregar"  class="button">Entregar  &#9203;</button>
 
   </div>
@@ -190,140 +190,141 @@ if (file_exists($ruta)) {
 }
 
 ?>
-<script  >
-    $(document).ready(function(){
+<script>
+   $(document).ready(function(){
+    let changingValue = false;
 
-        let changingValue = false; // Asegúrate de que esta variable esté definida fuera de tu función para controlar el estado
+    $('#abono2').on('change', function() {
+        if (changingValue) return;
 
-$('#abono2').on('change', function() {
-    if (changingValue) return;
+        changingValue = true;
 
-    changingValue = true;
+        let value = $(this).val().replace(/[^0-9]/g, '');
+        let numericValue = parseInt(value, 10);
 
-    let value = $(this).val().replace(/[^0-9]/g, '');
-    let numericValue = parseInt(value, 10); // Convertimos a entero para trabajar sin decimales
+        let valorTotalValue = $('#valor_total22').val().replace(/[^0-9]/g, '');
+        let valorTotal = parseInt(valorTotalValue, 10);
 
-    // Obtener el valor de valor_total desde el input oculto y limpiarlo para cálculo
-    let valorTotalValue = $('#valor_total22').val().replace(/[^0-9]/g, '');
-    let valorTotal = parseInt(valorTotalValue, 10);
+        let saldo = valorTotal - numericValue;
 
-    let saldo = valorTotal - numericValue; // Cálculo del saldo
-
-    // Actualizar el saldo en el formato deseado, incluyendo el signo de dólar
-    $('#saldo2').text("$" + saldo.toLocaleString('es-CO'));
-
-    // Volver a formatear el valor introducido al formato de moneda, incluyendo el signo de dólar
-    $(this).val("$" + numericValue.toLocaleString('es-CO'));
-
-    changingValue = false;
-});
-
-
-$("#entrega_parcial_entregar").click(function(e){
-    e.preventDefault();
-
-    var id_orden = $("#id_orden").val();
-    var id_usuario = $("#id_usuario").val();
-    var telefono_cliente = $("#telefono_cliente").val();
-    var abono = $("#abono2").val().replace(/[^0-9]/g, ''); // Limpiar el valor para enviar solo números
-    var saldo = $("#saldo2").text().replace(/[^0-9]/g, '');
-    var total = $("#valor_total22").val().replace(/[^0-9]/g, '');
-    var total_completo = $("#valor_total2").val().replace(/[^0-9]/g, '');
-
-    var abonos_totales = $("#abonos_totales").val().replace(/[^0-9]/g, ''); // Usar .val() en lugar de .text()
-    var forma_pago = $("#forma_pago").val();
-    var abono_total = abono + abonos_totales;
-    var prendas_datos = [];
-    var validacionCorrecta = true; // Asunción inicial de que todas las validaciones son correctas
-
-    $(".input_file").each(function() {
-        var prenda_id = $(this).attr('name').match(/\[(\d+)\]/)[1];
-        var prenda_numero_entregar_input = $(this).val().trim();
-        var prenda_numero_entregar = prenda_numero_entregar_input ? parseInt(prenda_numero_entregar_input, 10) : NaN;
-        var prenda_numero_real = parseInt($(this).attr('placeholder').trim(), 10);
-        var nombre_prenda = $(this).closest('tr').find('td:first').text().trim(); // Asumiendo que el nombre de la prenda está en el primer <td>
-
-    
-       // Sumar las prendas a entregar
-        var totalPrendasAEntregar = prendas_datos.reduce((acc, cur) => acc + (cur.prenda_numero_entregar || 0), 0);
-
-        if (saldo <= abono_total) {
-            alert(`El valor de los abonos no pueden superar el valor total de la prenda.`);
-            validacionCorrecta = false;
-            return false; // Salir del bucle .each
+        if (numericValue > valorTotal) {
+            alert('El valor del abono no puede ser mayor al saldo total de la prenda.');
+            $(this).val("$" + valorTotal.toLocaleString('es-CO'));
+            $('#saldo2').text("$" + saldo.toLocaleString('es-CO'));
+            changingValue = false;
+            return;
         }
 
-        if (prenda_numero_entregar > prenda_numero_real) {
-            alert(`En la prenda ${nombre_prenda}, estás intentando entregar un número mayor de prendas al recibido. Puede ser menor o igual.`);
-            validacionCorrecta = false;
-            return false; // Salir del bucle .each
-        }
-        if (abonos_totales > total) {
-            alert(`En la prenda ${nombre_prenda}, el número de prendas a entregar debe ser mayor a 0.`);
-            validacionCorrecta = false;
-            return false; // Salir del bucle .each
+        if (numericValue < 1000) {
+            alert('El valor del abono no puede ser inferior a $1.000.');
+            $(this).val("$1.000");
+            numericValue = 1000;
+            saldo = valorTotal - numericValue;
         }
 
-     // Convertir a números enteros para la comparación
-            var abonoNumerico = parseInt(abono, 10) || 0; // Usa 0 como valor predeterminado si el parseo falla
-            var abonosTotalesNumerico = parseInt(abonos_totales, 10) || 0;
-            var totalNumerico = parseInt(total_completo, 10) || 0;
+        $('#saldo2').text("$" + saldo.toLocaleString('es-CO'));
+        $(this).val("$" + numericValue.toLocaleString('es-CO'));
 
-           
-
-
-        prendas_datos.push({
-            prenda_id: prenda_id,
-            prenda_numero_entregar: prenda_numero_entregar,
-            prenda_numero_real: prenda_numero_real
-        });
+        changingValue = false;
     });
 
-    if (!validacionCorrecta) {
-        return; // Detener la ejecución si la validación falló
-    }
+    $("#entrega_parcial_entregar").click(function(e){
+        e.preventDefault();
 
-    console.log(id_orden, id_usuario, telefono_cliente, abono, saldo, forma_pago, prendas_datos); 
-    var numero_prendas_entregar = prendas_datos.reduce(function(acumulador, prenda) {
-        return acumulador + (isNaN(prenda.prenda_numero_entregar) ? 0 : prenda.prenda_numero_entregar);
-    }, 0);
-    var mensajeConfirmacion = "¿Estás seguro de que deseas entregar " + numero_prendas_entregar + " prenda(s) y abonar $" + abono + "?";
+        var id_orden = $("#id_orden").val();
+        var id_usuario = $("#id_usuario").val();
+        var telefono_cliente = $("#telefono_cliente").val();
+        var abono = parseInt($("#abono2").val().replace(/[^0-9]/g, ''), 10);
+        var saldo = parseInt($("#saldo2").text().replace(/[^0-9]/g, ''), 10);
+        var total = parseInt($("#valor_total22").val().replace(/[^0-9]/g, ''), 10);
+        var total_completo = parseInt($("#valor_total1").val().replace(/[^0-9]/g, ''), 10); // Utiliza valor_total1 para comparar con el abono
+        var abonos_totales = parseInt($("#abonos_totales").val().replace(/[^0-9]/g, ''), 10);
+        var forma_pago = $("#forma_pago").val();
+        var prendas_datos = [];
+        var validacionCorrecta = true;
 
-    var confirmar = confirm(mensajeConfirmacion);
-
-    if (confirmar) {
-    $.ajax({
-        type: "POST",
-        url: '../../controllers/calendarioController.php',
-        data: JSON.stringify({
-            action: "entrega_parcial_en",
-            id_orden: id_orden,
-            id_usuario: id_usuario,
-            telefono_cliente: telefono_cliente,
-            abono: abono,
-            saldo: saldo,
-            forma_pago: forma_pago,
-            prendas_datos: prendas_datos
-        }),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function(response) {
-            alert("Se ha realizado de manera correcta la entrega parcialo abono.");
-
-        },
-        error: function(xhr, status, error) {
-            // Si hay un error en la solicitud AJAX
-            console.error("Error en AJAX:", status, error);
-            alert("Error al actualizar la prenda.");
+        // Validación del abono
+        if (abono > total_completo) {
+            alert('El valor del abono no puede superar el saldo total de la prenda.');
+            validacionCorrecta = false;
         }
-    });
-    } else {
-                // El usuario hizo clic en "Cancelar", no hacer nada
-                console.log("Acción cancelada por el usuario.");
+
+        if (abono < 1000) {
+            alert('El valor del abono no puede ser inferior a $1.000.');
+            validacionCorrecta = false;
+        }
+
+        if (!validacionCorrecta) {
+            return;
+        }
+
+        $(".input_file").each(function() {
+            var prenda_id = $(this).attr('name').match(/\[(\d+)\]/)[1];
+            var prenda_numero_entregar_input = $(this).val().trim();
+            var prenda_numero_entregar = prenda_numero_entregar_input ? parseInt(prenda_numero_entregar_input, 10) : 0;
+            var prenda_numero_real = parseInt($(this).attr('placeholder').trim(), 10);
+            var nombre_prenda = $(this).closest('tr').find('td:first').text().trim();
+
+            if ((abono + abonos_totales) > total_completo) {
+                alert(`El valor del abono no puede superar el saldo total de la prenda.`);
+                validacionCorrecta = false;
+                return false; // Salir del bucle .each
             }
+
+            if (prenda_numero_entregar > prenda_numero_real) {
+                alert(`En la prenda ${nombre_prenda}, estás intentando entregar un número mayor de prendas al recibido. Puede ser menor o igual.`);
+                validacionCorrecta = false;
+                return false; // Salir del bucle .each
+            }
+
+            prendas_datos.push({
+                prenda_id: prenda_id,
+                prenda_numero_entregar: prenda_numero_entregar,
+                prenda_numero_real: prenda_numero_real
+            });
+        });
+
+        if (!validacionCorrecta) {
+            return;
+        }
+
+        var numero_prendas_entregar = prendas_datos.reduce(function(acumulador, prenda) {
+            return acumulador + (isNaN(prenda.prenda_numero_entregar) ? 0 : prenda.prenda_numero_entregar);
+        }, 0);
+
+        var mensajeConfirmacion = "¿Estás seguro de que deseas entregar " + numero_prendas_entregar + " prenda(s) y abonar $" + abono + "?";
+
+        var confirmar = confirm(mensajeConfirmacion);
+
+        if (confirmar) {
+            $.ajax({
+                type: "POST",
+                url: '../../controllers/calendarioController.php',
+                data: JSON.stringify({
+                    action: "entrega_parcial_en",
+                    id_orden: id_orden,
+                    id_usuario: id_usuario,
+                    telefono_cliente: telefono_cliente,
+                    abono: abono,
+                    saldo: saldo,
+                    forma_pago: forma_pago,
+                    prendas_datos: prendas_datos
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    alert("Se ha realizado de manera correcta la entrega parcial o abono.");
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en AJAX:", status, error);
+                    alert("Error al actualizar la prenda.");
+                }
+            });
+        } else {
+            console.log("Acción cancelada por el usuario.");
+        }
+    });
 });
 
 
-
-});
 </script>
