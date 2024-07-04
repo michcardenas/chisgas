@@ -27,7 +27,7 @@ include '../../conexion/db_connection.php';
 include '../../model/funciones.php';
 
 $mensaje = ''; // Variable para almacenar el mensaje de éxito o error
-$base = ''; // Variable para almacenar el valor de la caja cuando se abrió
+$base = 0; // Variable para almacenar el valor de la caja cuando se abrió
 $encargado = $_SESSION['username']; // Nombre del encargado
 
 // Obtener los datos de la caja abierta hoy
@@ -37,7 +37,7 @@ $result_select = mysqli_query($conn, $sql_select);
 $row_select = mysqli_fetch_assoc($result_select);
 
 if ($row_select) {
-    $base = number_format($row_select['base'], 0, ',', '.');
+    $base = $row_select['base'];
     if (!is_null($row_select['gastos']) && !is_null($row_select['dinero_final'])) {
         $mensaje = "La caja ya ha sido cerrada hoy.";
     }
@@ -48,10 +48,17 @@ if ($row_select) {
 // Calcular el total de órdenes del día que están arregladas o en entrega parcial
 $total_recogido = 0;
 
-$sql_ordenes_dia = "SELECT SUM(valor_total) AS total 
-                    FROM ordenes 
-                    WHERE DATE(fecha_entrega) = '$fecha_hoy' 
-                    AND (estado = '6' OR estado = '7')";
+$sql_ordenes_dia = "SELECT SUM(valor_total) AS total_recogido 
+                    FROM (
+                        SELECT SUM(valor_total) AS valor_total 
+                        FROM ordenes 
+                        WHERE DATE(fecha_entrega) = '$fecha_hoy' 
+                        AND (estado = '6' OR estado = '7')
+                        UNION ALL
+                        SELECT SUM(abono) AS valor_total 
+                        FROM entregas_parciales 
+                        WHERE DATE(fecha_hora) = '$fecha_hoy'
+                    ) AS totales";
 
 $result_ordenes_dia = mysqli_query($conn, $sql_ordenes_dia);
 
@@ -60,10 +67,12 @@ if (!$result_ordenes_dia) {
     $mensaje .= " Error: " . mysqli_error($conn);
 } else {
     $row_ordenes_dia = mysqli_fetch_assoc($result_ordenes_dia);
-    if ($row_ordenes_dia['total']) {
-        $total_recogido = $row_ordenes_dia['total'];
+    if ($row_ordenes_dia['total_recogido']) {
+        $total_recogido = $row_ordenes_dia['total_recogido'];
     }
 }
+
+$dinero_final_calculado = $base + $total_recogido; // Calculo inicial del dinero final sin los gastos
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_POST['dinero_final']) && empty($mensaje)) {
     // Verificar que la hora actual sea después de las 12:00 PM
@@ -72,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_P
         $mensaje = "La caja solo se puede cerrar después de las 12:00 PM.";
     } else {
         $gastos = $_POST['gastos'];
-        $dinero_final = preg_replace('/[^\d.]/', '', $_POST['dinero_final']); // Remover formato de miles
         $total_gastos = 0;
 
         // Calcular la suma total de los gastos
@@ -81,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_P
             $total_gastos += preg_replace('/[^\d.]/', '', $gasto);
         }
 
-        $dinero_final_calculado = $dinero_final - $total_gastos;
+        $dinero_final_calculado -= $total_gastos; // Actualizar el dinero final restando los gastos
 
         $fecha = date('Y-m-d H:i:s');
 
@@ -135,41 +143,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_P
                     </tr>
                     <tr>
                         <th>Base de Caja:</th>
-                        <td>$<?php echo $base; ?></td>
+                        <td>$<?php echo number_format($base, 0, ',', '.'); ?></td>
                     </tr>
                 </table>
             <?php endif; ?>
 
             <?php if (empty($mensaje) || $mensaje == "La caja solo se puede cerrar después de las 12:00 PM.") : ?>
-            <form id="cerrar_caja_form" class="card" method="post">
-                <div class="card_header"></div>
+                <form id="cerrar_caja_form" class="card" method="post">
+                    <div class="card_header"></div>
 
-                <div class="field">
-                    <label for="gasto">Agregar Gasto:</label>
-                    <input class="input" type="text" id="gasto" name="gasto" placeholder="Descripción del gasto">
-                    <button type="button" id="add_gasto_button" class="button">Agregar Gasto</button>
-                </div>
+                    <div class="field">
+                        <label for="gasto">Agregar Gasto:</label>
+                        <input class="input" type="text" id="gasto" name="gasto" placeholder="Descripción del gasto">
+                        <button type="button" id="add_gasto_button" class="button">Agregar Gasto</button>
+                    </div>
 
-                <div class="field">
-                    <label for="gastos">Gastos:</label>
-                    <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
-                </div>
+                    <div class="field">
+                        <label for="gastos">Gastos:</label>
+                        <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
+                    </div>
 
-                <div class="field">
-                    <label for="suma_gastos">Suma Total de Gastos:</label>
-                    <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
-                </div>
+                    <div class="field">
+                        <label for="suma_gastos">Suma Total de Gastos:</label>
+                        <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
+                    </div>
 
-                <div class="field">
-                    <label for="dinero_final">Dinero Final en Caja:</label>
-                    <input class="input" type="text" id="dinero_final" name="dinero_final" placeholder="$" required>
-                </div>
+                    <div class="field">
+                        <label for="dinero_final">Dinero Final en Caja</label>
+                        <input class="input" type="text" id="dinero_final" name="dinero_final" value="<?php echo number_format($dinero_final_calculado, 0, ',', '.'); ?>" required readonly>
+                    </div>
 
-                <div class="field_boton_editar">
-                    <button type="submit" class="button">Cerrar Caja</button>
-                    <button type="button" class="button atras" onclick="goBack()">Volver</button>
-                </div>
-            </form>
+                    <div class="field_boton_editar">
+                        <button type="submit" class="button">Cerrar Caja</button>
+                        <button type="button" class="button atras" onclick="goBack()">Volver</button>
+                    </div>
+                </form>
             <?php endif; ?>
         </div>
     </div>
@@ -208,6 +216,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_P
                 totalGastos += parseFloat(gasto.replace(/[^\d.]/g, '')) || 0;
             });
             sumaGastosInput.value = formatNumber(totalGastos);
+
+            // Actualizar el dinero final en caja
+            const base = <?php echo $base; ?>;
+            const totalRecogido = <?php echo $total_recogido; ?>;
+            const dineroFinalCalculado = base + totalRecogido - totalGastos;
+            dineroFinalInput.value = formatNumber(dineroFinalCalculado);
         }
 
         // Función para agregar un gasto a la lista de gastos

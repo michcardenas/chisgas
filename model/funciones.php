@@ -110,14 +110,11 @@ function prendas_por_entregar($id_orden) {
                 p.estado,
                 p.id,
                 p.prendas_numero,
-                SUM(ep.cantidad_entregada) AS cantidad_entregada_total, -- Suma de cantidad entregada
                 c.nombre AS nombre_cliente,
                 c.telefono AS telefono_cliente,
                 u.login,
                 p.valor,
                 o.valor_total,
-                (o.saldo + SUM(ep.abono)) AS saldo_actualizado, -- Actualización de saldo con suma de abonos
-                (o.abono + SUM(ep.abono)) AS abono_total, -- Suma de abonos
                 o.abono
             FROM 
                 prendas p
@@ -425,3 +422,6 @@ function obtenerEstadoGeneral($estadoOrden) {
             return ''; // No agregamos nada si no es 6 ni 7
     }
 }
+
+?>
+

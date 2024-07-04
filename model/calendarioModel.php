@@ -480,7 +480,6 @@ function entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abon
         $stmtOrden->execute();
         $stmtOrden->close();
 
-
         // Asegurarse de que $prendas_datos sea un array ya está garantizado por cómo se maneja la función
         // Recorrer $prendas_datos para manejar cada prenda
         foreach ($prendas_datos as $prenda) {
@@ -517,11 +516,5 @@ function entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abon
         return false;
     }
 }
-
-
-
-
-
-
 
 ?>

@@ -27,33 +27,26 @@ $id_orden = isset($_GET['idOrden']) ? htmlspecialchars($_GET['idOrden']) : '';
 // Este es tu código para obtener los datos
 $arreglos_prendas = prendas_por_entregar($id_orden);
 
-$entregas_parciales=entregas_parciales_datos($id_orden);
+$entregas_parciales= entregas_parciales_datos($id_orden);
+
 // Asegúrate de que $entregas_parciales sea un array
 if (is_array($entregas_parciales)) {
     $total_abonos = array_sum(array_column($entregas_parciales, 'abono'));
 
-
-
-
-
-
-$cantidades_por_prenda = [];
-foreach ($entregas_parciales as $entrega) {
-    $id_prenda = $entrega['id_prenda'];
-    if (!isset($cantidades_por_prenda[$id_prenda])) {
-        $cantidades_por_prenda[$id_prenda] = 0;
+    $cantidades_por_prenda = [];
+    foreach ($entregas_parciales as $entrega) {
+        $id_prenda = $entrega['id_prenda'];
+        if (!isset($cantidades_por_prenda[$id_prenda])) {
+            $cantidades_por_prenda[$id_prenda] = 0;
+        }
+        $cantidades_por_prenda[$id_prenda] += $entrega['cantidad_entregada'];
     }
-    $cantidades_por_prenda[$id_prenda] += $entrega['cantidad_entregada'];
-}
-}else{
+} else {
     $total_abonos = 0;
-}   
+}
 ?>
 <div class="p_centrar">
 <div class="centrar">
-
-
-    
     <?php
     // Asumimos que $arreglos_prendas tiene al menos un resultado
     if (isset($arreglos_prendas[0])) {
@@ -61,7 +54,7 @@ foreach ($entregas_parciales as $entrega) {
     }
     ?>
        
-       <table>
+<table>
     <thead>
         <tr>
             <th>Prenda</th>
@@ -81,19 +74,19 @@ foreach ($entregas_parciales as $entrega) {
             <?php
             // Calcular la cantidad ajustada de prendas
             $cantidad_original = $prenda['prendas_numero'];
-
             $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
             $cantidad_ajustada = max(0, $cantidad_original - $cantidad_entregada);
+            var_dump($cantidad_original);
             ?>
             <input class="input_file" type="number" name="prendas_numero[<?php echo $prenda['id']; ?>]" placeholder="<?php echo $cantidad_ajustada; ?>" min="1" />
         </td>
+        
         
         <td><?php echo "$" . number_format($prenda['valor'], 0, ',', '.'); ?></td>
         
         <input type="hidden" name="id_usuario" id="prendas_numero_real" value="<?php echo $prenda['prendas_numero']; ?>">
     </tr>
-<?php endforeach;  ?>
-
+    <?php endforeach;  ?>
     </tbody>
 </table>
 
@@ -106,54 +99,42 @@ foreach ($entregas_parciales as $entrega) {
           <div class="field">
             <label for="nombre_cliente">Nombre</label>
             <p><?php echo htmlspecialchars($primer_resultado['nombre_cliente']); ?> </p>
-        </div>
-        <div class="field">
+          </div>
+          <div class="field">
             <label for="nombre_cliente">Numero:</label>
             <p><?php echo htmlspecialchars($primer_resultado['telefono_cliente']); ?> </p>
-        </div>
+          </div>
         </div>
         <hr>
         <div>
           <span>Metodo de pago: </span>
           <div class="field">
-
-      <select class="input" name="forma_pago" id="forma_pago">
-          <option value="efectivo">Efectivo</option>
-          <option value="nequi">Nequi</option>
-      </select>
-  </div>
+            <select class="input" name="forma_pago" id="forma_pago">
+                <option value="efectivo">Efectivo</option>
+                <option value="nequi">Nequi</option>
+            </select>
+          </div>
         </div>
         <hr>
         <input type="hidden" name="id_orden" id="id_orden" value="<?php echo $id_orden;?>">
-        <input type="hidden" name="valor_total22" id="valor_total22" value="<?php echo $prenda['valor_total']-$total_abonos- $prenda['abono'];?>">
-        <input type="hidden" name="valor_total1" id="valor_total1" value="<?php echo $prenda['valor_total'] ;?>">
-
-        <input type="hidden" name="abonos_totales" id="abonos_totales" value="<?php echo number_format($prenda['abono']+$total_abonos); ?>">
-
-        <input type="hidden" name="id_usuario" id="id_usuario" value="<?php echo $_SESSION['username'];?>">
-        <input type="hidden" name="telefono_cliente" id="telefono_cliente" value="<?php echo htmlspecialchars($primer_resultado['telefono_cliente']);?>">
-
+        <input type="hidden" name="valor_total22" id="valor_total22" value="<?php echo $prenda['valor_total'] - $total_abonos - $prenda['abono']; ?>">
+        <input type="hidden" name="valor_total1" id="valor_total1" value="<?php echo $prenda['valor_total']; ?>">
+        <input type="hidden" name="abonos_totales" id="abonos_totales" value="<?php echo number_format($prenda['abono'] + $total_abonos); ?>">
+        <input type="hidden" name="id_usuario" id="id_usuario" value="<?php echo $_SESSION['username']; ?>">
+        <input type="hidden" name="telefono_cliente" id="telefono_cliente" value="<?php echo htmlspecialchars($primer_resultado['telefono_cliente']); ?>">
         <hr>
         <div class="payments">
           <span>Detalles Pago</span>
-          
           <div class="details">
-          <br>
+            <br>
             <span>Subtotal:</span>
             <label id="valor_total2" class="price"><?php echo "$" . number_format($prenda['valor_total'], 0, ',', '.'); ?></label>     
-            <?php
-            if ($prenda['abono'] > 0) {
-            ?>
-             <span>Abonos anteriores:</span>
+            <?php if ($prenda['abono'] > 0): ?>
+            <span>Abonos anteriores:</span>
             <input class="input" value="<?php echo "$" . number_format($prenda['abono'] + $total_abonos, 0, ',', '.'); ?>" type="text" readonly>
-            <?php
-            }
-            ?>
-
-
+            <?php endif; ?>
             <span>Abono:</span>
-            <input  class="input"  placeholder="<?php echo "Ingrese si aplica" ; ?>" name="abono" type="text"  id="abono2">
-
+            <input class="input" placeholder="<?php echo "Ingrese si aplica"; ?>" name="abono" type="text" id="abono2">
           </div>
         </div>
       </div>
@@ -161,22 +142,16 @@ foreach ($entregas_parciales as $entrega) {
   </div>
 
   <div class="card checkout">
-   
-    <label for="total">Saldo</label>  <h1 class="price" id="saldo2"><?php echo "$" . number_format($prenda['valor_total']-$total_abonos-$prenda['abono'], 0, ',', '.'); ?></h1>
-    <button id="entrega_parcial_entregar"  class="button">Entregar  &#9203;</button>
-
+    <label for="total">Saldo</label>  
+    <h1 class="price" id="saldo2"><?php echo "$" . number_format($prenda['valor_total'] - $total_abonos - $prenda['abono'], 0, ',', '.'); ?></h1>
+    <button id="entrega_parcial_entregar" class="button">Entregar  &#9203;</button>
   </div>
-
 </div>
-
-
 
 </div>
 </div>
-
 
 <?php
-
 $ruta_footer = '../footer.php';
 
 if (file_exists($ruta)) {
@@ -188,10 +163,10 @@ if (file_exists($ruta)) {
 } else {
     echo "El archivo $ruta no existe.";
 }
-
 ?>
+
 <script>
-   $(document).ready(function(){
+$(document).ready(function(){
     let changingValue = false;
 
     $('#abono2').on('change', function() {
@@ -314,6 +289,8 @@ if (file_exists($ruta)) {
                 dataType: "json",
                 success: function(response) {
                     alert("Se ha realizado de manera correcta la entrega parcial o abono.");
+           
+                    location.reload(); // Recargar la página para reflejar los cambios
                 },
                 error: function(xhr, status, error) {
                     console.error("Error en AJAX:", status, error);
@@ -325,6 +302,5 @@ if (file_exists($ruta)) {
         }
     });
 });
-
 
 </script>

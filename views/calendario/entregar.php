@@ -50,7 +50,7 @@ foreach ($arreglos_prendas as $prenda) {
 }
 ?>
 
-<div class="p_centrar">
+<<div class="p_centrar">
     <div class="centrar">
         <?php if (isset($arreglos_prendas[0])): ?>
             <?php $primer_resultado = $arreglos_prendas[0]; ?>
@@ -65,15 +65,15 @@ foreach ($arreglos_prendas as $prenda) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($arreglos_prendas as $index => $prenda): ?>
-                    <?php
-                    // Calcular la cantidad ajustada de prendas
+                <?php 
+                $todas_prendas_hechas = true; // Inicializamos como true
+                foreach ($arreglos_prendas as $index => $prenda): 
                     $cantidad_original = $prenda['prendas_numero'];
                     $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
                     $cantidad_ajustada = max(0, $cantidad_original - $cantidad_entregada);
                     
-                    // Si la cantidad ajustada es 0, no generamos la fila
                     if ($cantidad_ajustada > 0):
+                        $todas_prendas_hechas = false; // Si hay alguna prenda no hecha, lo marcamos como false
                     ?>
                     <tr>
                         <td>
@@ -148,10 +148,9 @@ foreach ($arreglos_prendas as $prenda) {
         </div>
 
         <div class="flex">
-            <?php if ($entregas_total): ?>
+            <?php if ($todas_prendas_hechas): ?>
                 <button id="entrega_total" class="button">Entrega total &#128722;</button>
-            <?php endif; ?>
-            <?php if (count($arreglos_prendas) > 1 || $arreglos_prendas[0]['prendas_numero'] > 1): ?>
+            <?php else: ?>
                 <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
             <?php endif; ?>
         </div>
@@ -167,5 +166,3 @@ if (file_exists($ruta_footer)) {
     echo "El archivo $ruta_footer no existe.";
 }
 ?>
-
-

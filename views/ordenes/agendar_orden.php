@@ -140,13 +140,12 @@ if (isset($_SESSION['cliente_consultar'])) {
 </table>
 <tr>
 
-<form id="calendario_form" style="display: flex; justify-content: space-between;">
-    <a href="../calendario/calendario.php" class="button" onclick="guardarDatosYConsultar()" style="display: flex; align-items: center;">
+<form id="calendario_form" style="display: flex; justify-content: space-between;" onsubmit="guardarDatosYConsultar(event)">
+    <a href="../calendario/calendario.php" class="button" style="display: flex; align-items: center;">
         <span style="margin-right: 5px;">&#128197;</span>
         <span>Consultar Calendario</span>
     </a>
 </form>
-
 
 
 <form id="orden_form" class="card">
@@ -167,9 +166,10 @@ if (isset($_SESSION['cliente_consultar'])) {
     </div>
 
     <div class="field">
-        <label for="total_prendas">Total de Prendas</label>
-        <input class="input" name="total_prendas" type="number" id="total_prendas">
-    </div>
+    <label for="total_prendas">Total de Prendas</label>
+    <input class="input" name="total_prendas" type="number" id="total_prendas" value="<?php echo $total_prendas; ?>" readonly>
+</div>
+
 
     <div class="field">
         <label for="valor_total">Valor Total</label>
@@ -201,62 +201,73 @@ if (isset($_SESSION['cliente_consultar'])) {
 </div>
 
 <script>
-    // Función para guardar los datos y consultar el calendario
-    function guardarDatosYConsultar() {
-        const totalPrendas = document.getElementById('total_prendas').value;
-        const formData = {
-            fecha_entrega: document.getElementById('fecha_entrega').value,
-            franja_horaria: document.getElementById('franja_horaria').value,
-            total_prendas: totalPrendas,
-            abono: document.getElementById('abono').value,
-            forma_pago: document.getElementById('forma_pago').value
-            // Agrega más campos según sea necesario
-        };
+// Función para guardar los datos y consultar el calendario
+function guardarDatosYConsultar(event) {
+    event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
 
-        // Almacena los datos en localStorage usando el número de prendas como clave
-        localStorage.setItem(`ordenData_${totalPrendas}`, JSON.stringify(formData));
-        
-        // Enviar el formulario de forma segura y redirigir al calendario
-        document.getElementById('calendario_form').submit();
+    const totalPrendas = document.getElementById('total_prendas').value;
+    const formData = {
+        fecha_entrega: document.getElementById('fecha_entrega').value,
+        franja_horaria: document.getElementById('franja_horaria').value,
+        total_prendas: totalPrendas,
+        abono: document.getElementById('abono').value,
+        forma_pago: document.getElementById('forma_pago').value
+        // Agrega más campos según sea necesario
+    };
+
+    // Almacena los datos en localStorage usando el número de prendas como clave
+    localStorage.setItem(`ordenData_${totalPrendas}`, JSON.stringify(formData));
+    
+    // Establece una bandera en localStorage para mostrar el botón "Volver"
+    localStorage.setItem('mostrarVolver', 'true');
+
+    // Redirigir al calendario
+    window.location.href = '../calendario/calendario.php';
+}
+
+// Cargar datos almacenados al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    const totalPrendas = document.getElementById('total_prendas').value;
+    const storedData = localStorage.getItem(`ordenData_${totalPrendas}`);
+    if (storedData) {
+        const data = JSON.parse(storedData);
+        document.getElementById('fecha_entrega').value = data.fecha_entrega;
+        document.getElementById('franja_horaria').value = data.franja_horaria;
+        document.getElementById('abono').value = data.abono;
+        document.getElementById('forma_pago').value = data.forma_pago;
+        // Carga más campos según sea necesario
     }
 
-    // Cargar datos almacenados al cargar la página
-    document.addEventListener('DOMContentLoaded', () => {
-        const totalPrendas = document.getElementById('total_prendas').value;
-        const storedData = localStorage.getItem(`ordenData_${totalPrendas}`);
-        if (storedData) {
-            const data = JSON.parse(storedData);
-            document.getElementById('fecha_entrega').value = data.fecha_entrega;
-            document.getElementById('franja_horaria').value = data.franja_horaria;
-            document.getElementById('abono').value = data.abono;
-            document.getElementById('forma_pago').value = data.forma_pago;
-            // Carga más campos según sea necesario
-        }
-    });
-
-    // Función para limpiar datos de la orden actual del localStorage si es necesario
-    function limpiarDatos() {
-        const totalPrendas = document.getElementById('total_prendas').value;
-        localStorage.removeItem(`ordenData_${totalPrendas}`);
+    // Verificar si la bandera está establecida y mostrar el botón "Volver" si es necesario
+    if (localStorage.getItem('mostrarVolver') === 'true') {
+        document.getElementById('volver_form').style.display = 'inline';
+        localStorage.removeItem('mostrarVolver'); // Limpiar la bandera después de usar
     }
+});
 
-    // Función para actualizar el saldo
-    function actualizarSaldo() {
-        const valorTotal = parseFloat(document.getElementById('valor_total').value.replace('$', '').replace(',', ''));
-        const abono = parseFloat(document.getElementById('abono').value);
-        if (!isNaN(valorTotal) && !isNaN(abono)) {
-            const saldo = valorTotal - abono;
-            document.getElementById('saldo').value = `$ ${saldo.toLocaleString()}`;
-        }
+// Función para limpiar datos de la orden actual del localStorage si es necesario
+function limpiarDatos() {
+    const totalPrendas = document.getElementById('total_prendas').value;
+    localStorage.removeItem(`ordenData_${totalPrendas}`);
+}
+
+// Función para actualizar el saldo
+function actualizarSaldo() {
+    const valorTotal = parseFloat(document.getElementById('valor_total').value.replace('$', '').replace(',', ''));
+    const abono = parseFloat(document.getElementById('abono').value);
+    if (!isNaN(valorTotal) && !isNaN(abono)) {
+        const saldo = valorTotal - abono;
+        document.getElementById('saldo').value = `$ ${saldo.toLocaleString()}`;
     }
+}
 
-    // Evento cuando se carga la página para escuchar cambios en el abono y actualizar el saldo
-    document.addEventListener('DOMContentLoaded', () => {
-        const abonoInput = document.getElementById('abono');
-        if (abonoInput) {
-            abonoInput.addEventListener('input', actualizarSaldo);
-        }
-    });
+// Evento cuando se carga la página para escuchar cambios en el abono y actualizar el saldo
+document.addEventListener('DOMContentLoaded', () => {
+    const abonoInput = document.getElementById('abono');
+    if (abonoInput) {
+        abonoInput.addEventListener('input', actualizarSaldo);
+    }
+});
 </script>
 
 </form>

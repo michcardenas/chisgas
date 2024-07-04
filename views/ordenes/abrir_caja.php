@@ -43,30 +43,39 @@ if (mysqli_num_rows($result_check) > 0) {
     $row_select = mysqli_fetch_assoc($result_select);
 
     if ($row_select) {
-        $base = number_format($row_select['dinero_final'], 0, ',', '.');
+        $base = number_format($row_select['dinero_final'], 0, ',', '.'); // Formatear para mostrar al usuario
     }
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['base'])) {
         // Obtener la base de caja sin formato
         $base = $_POST['base'];
-        // Remover cualquier formato de miles para obtener el valor sin formato
-        $base = preg_replace('/[^\d.]/', '', $base); // Esto elimina todo excepto dígitos y el punto decimal si lo hubiera
+        // Limpiar el formato de miles para obtener el valor sin formato
+        $base = preg_replace('/[^\d]/', '', $base); // Esto elimina todo excepto dígitos
 
-        $fecha = date('Y-m-d H:i:s');
-
-        // Insertar los datos en la tabla caja
-        $sql = "INSERT INTO caja (fecha, base) VALUES ('$fecha', '$base')";
-        if (mysqli_query($conn, $sql)) {
-            $mensaje = "Caja iniciada con éxito con una base de $base el $fecha";
-            // Redirigir a caja.php después de la inserción exitosa
-            header("Location: caja.php");
-            exit();
+        // Asegurarse de que $base sea un valor numérico válido
+        if (is_numeric($base)) {
+            $base = intval($base);
         } else {
-            $mensaje = "Error: " . mysqli_error($conn);
+            $mensaje = "El valor de la base no es válido.";
         }
 
-        // Cerrar la conexión a la base de datos
-        mysqli_close($conn);
+        if (empty($mensaje)) {
+            $fecha = date('Y-m-d H:i:s');
+
+            // Insertar los datos en la tabla caja
+            $sql = "INSERT INTO caja (fecha, base) VALUES ('$fecha', '$base')";
+            if (mysqli_query($conn, $sql)) {
+                $mensaje = "Caja iniciada con éxito con una base de " . number_format($base, 0, ',', '.') . " el $fecha"; // Formatear para mostrar al usuario
+                // Redirigir a caja.php después de la inserción exitosa
+                header("Location: caja.php");
+                exit();
+            } else {
+                $mensaje = "Error: " . mysqli_error($conn);
+            }
+
+            // Cerrar la conexión a la base de datos
+            mysqli_close($conn);
+        }
     }
 }
 ?>
@@ -93,7 +102,7 @@ if (mysqli_num_rows($result_check) > 0) {
 
                     <div class="field">
                         <label for="base">Base de Caja:</label>
-                        <input class="input" type="text" id="base" name="base" placeholder="$" value="<?php echo isset($_POST['base']) ? number_format(preg_replace('/[^\d]/', '', $_POST['base']), 0, ',', '.') : $base; ?>" required>
+                        <input class="input" type="text" id="base" name="base" placeholder="$" value="<?php echo isset($_POST['base']) ? $_POST['base'] : $base; ?>" required>
                     </div>
 
                     <div class="field_boton_editar">

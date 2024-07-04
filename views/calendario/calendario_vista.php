@@ -54,6 +54,10 @@ function convertirMinutosAHoras($minutos) {
         <input placeholder="Buscar cliente..."  id="nombre_cliente" type="text">
         <button class="button-buscar_orden">Buscar</button>
       </div>
+      <form action="../ordenes/agendar_orden.php" method="POST" style="display: none;" id="volver_form">
+    <button type="submit" class="button">Volver</button>
+</form>
+
       <div id="resultados" class="lista-nombres">
             <!-- Aquí se mostrará la lista de nombres -->
         </div><table border="1">
@@ -76,9 +80,6 @@ function convertirMinutosAHoras($minutos) {
 </tbody>
 
 </table>
-<form action="../ordenes/agendar_orden.php" method="POST" style="display: inline;">
-        <button type="submit" class="button">Volver</button>
-    </form>
 
 </div>
 </div>
