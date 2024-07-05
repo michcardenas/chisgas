@@ -66,14 +66,10 @@ foreach ($arreglos_prendas as $prenda) {
             </thead>
             <tbody>
                 <?php 
-                $todas_prendas_hechas = true; // Inicializamos como true
                 foreach ($arreglos_prendas as $index => $prenda): 
                     $cantidad_original = $prenda['prendas_numero'];
                     $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
                     $cantidad_ajustada = max(0, $cantidad_original - $cantidad_entregada);
-                    
-                    if ($cantidad_ajustada > 0):
-                        $todas_prendas_hechas = false; // Si hay alguna prenda no hecha, lo marcamos como false
                     ?>
                     <tr>
                         <td>
@@ -87,7 +83,6 @@ foreach ($arreglos_prendas as $prenda) {
                         <td><?php echo "$" . number_format($prenda['valor'], 0, ',', '.'); ?></td>
                         <input type="hidden" name="id_usuario" id="prendas_numero_real" value="<?php echo htmlspecialchars($prenda['prendas_numero']); ?>">
                     </tr>
-                    <?php endif; ?>
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -148,11 +143,9 @@ foreach ($arreglos_prendas as $prenda) {
         </div>
 
         <div class="flex">
-            <?php if ($todas_prendas_hechas): ?>
                 <button id="entrega_total" class="button">Entrega total &#128722;</button>
-            <?php else: ?>
+     
                 <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
-            <?php endif; ?>
         </div>
     </div>
 </div>

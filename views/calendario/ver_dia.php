@@ -56,7 +56,13 @@ foreach ($ordenes_del_dia as $orden) {
     $nombre_cliente = $orden["nombre_cliente"] ? $orden["nombre_cliente"] : "Cliente Desconocido";
     echo '<tr>';
     echo '<td>';
-    echo '<a href="ver_arreglos.php?id_orden=' . $orden["id_orden"] . '">' . htmlspecialchars($nombre_cliente) . '</a>';
+
+    // Verificar si la orden está entregada (estado 6) para desactivar el enlace
+    if ($orden["estado_orden"] == 6) {
+        echo htmlspecialchars($nombre_cliente);
+    } else {
+        echo '<a href="ver_arreglos.php?id_orden=' . $orden["id_orden"] . '">' . htmlspecialchars($nombre_cliente) . '</a>';
+    }
     echo '</td>';
 
     echo '<td>' . htmlspecialchars($orden["total_prendas_por_orden"]) . '</td>';

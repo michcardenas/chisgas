@@ -76,7 +76,6 @@ if (is_array($entregas_parciales)) {
             $cantidad_original = $prenda['prendas_numero'];
             $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
             $cantidad_ajustada = max(0, $cantidad_original - $cantidad_entregada);
-            var_dump($cantidad_original);
             ?>
             <input class="input_file" type="number" name="prendas_numero[<?php echo $prenda['id']; ?>]" placeholder="<?php echo $cantidad_ajustada; ?>" min="1" />
         </td>

@@ -104,33 +104,33 @@ function prendas_por_entregar($id_orden) {
     global $conn;  // Asegúrate de que tu conexión se llama $conn
 
     $query = "
-                SELECT 
-                p.nombre_ropa,
-                p.tiempo_estimado,
-                p.estado,
-                p.id,
-                p.prendas_numero,
-                c.nombre AS nombre_cliente,
-                c.telefono AS telefono_cliente,
-                u.login,
-                p.valor,
-                o.valor_total,
-                o.abono
-            FROM 
-                prendas p
-            LEFT JOIN 
-                clientes c ON c.id = p.id_cliente
-            LEFT JOIN 
-                usuarios u ON p.id_asignacion = u.id
-            LEFT JOIN 
-                ordenes o ON o.id = p.id_orden
-            LEFT JOIN 
-                entregas_parciales ep ON ep.id_prenda = p.id AND ep.id_orden = o.id -- JOIN con entregas_parciales
-            WHERE 
-                p.id_orden = ?
-                AND p.estado = 5
-            GROUP BY 
-                p.id -- Agrupar por id de prenda para sumar correctamente
+        SELECT 
+            p.nombre_ropa,
+            p.tiempo_estimado,
+            p.estado,
+            p.id,
+            p.prendas_numero,
+            c.nombre AS nombre_cliente,
+            c.telefono AS telefono_cliente,
+            u.login,
+            p.valor,
+            o.valor_total,
+            o.abono
+        FROM 
+            prendas p
+        LEFT JOIN 
+            clientes c ON c.id = p.id_cliente
+        LEFT JOIN 
+            usuarios u ON p.id_asignacion = u.id
+        LEFT JOIN 
+            ordenes o ON o.id = p.id_orden
+        LEFT JOIN 
+            entregas_parciales ep ON ep.id_prenda = p.id AND ep.id_orden = o.id
+        WHERE 
+            p.id_orden = ?
+            AND p.estado = 5
+        GROUP BY 
+            p.id
     ";
 
     // Preparar la consulta y vincular el parámetro
@@ -422,6 +422,5 @@ function obtenerEstadoGeneral($estadoOrden) {
             return ''; // No agregamos nada si no es 6 ni 7
     }
 }
-
 ?>
 

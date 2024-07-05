@@ -762,6 +762,7 @@ $("#entrega_total").click(function(e) {
           }
       },
       error: function(xhr, status, error) {
+          alert( jqXHR.responseText);
           console.error('Error en la solicitud AJAX:', status, error);
           alert("Hubo un error al procesar la solicitud. Por favor, inténtalo de nuevo más tarde.");
       }

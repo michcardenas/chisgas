@@ -48,18 +48,22 @@ if ($row_select) {
 // Calcular el total de órdenes del día que están arregladas o en entrega parcial
 $total_recogido = 0;
 
-$sql_ordenes_dia = "SELECT SUM(valor_total) AS total_recogido 
+$sql_ordenes_dia = "SELECT COALESCE(SUM(valor_total), 0) AS total_recogido 
                     FROM (
                         SELECT SUM(valor_total) AS valor_total 
                         FROM ordenes 
                         WHERE DATE(fecha_entrega) = '$fecha_hoy' 
-                        AND (estado = '6' OR estado = '7')
+                            AND (estado = '6' OR estado = '7')
                         UNION ALL
                         SELECT SUM(abono) AS valor_total 
                         FROM entregas_parciales 
                         WHERE DATE(fecha_hora) = '$fecha_hoy'
+                        UNION ALL
+                        SELECT SUM(abono) AS valor_total 
+                        FROM ordenes 
+                        WHERE DATE(fecha_entrega) = '$fecha_hoy' 
+                            AND abono IS NOT NULL
                     ) AS totales";
-
 $result_ordenes_dia = mysqli_query($conn, $sql_ordenes_dia);
 
 if (!$result_ordenes_dia) {
