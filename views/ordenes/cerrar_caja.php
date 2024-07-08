@@ -47,23 +47,34 @@ if ($row_select) {
 
 // Calcular el total de órdenes del día que están arregladas o en entrega parcial
 $total_recogido = 0;
+$total_efectivo = 0;
+$total_nequi = 0;
 
-$sql_ordenes_dia = "SELECT COALESCE(SUM(valor_total), 0) AS total_recogido 
+$sql_ordenes_dia = "SELECT 
+                        COALESCE(SUM(CASE WHEN forma_pago = 'Efectivo' THEN saldo ELSE 0 END), 0) AS total_efectivo,
+                        COALESCE(SUM(CASE WHEN forma_pago = 'Nequi' THEN saldo ELSE 0 END), 0) AS total_nequi,
+                        COALESCE(SUM(saldo), 0) AS total_recogido 
                     FROM (
-                        SELECT SUM(valor_total) AS valor_total 
+                        SELECT saldo, forma_pago
                         FROM ordenes 
                         WHERE DATE(fecha_entrega) = '$fecha_hoy' 
                             AND (estado = '6' OR estado = '7')
                         UNION ALL
-                        SELECT SUM(abono) AS valor_total 
+                        SELECT abono, forma_pago
                         FROM entregas_parciales 
                         WHERE DATE(fecha_hora) = '$fecha_hoy'
                         UNION ALL
-                        SELECT SUM(abono) AS valor_total 
+                        SELECT abono, forma_pago
                         FROM ordenes 
                         WHERE DATE(fecha_entrega) = '$fecha_hoy' 
                             AND abono IS NOT NULL
+                        UNION ALL
+                        SELECT o.saldo, o.forma_pago
+                        FROM entregas e
+                        INNER JOIN ordenes o ON e.orden_id = o.id
+                        WHERE DATE(e.fecha) = '$fecha_hoy'
                     ) AS totales";
+
 $result_ordenes_dia = mysqli_query($conn, $sql_ordenes_dia);
 
 if (!$result_ordenes_dia) {
@@ -71,8 +82,10 @@ if (!$result_ordenes_dia) {
     $mensaje .= " Error: " . mysqli_error($conn);
 } else {
     $row_ordenes_dia = mysqli_fetch_assoc($result_ordenes_dia);
-    if ($row_ordenes_dia['total_recogido']) {
+    if ($row_ordenes_dia) {
         $total_recogido = $row_ordenes_dia['total_recogido'];
+        $total_efectivo = $row_ordenes_dia['total_efectivo'];
+        $total_nequi = $row_ordenes_dia['total_nequi'];
     }
 }
 
@@ -144,6 +157,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_P
                     <tr>
                         <th>Total Recogido del Día:</th>
                         <td>$<?php echo number_format($total_recogido); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Total Efectivo:</th>
+                        <td>$<?php echo number_format($total_efectivo); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Total Nequi:</th>
+                        <td>$<?php echo number_format($total_nequi); ?></td>
                     </tr>
                     <tr>
                         <th>Base de Caja:</th>
