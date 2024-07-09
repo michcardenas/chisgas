@@ -91,19 +91,23 @@ if (!$result_ordenes_dia) {
 
 $dinero_final_calculado = $base + $total_recogido; // Calculo inicial del dinero final sin los gastos
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_POST['dinero_final']) && empty($mensaje)) {
+// Procesar el formulario de cierre de caja
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && empty($mensaje)) {
     // Verificar que la hora actual sea después de las 12:00 PM
     $hora_actual = date('H:i:s');
     if ($hora_actual < '12:00:00') {
         $mensaje = "La caja solo se puede cerrar después de las 12:00 PM.";
     } else {
-        $gastos = $_POST['gastos'];
-        $total_gastos = 0;
+        $dinero_final = $_POST['dinero_final'];
+        $gastos = isset($_POST['gastos']) ? $_POST['gastos'] : ''; // Obtener gastos o establecer como cadena vacía si no se proporcionan
 
         // Calcular la suma total de los gastos
-        $gastos_array = explode("\n", $gastos);
-        foreach ($gastos_array as $gasto) {
-            $total_gastos += preg_replace('/[^\d.]/', '', $gasto);
+        $total_gastos = 0;
+        if (!empty($gastos)) {
+            $gastos_array = explode("\n", $gastos);
+            foreach ($gastos_array as $gasto) {
+                $total_gastos += preg_replace('/[^\d.]/', '', $gasto);
+            }
         }
 
         $dinero_final_calculado -= $total_gastos; // Actualizar el dinero final restando los gastos
@@ -204,6 +208,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gastos']) && isset($_P
                     </div>
                 </form>
             <?php endif; ?>
+<!-- Links a Facturas y Estadísticas -->
+<a href="../ordenes/facturas.php" class="button">Facturas</a>
+<a href="../ordenes/estadisticas.php" class="button">Estadisticas</a>
         </div>
     </div>
 </div>

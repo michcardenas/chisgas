@@ -34,6 +34,8 @@ if (file_exists($ruta)) {
     </a>
 </div>
 
+
+
 <?php 
 $ruta_footer = '../footer.php';
 if (file_exists($ruta_footer)) {

@@ -422,5 +422,102 @@ function obtenerEstadoGeneral($estadoOrden) {
             return ''; // No agregamos nada si no es 6 ni 7
     }
 }
+
+// Asumiendo que $conn es tu conexión a la base de datos
+
+function seleccionar_todas_las_columnas_caja_por_mes($mes, $anio) {
+    global $conn;
+
+    $sql = "SELECT 
+                c.*, 
+                COUNT(e.id) AS total_entregas
+            FROM 
+                caja c
+            LEFT JOIN 
+                entregas e ON DATE(c.fecha) = DATE(e.fecha) -- Comparación de las fechas sin la hora
+                          AND c.fecha >= e.fecha            -- Asegura que las fechas coincidan
+            WHERE 
+                (? IS NULL OR MONTH(c.fecha) = ?) AND
+                (? IS NULL OR YEAR(c.fecha) = ?)
+            GROUP BY 
+                c.fecha
+            ORDER BY 
+                c.fecha";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iiii", $mes, $mes, $anio, $anio);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+function seleccionar_datos_por_id($id) {
+    global $conn; // Asegúrate de que tu conexión se llama $conn
+
+    // Query para seleccionar los datos de la tabla caja para el ID especificado
+    $query = "
+SELECT 
+        c.*, 
+        COUNT(DISTINCT e.id) AS total_entregas,
+        cl.nombre AS nombre_cliente,
+        GROUP_CONCAT(DISTINCT cl.nombre SEPARATOR ', ') AS nombres_abonos
+    FROM 
+        caja c
+    LEFT JOIN 
+        entregas e ON DATE(c.fecha) = DATE(e.fecha)
+    LEFT JOIN 
+        prendas p ON e.orden_id = p.id_orden
+    LEFT JOIN 
+        clientes cl ON p.id_cliente = cl.id
+    LEFT JOIN 
+        ordenes o ON DATE(c.fecha) = DATE(o.fecha_entrega)
+    LEFT JOIN 
+        usuarios u ON e.usuario_id = u.id
+        WHERE
+        c.id = ?
+    GROUP BY 
+        c.id, cl.nombre, c.fecha
+    ORDER BY 
+            c.fecha;
+
+    ";
+
+    // Preparar la consulta
+    $stmt = $conn->prepare($query);
+
+    if (!$stmt) {
+        // Si hay un error en la preparación de la consulta, muestra el mensaje de error
+        echo "Error en la preparación de la consulta: " . $conn->error;
+        return false;
+    }
+
+    // Vincular el parámetro de ID y ejecutar la consulta
+    $stmt->bind_param("i", $id);
+    $result = $stmt->execute();
+
+    if (!$result) {
+        // Si hay un error al ejecutar la consulta, muestra el mensaje de error
+        echo "Error al ejecutar la consulta: " . $stmt->error;
+        return false;
+    }
+
+    // Obtener los resultados
+    $resultados = $stmt->get_result();
+
+    // Verificar si la consulta devuelve resultados
+    if ($resultados->num_rows > 0) {
+        $data = [];
+        while ($row = $resultados->fetch_assoc()) {
+            $data[] = $row;
+        }
+        return $data;
+    } else {
+        return []; // Devolver un array vacío si no hay resultados encontrados
+    }
+
+    // Cerrar el statement (liberar los recursos)
+    $stmt->close();
+}
+
 ?>
 
