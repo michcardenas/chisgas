@@ -66,7 +66,7 @@ $sql_ordenes_dia = "SELECT
                         UNION ALL
                         SELECT abono, forma_pago
                         FROM ordenes 
-                        WHERE DATE(fecha_entrega) = '$fecha_hoy' 
+                        WHERE DATE(fecha_creacion) = '$fecha_hoy' 
                             AND abono IS NOT NULL
                         UNION ALL
                         SELECT o.saldo, o.forma_pago

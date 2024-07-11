@@ -203,71 +203,72 @@ if (isset($_SESSION['cliente_consultar'])) {
 <script>
 // Función para guardar los datos y consultar el calendario
 function guardarDatosYConsultar(event) {
-    event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
+            event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
 
-    const totalPrendas = document.getElementById('total_prendas').value;
-    const formData = {
-        fecha_entrega: document.getElementById('fecha_entrega').value,
-        franja_horaria: document.getElementById('franja_horaria').value,
-        total_prendas: totalPrendas,
-        abono: document.getElementById('abono').value,
-        forma_pago: document.getElementById('forma_pago').value
-        // Agrega más campos según sea necesario
-    };
+            const totalPrendas = document.getElementById('total_prendas').value;
+            const formData = {
+                fecha_entrega: document.getElementById('fecha_entrega').value,
+                franja_horaria: document.getElementById('franja_horaria').value,
+                total_prendas: totalPrendas,
+                abono: document.getElementById('abono').value,
+                forma_pago: document.getElementById('forma_pago').value
+                // Agrega más campos según sea necesario
+            };
 
-    // Almacena los datos en localStorage usando el número de prendas como clave
-    localStorage.setItem(`ordenData_${totalPrendas}`, JSON.stringify(formData));
-    
-    // Establece una bandera en localStorage para mostrar el botón "Volver"
-    localStorage.setItem('mostrarVolver', 'true');
+            // Almacena los datos en localStorage usando el número de prendas como clave
+            localStorage.setItem(`ordenData_${totalPrendas}`, JSON.stringify(formData));
+            
+            // Establece una bandera en localStorage para mostrar el botón "Volver"
+            localStorage.setItem('mostrarVolver', 'true');
 
-    // Redirigir al calendario
-    window.location.href = '../calendario/calendario.php';
-}
+            // Redirigir al calendario
+            window.location.href = '../calendario/calendario_vista.php';
+        }
 
-// Cargar datos almacenados al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    const totalPrendas = document.getElementById('total_prendas').value;
-    const storedData = localStorage.getItem(`ordenData_${totalPrendas}`);
-    if (storedData) {
-        const data = JSON.parse(storedData);
-        document.getElementById('fecha_entrega').value = data.fecha_entrega;
-        document.getElementById('franja_horaria').value = data.franja_horaria;
-        document.getElementById('abono').value = data.abono;
-        document.getElementById('forma_pago').value = data.forma_pago;
-        // Carga más campos según sea necesario
-    }
+        // Cargar datos almacenados al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalPrendas = document.getElementById('total_prendas').value;
+            const storedData = localStorage.getItem(`ordenData_${totalPrendas}`);
+            if (storedData) {
+                const data = JSON.parse(storedData);
+                document.getElementById('fecha_entrega').value = data.fecha_entrega;
+                document.getElementById('franja_horaria').value = data.franja_horaria;
+                document.getElementById('abono').value = data.abono;
+                document.getElementById('forma_pago').value = data.forma_pago;
+                // Carga más campos según sea necesario
+            }
 
-    // Verificar si la bandera está establecida y mostrar el botón "Volver" si es necesario
-    if (localStorage.getItem('mostrarVolver') === 'true') {
-        document.getElementById('volver_form').style.display = 'inline';
-        localStorage.removeItem('mostrarVolver'); // Limpiar la bandera después de usar
-    }
-});
+            // Verificar si la bandera está establecida y mostrar el botón "Volver" si es necesario
+            if (localStorage.getItem('mostrarVolver') === 'true') {
+                document.getElementById('volver_form').style.display = 'inline';
+                localStorage.removeItem('mostrarVolver'); // Limpiar la bandera después de usar
+            }
+        });
 
-// Función para limpiar datos de la orden actual del localStorage si es necesario
-function limpiarDatos() {
-    const totalPrendas = document.getElementById('total_prendas').value;
-    localStorage.removeItem(`ordenData_${totalPrendas}`);
-}
+        // Función para limpiar datos de la orden actual del localStorage si es necesario
+        function limpiarDatos() {
+            const totalPrendas = document.getElementById('total_prendas').value;
+            localStorage.removeItem(`ordenData_${totalPrendas}`);
+        }
 
-// Función para actualizar el saldo
-function actualizarSaldo() {
-    const valorTotal = parseFloat(document.getElementById('valor_total').value.replace('$', '').replace(',', ''));
-    const abono = parseFloat(document.getElementById('abono').value);
-    if (!isNaN(valorTotal) && !isNaN(abono)) {
-        const saldo = valorTotal - abono;
-        document.getElementById('saldo').value = `$ ${saldo.toLocaleString()}`;
-    }
-}
+        // Función para actualizar el saldo
+        function actualizarSaldo() {
+            const valorTotal = parseFloat(document.getElementById('valor_total').value.replace('$', '').replace(',', ''));
+            const abono = parseFloat(document.getElementById('abono').value);
+            if (!isNaN(valorTotal) && !isNaN(abono)) {
+                const saldo = valorTotal - abono;
+                document.getElementById('saldo').value = `$ ${saldo.toLocaleString()}`;
+            }
+        }
 
-// Evento cuando se carga la página para escuchar cambios en el abono y actualizar el saldo
-document.addEventListener('DOMContentLoaded', () => {
-    const abonoInput = document.getElementById('abono');
-    if (abonoInput) {
-        abonoInput.addEventListener('input', actualizarSaldo);
-    }
-});
+        // Evento cuando se carga la página para escuchar cambios en el abono y actualizar el saldo
+        document.addEventListener('DOMContentLoaded', () => {
+            const abonoInput = document.getElementById('abono');
+            if (abonoInput) {
+                abonoInput.addEventListener('input', actualizarSaldo);
+            }
+        });
+    </script>
 </script>
 
 </form>

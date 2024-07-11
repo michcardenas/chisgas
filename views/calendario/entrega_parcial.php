@@ -202,104 +202,105 @@ $(document).ready(function(){
         changingValue = false;
     });
 
-    $("#entrega_parcial_entregar").click(function(e){
-        e.preventDefault();
+    $("#entrega_parcial_entregar").click(function(e) {
+            e.preventDefault();
 
-        var id_orden = $("#id_orden").val();
-        var id_usuario = $("#id_usuario").val();
-        var telefono_cliente = $("#telefono_cliente").val();
-        var abono = parseInt($("#abono2").val().replace(/[^0-9]/g, ''), 10);
-        var saldo = parseInt($("#saldo2").text().replace(/[^0-9]/g, ''), 10);
-        var total = parseInt($("#valor_total22").val().replace(/[^0-9]/g, ''), 10);
-        var total_completo = parseInt($("#valor_total1").val().replace(/[^0-9]/g, ''), 10); // Utiliza valor_total1 para comparar con el abono
-        var abonos_totales = parseInt($("#abonos_totales").val().replace(/[^0-9]/g, ''), 10);
-        var forma_pago = $("#forma_pago").val();
-        var prendas_datos = [];
-        var validacionCorrecta = true;
+            var id_orden = $("#id_orden").val();
+            var id_usuario = $("#id_usuario").val();
+            var telefono_cliente = $("#telefono_cliente").val();
+            var abono = parseInt($("#abono2").val().replace(/[^0-9]/g, ''), 10);
+            var saldo = parseInt($("#saldo2").text().replace(/[^0-9]/g, ''), 10);
+            var total = parseInt($("#valor_total22").val().replace(/[^0-9]/g, ''), 10);
+            var total_completo = parseInt($("#valor_total1").val().replace(/[^0-9]/g, ''), 10);
+            var abonos_totales = parseInt($("#abonos_totales").val().replace(/[^0-9]/g, ''), 10);
+            var forma_pago = $("#forma_pago").val();
+            var prendas_datos = [];
+            var validacionCorrecta = true;
 
-        // Validación del abono
-        if (abono > total_completo) {
-            alert('El valor del abono no puede superar el saldo total de la prenda.');
-            validacionCorrecta = false;
-        }
-
-        if (abono < 1000) {
-            alert('El valor del abono no puede ser inferior a $1.000.');
-            validacionCorrecta = false;
-        }
-
-        if (!validacionCorrecta) {
-            return;
-        }
-
-        $(".input_file").each(function() {
-            var prenda_id = $(this).attr('name').match(/\[(\d+)\]/)[1];
-            var prenda_numero_entregar_input = $(this).val().trim();
-            var prenda_numero_entregar = prenda_numero_entregar_input ? parseInt(prenda_numero_entregar_input, 10) : 0;
-            var prenda_numero_real = parseInt($(this).attr('placeholder').trim(), 10);
-            var nombre_prenda = $(this).closest('tr').find('td:first').text().trim();
-
-            if ((abono + abonos_totales) > total_completo) {
-                alert(`El valor del abono no puede superar el saldo total de la prenda.`);
+            // Validación del abono
+            if (abono > total_completo) {
+                alert('El valor del abono no puede superar el saldo total de la prenda.');
                 validacionCorrecta = false;
-                return false; // Salir del bucle .each
             }
 
-            if (prenda_numero_entregar > prenda_numero_real) {
-                alert(`En la prenda ${nombre_prenda}, estás intentando entregar un número mayor de prendas al recibido. Puede ser menor o igual.`);
+            if (abono < 1000) {
+                alert('El valor del abono no puede ser inferior a $1.000.');
                 validacionCorrecta = false;
-                return false; // Salir del bucle .each
             }
 
-            prendas_datos.push({
-                prenda_id: prenda_id,
-                prenda_numero_entregar: prenda_numero_entregar,
-                prenda_numero_real: prenda_numero_real
-            });
-        });
+            if (!validacionCorrecta) {
+                return;
+            }
 
-        if (!validacionCorrecta) {
-            return;
-        }
+            $(".input_file").each(function() {
+                var prenda_id = $(this).attr('name').match(/\[(\d+)\]/)[1];
+                var prenda_numero_entregar_input = $(this).val().trim();
+                var prenda_numero_entregar = prenda_numero_entregar_input ? parseInt(prenda_numero_entregar_input, 10) : 0;
+                var prenda_numero_real = parseInt($(this).attr('placeholder').trim(), 10);
+                var nombre_prenda = $(this).closest('tr').find('td:first').text().trim();
 
-        var numero_prendas_entregar = prendas_datos.reduce(function(acumulador, prenda) {
-            return acumulador + (isNaN(prenda.prenda_numero_entregar) ? 0 : prenda.prenda_numero_entregar);
-        }, 0);
-
-        var mensajeConfirmacion = "¿Estás seguro de que deseas entregar " + numero_prendas_entregar + " prenda(s) y abonar $" + abono + "?";
-
-        var confirmar = confirm(mensajeConfirmacion);
-
-        if (confirmar) {
-            $.ajax({
-                type: "POST",
-                url: '../../controllers/calendarioController.php',
-                data: JSON.stringify({
-                    action: "entrega_parcial_en",
-                    id_orden: id_orden,
-                    id_usuario: id_usuario,
-                    telefono_cliente: telefono_cliente,
-                    abono: abono,
-                    saldo: saldo,
-                    forma_pago: forma_pago,
-                    prendas_datos: prendas_datos
-                }),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(response) {
-                    alert("Se ha realizado de manera correcta la entrega parcial o abono.");
-           
-                    location.reload(); // Recargar la página para reflejar los cambios
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error en AJAX:", status, error);
-                    alert("Error al actualizar la prenda.");
+                if ((abono + abonos_totales) > total_completo) {
+                    alert(`El valor del abono no puede superar el saldo total de la prenda.`);
+                    validacionCorrecta = false;
+                    return false; // Salir del bucle .each
                 }
+
+                if (prenda_numero_entregar > prenda_numero_real) {
+                    alert(`En la prenda ${nombre_prenda}, estás intentando entregar un número mayor de prendas al recibido. Puede ser menor o igual.`);
+                    validacionCorrecta = false;
+                    return false; // Salir del bucle .each
+                }
+
+                prendas_datos.push({
+                    prenda_id: prenda_id,
+                    prenda_numero_entregar: prenda_numero_entregar,
+                    prenda_numero_real: prenda_numero_real
+                });
             });
-        } else {
-            console.log("Acción cancelada por el usuario.");
-        }
+
+            if (!validacionCorrecta) {
+                return;
+            }
+
+            var numero_prendas_entregar = prendas_datos.reduce(function(acumulador, prenda) {
+                return acumulador + (isNaN(prenda.prenda_numero_entregar) ? 0 : prenda.prenda_numero_entregar);
+            }, 0);
+
+            var mensajeConfirmacion = "¿Estás seguro de que deseas entregar " + numero_prendas_entregar + " prenda(s) y abonar $" + abono + "?";
+
+            var confirmar = confirm(mensajeConfirmacion);
+
+            if (confirmar) {
+                $.ajax({
+                    type: "POST",
+                    url: '../../controllers/calendarioController.php',
+                    data: JSON.stringify({
+                        action: "entrega_parcial_en",
+                        id_orden: id_orden,
+                        id_usuario: id_usuario,
+                        telefono_cliente: telefono_cliente,
+                        abono: abono,
+                        saldo: saldo,
+                        forma_pago: forma_pago,
+                        prendas_datos: prendas_datos
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        alert("Se ha realizado de manera correcta la entrega parcial o abono.");
+                       
+                        // Volver a la página anterior
+                        window.history.back();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error en AJAX:", status, error);
+                        alert("Error al actualizar la prenda.");
+                    }
+                });
+            } else {
+                console.log("Acción cancelada por el usuario.");
+            }
+        });
     });
-});
 
 </script>
