@@ -179,38 +179,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && emp
 
             <?php if (empty($mensaje) || $mensaje == "La caja solo se puede cerrar después de las 12:00 PM.") : ?>
                 <form id="cerrar_caja_form" class="card" method="post">
-                    <div class="card_header"></div>
+    <div class="card_header"></div>
 
-                    <div class="field">
-                        <label for="gasto">Agregar Gasto:</label>
-                        <input class="input" type="text" id="gasto" name="gasto" placeholder="Descripción del gasto">
-                        <button type="button" id="add_gasto_button" class="button">Agregar Gasto</button>
-                    </div>
+    <div class="field">
+        <label for="gasto">Agregar Gasto:</label>
+        <input class="input" type="text" id="gasto" name="gasto" placeholder="Descripción del gasto">
+        <button type="button" id="add_gasto_button" class="button">Agregar Gasto</button>
+    </div>
 
-                    <div class="field">
-                        <label for="gastos">Gastos:</label>
-                        <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
-                    </div>
+    <div class="field">
+        <label for="gastos">Gastos:</label>
+        <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
+    </div>
 
-                    <div class="field">
-                        <label for="suma_gastos">Suma Total de Gastos:</label>
-                        <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
-                    </div>
+    <div class="field">
+        <label for="suma_gastos">Suma Total de Gastos:</label>
+        <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
+    </div>
 
-                    <div class="field">
-                        <label for="dinero_final">Dinero Final en Caja</label>
-                        <input class="input" type="text" id="dinero_final" name="dinero_final" value="<?php echo number_format($dinero_final_calculado, 0, ',', '.'); ?>" required readonly>
-                    </div>
+    <div class="field">
+        <label for="dinero_final">Dinero Final en Caja</label>
+        <input class="input" type="text" id="dinero_final" name="dinero_final" value="<?php echo number_format($dinero_final_calculado, 0, ',', '.'); ?>" required readonly>
+    </div>
 
-                    <div class="field_boton_editar">
-                        <button type="submit" class="button">Cerrar Caja</button>
-                        <button type="button" class="button atras" onclick="goBack()">Volver</button>
-                    </div>
-                </form>
+    <div class="field_boton_editar">
+    <form action="cerrar_caja.php" method="post" style="display:inline;">
+        <button type="submit" class="button">Cerrar Caja</button>
+    </form>
+    <form action="facturas_dia.php" method="post" style="display:inline;">
+        <button type="submit" class="button">Facturas del Día</button>
+    </form>
+    <button type="button" class="button atras" onclick="goBack()">Volver</button>
+</div>
             <?php endif; ?>
-<!-- Links a Facturas y Estadísticas -->
-<a href="../ordenes/facturas.php" class="button">Facturas</a>
-<a href="../ordenes/estadisticas.php" class="button">Estadisticas</a>
+            <form action="facturas_dia.php" method="post" style="display:inline;">
+                        <button type="submit" class="button">Facturas del Dia</button>
+                        </form>
+
         </div>
     </div>
 </div>

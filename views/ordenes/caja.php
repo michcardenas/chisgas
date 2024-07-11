@@ -32,6 +32,15 @@ if (file_exists($ruta)) {
     <a href="../ordenes/cerrar_caja.php">
         <button type="submit" name="accion" value="cerrar" class="button2">Cerrar caja &#x1F6AC;</button>
     </a>
+
+    <a href="../ordenes/estadisticas.php">
+    <button type="submit" name="accion" value="estadisticas" class="button2">Estadisticas &#x1F4C8;</button>
+</a>
+
+<a href="../ordenes/facturas.php">
+    <button type="submit" name="accion" value="facturas" class="button2">Facturas &#x1F4C4;</button>
+</a>
+
 </div>
 
 

@@ -18,7 +18,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     // Incluir archivos de template y footer
     $ruta_css = '../css/style.css';
     $ruta_icon = '../img/aguja.png';
-    $ruta_image_menu = "cerrar_caja.php"; // Cambiado a cerrar_caja.php
+    $ruta_image_menu = "caja.php"; // Cambiado a cerrar_caja.php
     $ruta_image = "../img/chisgas_fondo_blanco.png";
     include $ruta_template;
 
