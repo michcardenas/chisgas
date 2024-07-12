@@ -141,12 +141,11 @@ if (isset($_SESSION['cliente_consultar'])) {
 <tr>
 
 <form id="calendario_form" style="display: flex; justify-content: space-between;" onsubmit="guardarDatosYConsultar(event)">
-    <a href="../calendario/calendario.php" class="button" style="display: flex; align-items: center;">
-        <span style="margin-right: 5px;">&#128197;</span>
-        <span>Consultar Calendario</span>
-    </a>
-</form>
-
+<button type="submit" class="button" style="display: flex; align-items: center;">
+            <span style="margin-right: 5px;">&#128197;</span>
+            <span>Consultar Calendario</span>
+        </button>
+    </form>
 
 <form id="orden_form" class="card">
     <div class="card_header"></div>
@@ -202,7 +201,7 @@ if (isset($_SESSION['cliente_consultar'])) {
 
 <script>
 // Función para guardar los datos y consultar el calendario
-function guardarDatosYConsultar(event) {
+        function guardarDatosYConsultar(event) {
             event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
 
             const totalPrendas = document.getElementById('total_prendas').value;
@@ -222,9 +221,8 @@ function guardarDatosYConsultar(event) {
             localStorage.setItem('mostrarVolver', 'true');
 
             // Redirigir al calendario
-            window.location.href = '../calendario/calendario_vista.php';
+            window.location.href = '../calendario/calendario.php';
         }
-
         // Cargar datos almacenados al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             const totalPrendas = document.getElementById('total_prendas').value;

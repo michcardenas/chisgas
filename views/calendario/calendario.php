@@ -29,9 +29,7 @@ if (file_exists($ruta)) {
     <input type="submit" id="hiddenSubmit">
 </form>
 
-<form id="volver_form" action="agendar_orden.php" method="GET" style="display: none;">
-        <button type="submit" class="button">Volver</button>
-    </form>
+
 
 <script>
     const calendarioData = JSON.parse(sessionStorage.getItem('calendarioData'));

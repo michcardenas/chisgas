@@ -54,9 +54,7 @@ function convertirMinutosAHoras($minutos) {
         <input placeholder="Buscar cliente..."  id="nombre_cliente" type="text">
         <button class="button-buscar_orden">Buscar</button>
       </div>
-      <form id="volver_form" action="agendar_orden.php" method="GET" style="display: none;">
-        <button type="submit" class="button">Volver</button>
-    </form>
+      <button id="boton_volver" onclick="volver()">Volver</button>
 
       <div id="resultados" class="lista-nombres">
             <!-- Aquí se mostrará la lista de nombres -->
@@ -84,13 +82,18 @@ function convertirMinutosAHoras($minutos) {
 </div>
 </div>
 <script>
-        // Verificar si la bandera está establecida y mostrar el botón "Volver"
-        document.addEventListener('DOMContentLoaded', function() {
+        // Función para mostrar el botón "Volver" si la bandera está establecida
+        window.onload = function() {
             if (localStorage.getItem('mostrarVolver') === 'true') {
-                document.getElementById('volver_form').style.display = 'inline';
-                localStorage.removeItem('mostrarVolver'); // Limpiar la bandera después de usar
+                document.getElementById('boton_volver').style.display = 'block';
+                // Limpiar la bandera para futuras visitas
+                localStorage.removeItem('mostrarVolver');
             }
-        });
+        };
+
+        function volver() {
+            window.history.back();
+        }
     </script>
 <?php 
 $ruta_footer = '../footer.php';
