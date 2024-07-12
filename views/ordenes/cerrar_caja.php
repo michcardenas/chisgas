@@ -212,9 +212,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && emp
     <button type="button" class="button atras" onclick="goBack()">Volver</button>
 </div>
             <?php endif; ?>
-            <form action="facturas_dia.php" method="post" style="display:inline;">
-                        <button type="submit" class="button">Facturas del Dia</button>
-                        </form>
 
         </div>
     </div>
