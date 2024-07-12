@@ -57,7 +57,7 @@ $sql_ordenes_dia = "SELECT
                     FROM (
                         SELECT saldo, forma_pago
                         FROM ordenes 
-                        WHERE DATE(fecha_entrega) = '$fecha_hoy' 
+                        WHERE DATE(fecha_creacion) = '$fecha_hoy' 
                             AND (estado = '6' OR estado = '7')
                         UNION ALL
                         SELECT abono, forma_pago
