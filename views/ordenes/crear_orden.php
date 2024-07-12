@@ -15,7 +15,6 @@ if (file_exists($ruta)) {
     $ruta_css = '../css/style.css';
     $ruta_icon = '../img/aguja.png';
     $ruta_image_menu = "../menu.php";
-
     $ruta_image = "../img/chisgas_fondo_blanco.png";
 
     include $ruta;
@@ -23,99 +22,92 @@ if (file_exists($ruta)) {
     echo "El archivo $ruta no existe.";
 }
 
+// Conectar a la base de datos
+include '../../conexion/db_connection.php'; // Ajusta la ruta según sea necesario
 
+// Obtener la fecha actual
+$fecha_hoy = date('Y-m-d');
 
+// Consulta para verificar si la caja está abierta hoy
+$sql = "SELECT fecha FROM caja WHERE DATE(fecha) = CURDATE()";
+$result = $conn->query($sql);
+
+$caja_abierta = $result->num_rows > 0;
+
+// Cerrar la conexión
+$conn->close();
 ?>
 
 <div class="p_centrar">
-
-<div class="centrar">
-
-
-  <form class="form card" >
-    <div class="card_header">
-      <h1 class="form_heading">Detalle cliente</h1>
-      <input type="hidden" name="cliente_id" id="cliente_id" value="<?php echo isset($_GET['id']) ? htmlspecialchars($_GET['id']) : ''; ?>">
-
+    <div class="centrar">
+        <?php if ($caja_abierta): ?>
+        <form class="form card">
+            <div class="card_header">
+                <h1 class="form_heading">Detalle cliente</h1>
+                <input type="hidden" name="cliente_id" id="cliente_id" value="<?php echo isset($_GET['id']) ? htmlspecialchars($_GET['id']) : ''; ?>">
+            </div>
+            <div class="field">
+                <label for="nombre_cliente">Nombre</label>
+                <input class="input" readonly name="nombre_cliente" type="text" placeholder="nombre" id="nombre_cliente" value="<?php echo isset($_GET['nombre']) ? htmlspecialchars($_GET['nombre']) : ''; ?>">
+            </div>
+            <div class="field">
+                <label for="telefono_cliente">Telefono</label>
+                <input class="input" readonly name="telefono_cliente" type="number" placeholder="telefono" id="telefono_cliente" value="<?php echo isset($_GET['telefono']) ? htmlspecialchars($_GET['telefono']) : ''; ?>">
+            </div>
+            <div class="content_loader"><div class="loader"></div></div>
+            <h1 class="form_heading" id="resultado_editar"></h1>
+        </form>
+        <form class="form card_2">
+            <div class="card_header">
+                <h1 class="form_heading">Crear orden de Arreglo</h1>
+            </div>
+            <div class="field flex">
+                <label for="nombre_cliente_select">Prenda</label>
+                <select class="input" name="nombre_prenda" id="nombre_prenda">
+                    <option value="" selected>Seleccione</option>
+                    <option value="Camisa">Camisa</option>
+                    <option value="Camiseta">Camiseta</option>
+                    <option value="Blusa">Blusa</option>
+                    <option value="Pantalon">Pantalon</option>
+                    <option value="Chaqueta">Chaqueta</option>
+                    <option value="Saco">Saco</option>
+                    <option value="Sueter">Sueter</option>
+                    <option value="Falda">Falda</option>
+                    <option value="Vestido">Vestido</option>
+                    <option value="Otro">Otro</option>
+                </select>
+                <label for="telefono_cliente"># de prendas</label>
+                <input class="input" name="prendas_numero" type="number" placeholder="# prendas" id="prendas_numero">
+            </div>
+            <input type="hidden" name="estado" id="estado" value="creado">
+            <div class="field">
+                <label for="descripcion_arreglo">Descripcion del Arreglo</label>
+                <textarea class="input" name="descripcion_arreglo" placeholder="Escribe la descripción aquí..." id="descripcion_arreglo"></textarea>
+            </div>
+            <div class="field flex">
+                <label for="telefono_cliente">Tiempo estimado</label>
+                <input class="input" name="tiempo_estimado" type="number" placeholder="Tiempo estimado" id="tiempo_estimado">
+                <label for="valor_prenda">Valor Total</label>
+                <input class="input" name="valor_prenda" type="text" data-real-value="" placeholder="$" value="0" id="valor_prenda">
+            </div>
+        </form>
+        <div class="flex">
+            <button value="agregar_prenda" id="agregar_prenda" class="button">Agregar &#10133;</button>
+            <button id="agendar_orden_btn" class="button"> &#9986; Agendar Orden</button>
+        </div>
+        <?php else: ?>
+        <p>La caja no está abierta. No se pueden crear órdenes en este momento.</p>
+        <?php endif; ?>
     </div>
-    <div class="field">
-      <label for="nombre_cliente">Nombre</label>
-      <input class="input" readonly name="nombre_cliente" type="text" placeholder="nombre" id="nombre_cliente" value="<?php echo isset($_GET['nombre']) ? htmlspecialchars($_GET['nombre']) : ''; ?>">
-    </div>
-    <div class="field">
-      <label for="telefono_cliente">Telefono</label>
-      <input class="input" readonly name="telefono_cliente" type="number" placeholder="telefono" id="telefono_cliente" value="<?php echo isset($_GET['telefono']) ? htmlspecialchars($_GET['telefono']) : ''; ?>">
-    </div>
-
-    <div class="content_loader"><div class="loader"></div></div>
-    <h1 class="form_heading" id="resultado_editar"></h1>
-
-  </form>
-
-  <form class="form card_2" >
-
-    <div class="card_header">
-   
-      <h1 class="form_heading">Crear orden de Arreglo</h1>
-
-    </div>
-    <div class="field flex">
-  <label for="nombre_cliente_select">Prenda</label>
-  <select class="input" name="nombre_prenda" id="nombre_prenda">
-    <option value=""  selected>Seleccione</option>
-    <option value="Camisa">Camisa</option>
-    <option value="Camiseta">Camiseta</option>
-    <option value="Blusa">Blusa</option>
-    <option value="Pantalon">Pantalon</option>
-    <option value="Chaqueta">Chaqueta</option>
-    <option value="Saco">Saco</option>
-    <option value="Sueter">Sueter</option>
-    <option value="Falda">Falda</option>
-    <option value="Vestido">Vestido</option>
-    <option value="Otro">Otro</option>
-  </select>
-  <label for="telefono_cliente"># de prendas</label>
-      <input class="input" name="prendas_numero" type="number" placeholder="# prendas" id="prendas_numero" >
-</div>
-<input type="hidden" name="estado" id="estado" value="creado">
-
-<div class="field">
-  <label for="descripcion_arreglo">Descripcion del Arreglo</label>
-  <textarea class="input" name="descripcion_arreglo" placeholder="Escribe la descripción aquí..." id="descripcion_arreglo"></textarea>
-</div>
-<div class="field flex">
-<label for="telefono_cliente">Tiempo estimado</label>
-      <input class="input" name="tiempo_estimado" type="number" placeholder="Tiempo estimado" id="tiempo_estimado" >
-      <label for="valor_prenda">Valor Total</label>
-      <input class="input" name="valor_prenda" type="text" data-real-value="" placeholder="$" value="0" id="valor_prenda" >
-    </div>  
-  
-    </form> 
-    <div class=" flex">
-      <button value="agregar_prenda" id="agregar_prenda"  class="button">Agregar &#10133;</button>
-      <button id="agendar_orden_btn" class="button"> &#9986; Agendar Orden</button>
-      </div> 
-</div>
-    </div>
-
-
-    
-  
-
-
 </div>
 
-</div>
 <?php 
 $ruta_footer = '../footer.php';
 
-if (file_exists($ruta)) {
-   
+if (file_exists($ruta_footer)) {
     $ruta_js = "../js/main.js";
-
     include $ruta_footer;
 } else {
-    echo "El archivo $ruta no existe.";
+    echo "El archivo $ruta_footer no existe.";
 }
-
 ?>

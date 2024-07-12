@@ -126,7 +126,8 @@ if (mysqli_num_rows($result_check) > 0) {
         const baseInput = document.getElementById('base');
 
         function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            // Añadir el símbolo de peso al inicio del número formateado
+            return '$ ' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
         baseInput.addEventListener('input', function(e) {
@@ -134,6 +135,7 @@ if (mysqli_num_rows($result_check) > 0) {
             this.value = formatNumber(val);
         });
 
+        // Al cargar la página, formatear el valor inicial si existe
         if (baseInput) {
             baseInput.value = formatNumber(baseInput.value.replace(/[^\d]/g, ''));
         }
