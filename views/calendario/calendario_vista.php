@@ -1,7 +1,7 @@
 <?php
 // Iniciar la sesión
 session_start();
-
+include '../../model/funciones.php';
 // Comprobar si el usuario ha iniciado sesión
 if (!isset($_SESSION['username'])) {
     // Si no ha iniciado sesión, redirigir al login
@@ -20,13 +20,13 @@ if (file_exists($ruta)) {
     include $ruta;
 } else {
     echo "El archivo $ruta no existe.";
+
 }
 if (isset($_POST['calendarioData'])) {
     $calendarioData = json_decode($_POST['calendarioData'], true);
 
     // Ahora puedes manipular $calendarioData como un array en PHP
 }
-
 
 function convertirMinutosAHoras($minutos) {
     $horas = floor($minutos / 60);
@@ -38,7 +38,6 @@ function convertirMinutosAHoras($minutos) {
         return "{$minRestantes}min";
     }
 }
-
 
 ?>
 
@@ -55,7 +54,6 @@ function convertirMinutosAHoras($minutos) {
         <button class="button-buscar_orden">Buscar</button>
       </div>
       <button id="boton_volver" onclick="volver()">Volver</button>
-
       <div id="resultados" class="lista-nombres">
             <!-- Aquí se mostrará la lista de nombres -->
         </div><table border="1">

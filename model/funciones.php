@@ -518,6 +518,5 @@ SELECT
     // Cerrar el statement (liberar los recursos)
     $stmt->close();
 }
-
 ?>
 

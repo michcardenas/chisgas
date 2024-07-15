@@ -39,41 +39,67 @@ $row_select = mysqli_fetch_assoc($result_select);
 if ($row_select) {
     $base = $row_select['base'];
     if (!is_null($row_select['gastos']) && !is_null($row_select['dinero_final'])) {
-        $mensaje = "La caja ya ha sido cerrada hoy.";
+        $mensaje = "<div style='display: flex; justify-content: center; align-items: center; height: 100vh;'>La caja ya ha sido cerrada hoy.</div>";
     }
 } else {
-    $mensaje = "No se encontró una caja abierta para hoy.";
+    $mensaje = "<div style='display: flex; justify-content: center; align-items: center; height: 100vh;'>No se encontró una caja abierta para hoy.</div>";
 }
+
+
 
 // Calcular el total de órdenes del día que están arregladas o en entrega parcial
 $total_recogido = 0;
 $total_efectivo = 0;
 $total_nequi = 0;
 
-$sql_ordenes_dia = "SELECT 
-                        COALESCE(SUM(CASE WHEN forma_pago = 'Efectivo' THEN saldo ELSE 0 END), 0) AS total_efectivo,
-                        COALESCE(SUM(CASE WHEN forma_pago = 'Nequi' THEN saldo ELSE 0 END), 0) AS total_nequi,
-                        COALESCE(SUM(saldo), 0) AS total_recogido 
-                    FROM (
-                        SELECT saldo, forma_pago
-                        FROM ordenes 
-                        WHERE DATE(fecha_creacion) = '$fecha_hoy' 
-                            AND (estado = '6' OR estado = '7')
-                        UNION ALL
-                        SELECT abono, forma_pago
-                        FROM entregas_parciales 
-                        WHERE DATE(fecha_hora) = '$fecha_hoy'
-                        UNION ALL
-                        SELECT abono, forma_pago
-                        FROM ordenes 
-                        WHERE DATE(fecha_creacion) = '$fecha_hoy' 
-                            AND abono IS NOT NULL
-                        UNION ALL
-                        SELECT o.saldo, o.forma_pago
-                        FROM entregas e
-                        INNER JOIN ordenes o ON e.orden_id = o.id
-                        WHERE DATE(e.fecha) = '$fecha_hoy'
-                    ) AS totales";
+$sql_ordenes_dia = "
+SELECT 
+    COALESCE(SUM(CASE WHEN forma_pago = 'Efectivo' THEN saldo ELSE 0 END), 0) AS total_efectivo,
+    COALESCE(SUM(CASE WHEN forma_pago = 'Nequi' THEN saldo ELSE 0 END), 0) AS total_nequi,
+    COALESCE(SUM(saldo), 0) AS total_recogido 
+FROM (
+    -- Total saldo de las órdenes restando abonos parciales
+    SELECT 
+        o.saldo - COALESCE(SUM(ep.abono), 0) AS saldo, 
+        o.forma_pago
+    FROM ordenes o
+    LEFT JOIN entregas_parciales ep ON o.id = ep.id_orden 
+      AND DATE(ep.fecha_hora) = CURDATE()
+    WHERE DATE(o.fecha_entrega) = CURDATE()
+      AND (o.estado = '6' OR o.estado = '7')
+    GROUP BY o.id, o.saldo, o.forma_pago
+    
+    UNION ALL
+    
+    -- Abonos parciales de entregas
+    SELECT 
+        ep.abono AS saldo, 
+        ep.forma_pago
+    FROM entregas_parciales ep
+    WHERE DATE(ep.fecha_hora) = CURDATE()
+    
+    UNION ALL
+    
+    -- Abonos iniciales en órdenes
+    SELECT 
+        o.abono AS saldo, 
+        o.forma_pago
+    FROM ordenes o
+    WHERE DATE(o.fecha_creacion) = CURDATE() 
+      AND o.abono IS NOT NULL
+    
+    UNION ALL
+    
+    -- Saldos de entregas
+    SELECT 
+        o.saldo, 
+        o.forma_pago
+    FROM entregas e
+    INNER JOIN ordenes o ON e.orden_id = o.id
+    WHERE DATE(e.fecha) = CURDATE()
+) AS totales;
+";
+
 
 $result_ordenes_dia = mysqli_query($conn, $sql_ordenes_dia);
 
@@ -179,40 +205,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && emp
 
             <?php if (empty($mensaje) || $mensaje == "La caja solo se puede cerrar después de las 12:00 PM.") : ?>
                 <form id="cerrar_caja_form" class="card" method="post">
-    <div class="card_header"></div>
+                    <div class="card_header"></div>
 
-    <div class="field">
-        <label for="gasto">Agregar Gasto:</label>
-        <input class="input" type="text" id="gasto" name="gasto" placeholder="Descripción del gasto">
-        <button type="button" id="add_gasto_button" class="button">Agregar Gasto</button>
-    </div>
+                    <div class="field">
+                        <label for="gasto">Agregar Gasto:</label>
+                        <input class="input" type="text" id="gasto" name="gasto" placeholder="Descripción del gasto">
+                        <button type="button" id="add_gasto_button" class="button">Agregar Gasto</button>
+                    </div>
 
-    <div class="field">
-        <label for="gastos">Gastos:</label>
-        <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
-    </div>
+                    <div class="field">
+                        <label for="gastos">Gastos:</label>
+                        <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
+                    </div>
 
-    <div class="field">
-        <label for="suma_gastos">Suma Total de Gastos:</label>
-        <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
-    </div>
+                    <div class="field">
+                        <label for="suma_gastos">Suma Total de Gastos:</label>
+                        <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
+                    </div>
 
-    <div class="field">
-        <label for="dinero_final">Dinero Final en Caja</label>
-        <input class="input" type="text" id="dinero_final" name="dinero_final" value="<?php echo number_format($dinero_final_calculado, 0, ',', '.'); ?>" required readonly>
-    </div>
+                    <div class="field">
+                        <label for="dinero_final">Dinero Final en Caja</label>
+                        <input class="input" type="text" id="dinero_final" name="dinero_final" value="<?php echo number_format($dinero_final_calculado, 0, ',', '.'); ?>" required readonly>
+                    </div>
 
-    <div class="field_boton_editar">
-    <form action="cerrar_caja.php" method="post" style="display:inline;">
-        <button type="submit" class="button">Cerrar Caja</button>
-    </form>
-    <form action="facturas_dia.php" method="post" style="display:inline;">
-        <button type="submit" class="button">Facturas del Día</button>
-    </form>
-    <button type="button" class="button atras" onclick="goBack()">Volver</button>
-</div>
+                    <div class="field_boton_editar">
+                        <button type="submit" class="button">Cerrar Caja</button>
+                        <button type="submit" formaction="facturas_dia.php" class="button">Facturas del Día</button>
+                        <button type="button" class="button atras" onclick="goBack()">Volver</button>
+                    </div>
+                </form>
             <?php endif; ?>
-
         </div>
     </div>
 </div>

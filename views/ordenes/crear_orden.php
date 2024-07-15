@@ -96,8 +96,10 @@ $conn->close();
             <button id="agendar_orden_btn" class="button"> &#9986; Agendar Orden</button>
         </div>
         <?php else: ?>
+            <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
         <p>La caja no está abierta. No se pueden crear órdenes en este momento.</p>
-        <?php endif; ?>
+    </div>
+<?php endif; ?>
     </div>
 </div>
 
