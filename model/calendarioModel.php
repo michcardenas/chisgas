@@ -480,7 +480,9 @@ function entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abon
         $stmtOrden->execute();
         $stmtOrden->close();
 
-        // Asegurarse de que $prendas_datos sea un array ya está garantizado por cómo se maneja la función
+        // Variable para controlar si ya se ha contado el abono
+        $abonoContado = false;
+
         // Recorrer $prendas_datos para manejar cada prenda
         foreach ($prendas_datos as $prenda) {
             // Extraer los valores para cada prenda
@@ -490,7 +492,15 @@ function entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abon
             // Preparar la consulta para insertar en entregas_parciales
             $sqlPrenda = "INSERT INTO entregas_parciales (id_orden, id_prenda, cantidad_entregada, abono, fecha_hora, forma_pago) VALUES (?, ?, ?, ?, NOW(), ?)";
             $stmtPrenda = $conn->prepare($sqlPrenda);
-            $stmtPrenda->bind_param("iiids", $id_orden, $id_prenda, $cantidad_entregada, $abono, $forma_pago);
+
+            // Solo contar el abono una vez para toda la operación
+            if (!$abonoContado) {
+                $stmtPrenda->bind_param("iiids", $id_orden, $id_prenda, $cantidad_entregada, $abono, $forma_pago);
+                $abonoContado = true;
+            } else {
+                $abonoCero = 0;
+                $stmtPrenda->bind_param("iiids", $id_orden, $id_prenda, $cantidad_entregada, $abonoCero, $forma_pago);
+            }
 
             // Ejecutar el statement
             if (!$stmtPrenda->execute()) {
@@ -516,5 +526,7 @@ function entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abon
         return false;
     }
 }
+
+
 
 ?>

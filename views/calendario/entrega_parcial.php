@@ -281,8 +281,6 @@ $(document).ready(function(){
                 dataType: "json",
                 success: function(response) {
                     alert("Se ha realizado de manera correcta la entrega parcial o abono.");
-                    // Redirigir utilizando la URL guardada en localStorage
-                    window.location.href = localStorage.getItem('previousPage');
                 },
                 error: function(xhr, status, error) {
                     console.error("Error en AJAX:", status, error);
