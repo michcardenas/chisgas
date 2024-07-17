@@ -59,6 +59,7 @@ function convertirMinutosAHoras($minutos) {
     <option value="4">En Proceso</option>
     <option value="5">Arreglado</option>
     <option value="6">Entregado</option>
+    <option value="7">Entrega Parcial</option>
     <option value="all">Todos</option>
 </select>
             <!-- Aquí se mostrará la lista de nombres -->

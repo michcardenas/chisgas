@@ -7,6 +7,7 @@ function ver_calendario() {
     $query = "
 SELECT 
     o.fecha_entrega,
+    o.estado AS orden_estado,
     p.estado,
     COUNT(DISTINCT p.id_cliente) AS numero_clientes,
     SUM(p.tiempo_estimado) AS tiempo_estimado_total
@@ -15,7 +16,8 @@ FROM
 JOIN 
     prendas p ON o.id = p.id_orden
 WHERE 
-    p.estado IN ('3', '4', '5')
+    p.estado IN ('3', '4', '5') 
+    AND (o.estado = '0' OR o.estado IS NULL)  -- Asegura que las órdenes en estado 0 también sean incluidas
 GROUP BY 
     o.fecha_entrega, p.estado
 ORDER BY 
@@ -589,6 +591,26 @@ function ver_calendario_estado_prenda($estado) {
         ORDER BY 
             o.fecha_entrega;
         ";
+    } elseif ($estado == '7') {
+        // Si se solicita el estado 7, seleccionamos sólo las órdenes y prendas en estado 7
+        $query = "
+        SELECT 
+            o.fecha_entrega,
+            o.estado AS orden_estado,
+            p.estado,
+            COUNT(DISTINCT p.id_cliente) AS numero_clientes,
+            SUM(p.tiempo_estimado) AS tiempo_estimado_total
+        FROM 
+            ordenes o
+        JOIN 
+            prendas p ON o.id = p.id_orden
+        WHERE 
+            o.estado = '7' 
+        GROUP BY 
+            o.fecha_entrega, p.estado, o.estado
+        ORDER BY 
+            o.fecha_entrega;
+        ";
     } elseif ($estado == 'all') {
         // Si se solicita el estado 'all', seleccionamos todas las órdenes sin importar su estado
         $query = "
@@ -605,7 +627,28 @@ function ver_calendario_estado_prenda($estado) {
         GROUP BY 
             o.fecha_entrega, p.estado, o.estado
         ORDER BY 
-            FIELD(p.estado, '3', '4', '5', '6'), 
+            FIELD(p.estado, '3', '4', '5', '6', '7'), 
+            o.fecha_entrega;
+        ";
+    } elseif ($estado == '3') {
+        // Si se solicita el estado 3, seleccionamos prendas en estado 3 y órdenes en estado 0
+        $query = "
+        SELECT 
+            o.fecha_entrega,
+            o.estado AS orden_estado,
+            p.estado,
+            COUNT(DISTINCT p.id_cliente) AS numero_clientes,
+            SUM(p.tiempo_estimado) AS tiempo_estimado_total
+        FROM 
+            ordenes o
+        JOIN 
+            prendas p ON o.id = p.id_orden
+        WHERE 
+            p.estado = '3' OR o.estado = '0'
+        GROUP BY 
+            o.fecha_entrega, p.estado, o.estado
+        ORDER BY 
+            FIELD(p.estado, '3', '4', '5'), 
             o.fecha_entrega;
         ";
     } else {
@@ -627,13 +670,13 @@ function ver_calendario_estado_prenda($estado) {
         JOIN 
             prendas p ON o.id = p.id_orden
         WHERE 
-            p.estado IN ('3', '4', '5') $estadoCondition AND o.id NOT IN (
-                SELECT id FROM ordenes WHERE estado = '6'
+            p.estado IN ('3', '4', '5', '7') $estadoCondition AND o.id NOT IN (
+                SELECT id FROM ordenes WHERE estado = '6' OR estado = '7'
             )
         GROUP BY 
             o.fecha_entrega, p.estado, o.estado
         ORDER BY 
-            FIELD(p.estado, '3', '4', '5'), 
+            FIELD(p.estado, '3', '4', '5', '7'), 
             o.fecha_entrega;
         ";
     }
@@ -651,6 +694,4 @@ function ver_calendario_estado_prenda($estado) {
         return false;  // O podrías devolver un array vacío dependiendo de lo que necesites
     }
 }
-
-
 ?>
