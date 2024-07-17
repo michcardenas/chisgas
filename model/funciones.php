@@ -148,7 +148,7 @@ function prendas_por_entregar($id_orden) {
         $data = [];
         while($row = $result->fetch_assoc()) {
             // Ajustar las cantidades según las entregas parciales
-            $row['prendas_numero'] -= $row['cantidad_entregada_total']; // Restar cantidad entregada
+            $row['prendas_numero']; // Restar cantidad entregada
             $data[] = $row;
         }
         return $data;

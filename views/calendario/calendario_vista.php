@@ -16,7 +16,7 @@ if (file_exists($ruta)) {
     $ruta_icon = '../img/aguja.png';
     $ruta_image_menu = '../menu.php';
     $ruta_image = "../img/chisgas_fondo_blanco.png";
-
+    $ruta_js = "../js/main.js";
     include $ruta;
 } else {
     echo "El archivo $ruta no existe.";
@@ -44,19 +44,26 @@ function convertirMinutosAHoras($minutos) {
 <div class="p_centrar">
 
 <div class="centrar">
-    <h4  class="form_heading">Busca tu cliente aqui!</h4>
-<div class="search">
+    <h4 class="form_heading">Busca el estado de las prendas aquí!</h4>
+    <div class="search">
         <select name="nombre" id="nombre_telefono"> 
             <option value="nombre">Nombre</option>
-            <option value="telefono">Telefono</option>
+            <option value="telefono">Teléfono</option>
         </select>
-        <input placeholder="Buscar cliente..."  id="nombre_cliente" type="text">
-        <button class="button-buscar_orden">Buscar</button>
-      </div>
-      <button id="boton_volver" onclick="volver()">Volver</button>
-      <div id="resultados" class="lista-nombres">
+        <input placeholder="Buscar cliente..." id="nombre_cliente" type="text">
+        <button class="button-buscar_orden" onclick="buscarPrenda()">Buscar</button>
+    </div>
+    <div class="select-container">
+    <select class="select-container" id="estadoPrendaSelect">
+    <option value="3">Pendiente</option>
+    <option value="4">En Proceso</option>
+    <option value="5">Arreglado</option>
+    <option value="6">Entregado</option>
+    <option value="all">Todos</option>
+</select>
             <!-- Aquí se mostrará la lista de nombres -->
-        </div><table border="1">
+        </div>
+        <table id="calendarioTabla" border="1">
     <thead>
         <tr>
             <th>Fecha de Entrega</th>
@@ -65,29 +72,31 @@ function convertirMinutosAHoras($minutos) {
         </tr>
     </thead>
     <tbody>
-    <?php foreach ($calendarioData as $index => $entry): ?>
-        <tr>
-            <!-- Añadiendo un enlace con un data-id al campo fecha_entrega -->
-            <td><a href="#" class="fecha-link" data-fecha="<?php echo htmlspecialchars($entry["fecha_entrega"]); ?>"><?php echo htmlspecialchars($entry["fecha_entrega"]); ?></a></td>
-            <td><?php echo htmlspecialchars($entry["numero_clientes"]); ?></td>
-            <td><?php echo convertirMinutosAHoras($entry["tiempo_estimado_total"]); ?></td>
-        </tr>
-    <?php endforeach; ?>
-</tbody>
-
+        <?php foreach ($calendarioData as $index => $entry): ?>
+            <tr>
+                <!-- Añadiendo un enlace con un data-id al campo fecha_entrega -->
+                <td><a href="#" class="fecha-link" data-fecha="<?php echo htmlspecialchars($entry["fecha_entrega"]); ?>" onclick="verDetallesOrden('<?php echo htmlspecialchars($entry["fecha_entrega"]); ?>')"><?php echo htmlspecialchars($entry["fecha_entrega"]); ?></a></td>
+                <td><?php echo htmlspecialchars($entry["numero_clientes"]); ?></td>
+                <td><?php echo convertirMinutosAHoras($entry["tiempo_estimado_total"]); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
 </table>
 
 </div>
 </div>
 <script>
-        // Función para mostrar el botón "Volver" si la bandera está establecida
-        window.onload = function() {
-            if (localStorage.getItem('mostrarVolver') === 'true') {
-                document.getElementById('boton_volver').style.display = 'block';
-                // Limpiar la bandera para futuras visitas
-                localStorage.removeItem('mostrarVolver');
-            }
-        };
+
+    function buscarPrenda() {
+        var criterio = document.getElementById('nombre_telefono').value;
+        var valor = document.getElementById('nombre_cliente').value;
+        var estado = document.getElementById('estado_prenda').value;
+        
+        // Lógica para buscar la prenda con el criterio y el valor ingresado, y filtrar por estado
+        console.log('Buscar prenda por:', criterio, valor, 'Estado:', estado);
+        // Actualiza el contenido de 'resultados' con los datos filtrados
+    }
+
 
         function volver() {
             window.history.back();

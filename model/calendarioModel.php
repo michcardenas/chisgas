@@ -7,15 +7,19 @@ function ver_calendario() {
     $query = "
 SELECT 
     o.fecha_entrega,
+    p.estado,
     COUNT(DISTINCT p.id_cliente) AS numero_clientes,
     SUM(p.tiempo_estimado) AS tiempo_estimado_total
 FROM 
     ordenes o
 JOIN 
     prendas p ON o.id = p.id_orden
+WHERE 
+    p.estado IN ('3', '4', '5')
 GROUP BY 
-    o.fecha_entrega
+    o.fecha_entrega, p.estado
 ORDER BY 
+    FIELD(p.estado, '3', '4', '5'), 
     o.fecha_entrega;
     ";
 
@@ -526,7 +530,127 @@ function entrega_parcial_en($id_orden, $nombre_usuario, $telefono_cliente, $abon
         return false;
     }
 }
+function ver_estados_prenda($estado_prenda) {
+    global $conn;  // Asegúrate de que tu conexión se llama $conn
 
+    $query = "
+SELECT 
+    o.fecha_entrega,
+    p.estado,
+    COUNT(DISTINCT p.id_cliente) AS numero_clientes,
+    SUM(p.tiempo_estimado) AS tiempo_estimado_total
+FROM 
+    ordenes o
+JOIN 
+    prendas p ON o.id = p.id_orden
+WHERE 
+    p.estado IN ('3', '4', '5')
+GROUP BY 
+    o.fecha_entrega, p.estado
+ORDER BY 
+    FIELD(p.estado, '3', '4', '5'), 
+    o.fecha_entrega;
+    ";
+
+    $result = $conn->query($query);
+
+    // Verificar si la consulta devuelve resultados
+    if ($result->num_rows > 0) {
+        $data = [];
+        while($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        return $data;
+    } else {
+        return false;  // O podrías devolver un array vacío dependiendo de lo que necesites
+    }
+}
+
+function ver_calendario_estado_prenda($estado) {
+    global $conn;  // Asegúrate de que tu conexión se llama $conn
+
+    if ($estado == '6') {
+        // Si se solicita el estado 6, seleccionamos sólo las órdenes y prendas en estado 6
+        $query = "
+        SELECT 
+            o.fecha_entrega,
+            o.estado AS orden_estado,
+            p.estado,
+            COUNT(DISTINCT p.id_cliente) AS numero_clientes,
+            SUM(p.tiempo_estimado) AS tiempo_estimado_total
+        FROM 
+            ordenes o
+        JOIN 
+            prendas p ON o.id = p.id_orden
+        WHERE 
+            o.estado = '6' 
+        GROUP BY 
+            o.fecha_entrega, p.estado, o.estado
+        ORDER BY 
+            o.fecha_entrega;
+        ";
+    } elseif ($estado == 'all') {
+        // Si se solicita el estado 'all', seleccionamos todas las órdenes sin importar su estado
+        $query = "
+        SELECT 
+            o.fecha_entrega,
+            o.estado AS orden_estado,
+            p.estado,
+            COUNT(DISTINCT p.id_cliente) AS numero_clientes,
+            SUM(p.tiempo_estimado) AS tiempo_estimado_total
+        FROM 
+            ordenes o
+        JOIN 
+            prendas p ON o.id = p.id_orden
+        GROUP BY 
+            o.fecha_entrega, p.estado, o.estado
+        ORDER BY 
+            FIELD(p.estado, '3', '4', '5', '6'), 
+            o.fecha_entrega;
+        ";
+    } else {
+        // Para los demás estados
+        $estadoCondition = '';
+        if ($estado != 'all') {
+            $estadoCondition = "AND p.estado = '$estado'";
+        }
+
+        $query = "
+        SELECT 
+            o.fecha_entrega,
+            o.estado AS orden_estado,
+            p.estado,
+            COUNT(DISTINCT p.id_cliente) AS numero_clientes,
+            SUM(p.tiempo_estimado) AS tiempo_estimado_total
+        FROM 
+            ordenes o
+        JOIN 
+            prendas p ON o.id = p.id_orden
+        WHERE 
+            p.estado IN ('3', '4', '5') $estadoCondition AND o.id NOT IN (
+                SELECT id FROM ordenes WHERE estado = '6'
+            )
+        GROUP BY 
+            o.fecha_entrega, p.estado, o.estado
+        ORDER BY 
+            FIELD(p.estado, '3', '4', '5'), 
+            o.fecha_entrega;
+        ";
+    }
+
+    $result = $conn->query($query);
+
+    // Verificar si la consulta devuelve resultados
+    if ($result->num_rows > 0) {
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        return $data;
+    } else {
+        return false;  // O podrías devolver un array vacío dependiendo de lo que necesites
+    }
+}
 
 
 ?>

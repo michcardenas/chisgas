@@ -809,9 +809,71 @@ $("#entrega_parcial").click(function(e) {
   }
 });
 });
-    
 
+function cargarCalendarioPorEstadoPrenda(estado) {
+    $.ajax({
+        url: '../../controllers/calendarioController.php',
+        type: 'POST',
+        data: {
+            'action': 'ver_calendario_estado_prenda',
+            'estado': estado
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                console.log(response);
+                sessionStorage.setItem('calendarioData', JSON.stringify(response.data));
+                actualizarVistaCalendario(response.data);
+                alert("Datos de calendario actualizados según el estado de la prenda.");
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert("Error en la comunicación con el servidor.");
+        }
+    });
+}
+
+function actualizarVistaCalendario(data) {
+    data.sort(function(a, b) {
+        return new Date(b.fecha_entrega) - new Date(a.fecha_entrega);
+    });
+
+    var tbody = $("#calendarioTabla tbody");
+    tbody.empty();
+
+    data.forEach(function(item) {
+        var row = `
+            <tr>
+                <td><a href="#" class="fecha-link" data-fecha="${item.fecha_entrega}" onclick="verDetallesOrden('${item.fecha_entrega}')">${item.fecha_entrega}</a></td>
+                <td>${item.numero_clientes}</td>
+                <td>${convertirMinutosAHoras(item.tiempo_estimado_total)}</td>
+            </tr>
+        `;
+        tbody.append(row);
+    });
+}
+
+$("#estadoPrendaSelect").change(function() {
+    var estado = $(this).val();
+    cargarCalendarioPorEstadoPrenda(estado);
+    console.log('Estado seleccionado:', estado);
 });
+
+function convertirMinutosAHoras(minutos) {
+    var horas = Math.floor(minutos / 60);
+    var minutosRestantes = minutos % 60;
+    return horas + "h " + minutosRestantes + "m";
+}
+});
+// Función para manejar los clics en las fechas y ver los detalles de la orden
+function verDetallesOrden(fecha) {
+    // Aquí puedes redirigir a una página de detalles o mostrar un modal con más información
+    window.location.href = '../calendario/ver_dia.php?fecha_entrega=' + fecha;
+};
+
+
 
 $('.ff').on('submit', function(e) {
     var nombre_cliente = $('#nombre_cliente').val();
