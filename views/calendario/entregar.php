@@ -48,9 +48,17 @@ $subtotal = 0;
 foreach ($arreglos_prendas as $prenda) {
     $subtotal += $prenda['valor'];
 }
+
+$totalPrendasBaseDatos = $arreglos_prendas[0]['total_prendas'] ?? 0;
+$totalPrendasEntregadas = array_reduce($arreglos_prendas, function($carry, $prenda) {
+    return $carry + $prenda['prendas_numero'];
+}, 0);
+
+$todasArregladas = ($totalPrendasBaseDatos == $totalPrendasEntregadas);
+
 ?>
 
-<<div class="p_centrar">
+<div class="p_centrar">
     <div class="centrar">
         <?php if (isset($arreglos_prendas[0])): ?>
             <?php $primer_resultado = $arreglos_prendas[0]; ?>
@@ -143,9 +151,11 @@ foreach ($arreglos_prendas as $prenda) {
         </div>
 
         <div class="flex">
+            <?php if ($todasArregladas): ?>
                 <button id="entrega_total" class="button">Entrega total &#128722;</button>
-     
+            <?php else: ?>
                 <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
+            <?php endif; ?>
         </div>
     </div>
 </div>

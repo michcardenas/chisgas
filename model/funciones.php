@@ -115,7 +115,8 @@ function prendas_por_entregar($id_orden) {
             u.login,
             p.valor,
             o.valor_total,
-            o.abono
+            o.abono,
+            o.total_prendas
         FROM 
             prendas p
         LEFT JOIN 

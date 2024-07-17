@@ -35,8 +35,12 @@ if (isset($_GET['fecha_entrega'])) {
 $id_orden = isset($_GET['id_orden']) ? htmlspecialchars($_GET['id_orden']) : '';
 // Este es tu código para obtener los datos
 $arreglos_prendas = prendas_por_orden_con_cliente($id_orden);
-?>
 
+
+
+
+
+?>
 <div class="p_centrar">
 <div class="centrar">
 <form class="form card">
@@ -75,13 +79,9 @@ $arreglos_prendas = prendas_por_orden_con_cliente($id_orden);
 
 $totalPrendas = count($arreglos_prendas);
 $totalPorcentaje = 0;
-$todasArregladas = true; // Variable para rastrear si todas las prendas están arregladas
 
 foreach ($arreglos_prendas as $prenda) {
     $totalPorcentaje += calcularPorcentaje($prenda['estado']);
-    if ($prenda['estado'] != 5) {
-        $todasArregladas = false; // Si alguna prenda no está arreglada, establecemos esto como falso
-    }
 }
 
 $porcentajeOrden = 0;
@@ -140,12 +140,13 @@ if ($totalPrendas > 0) {
     <p>Porcentaje de la orden: <?php echo number_format($porcentajeOrden, 0); ?>%</p>
 </div>
 
+
 <div class="flex">
-    <?php if ($todasArregladas) { ?>
-        <button id="entregar" class="button">Entregar &#128722;</button>
-    <?php } ?>
+    <button id="entregar" class="button">Entregar &#128722;</button>
 </div>
 
+</div>
+</div>
 
 
 <?php
