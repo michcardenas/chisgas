@@ -35,11 +35,8 @@ if (isset($_GET['fecha_entrega'])) {
 $id_prenda = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : '';
 // Este es tu código para obtener los datos
 $ver_arreglo = ver_arreglo($id_prenda);
-
-
-
-
 ?>
+
 <div class="p_centrar">
     <div class="centrar">
         <form class="form card">
@@ -49,7 +46,7 @@ $ver_arreglo = ver_arreglo($id_prenda);
 
             <?php
             if ($ver_arreglo) {
-                ?>
+            ?>
                 <input type="hidden" name="prenda_id" id="prenda_id" value="<?php echo htmlspecialchars($ver_arreglo['id']); ?>">
                 <input type="hidden" name="id_orden" id="id_orden" value="<?php echo htmlspecialchars($ver_arreglo['id_orden']); ?>">
 
@@ -64,19 +61,21 @@ $ver_arreglo = ver_arreglo($id_prenda);
                             if ($ver_arreglo['nombre_ropa'] == $nombre) echo ' selected';
                             echo '>' . $nombre . '</option>';
                         }
-                    }
                         ?>
                     </select>
                 </div>
 
                 <div class="field">
                     <label for="prendas_numero">Numero de prendas: </label>
-                    <input class="input" name="prendas_numero" type="text" id="prendas_numero" value="<?php echo htmlspecialchars($ver_arreglo['prendas_numero']); ?>">
+                    <?php
+                    $prendas_numero_restado = $ver_arreglo['prendas_numero'] - $ver_arreglo['cantidad_entregada'];
+                    ?>
+                    <input class="input" name="prendas_numero" type="text" id="prendas_numero" value="<?php echo htmlspecialchars($prendas_numero_restado); ?>">
                 </div>
 
                 <div class="field">
                     <label for="descripcion_arreglo">Descripcion Arreglo: </label>
-                    <textarea class="input" name="descripcion_arreglo" id="descripcion_arreglo"><?php echo htmlspecialchars($ver_arreglo['descripcion_arreglo']); ?> </textarea>
+                    <textarea class="input" name="descripcion_arreglo" id="descripcion_arreglo"><?php echo htmlspecialchars($ver_arreglo['descripcion_arreglo']); ?></textarea>
                 </div>
 
                 <div class="field">
@@ -108,73 +107,68 @@ $ver_arreglo = ver_arreglo($id_prenda);
                     </select>
                 </div>
                 <div class="progress-container">
-    <div id="progress-bar" class="progress-bar"></div>
-</div>
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // Función para actualizar la barra de progreso
-    function updateProgressBar(estado) {
-        var percent = 0;
-        var color = '#111111';
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    // Función para actualizar la barra de progreso
+                    function updateProgressBar(estado) {
+                        var percent = 0;
+                        var color = '#111111';
 
-        switch (estado) {
-            case '1': // Ingresado
-                percent = 0;
-                color = '#FF5733'; // Cambiar color aquí (ejemplo: Naranja)
-                break;
-            case '4': // En proceso
-                percent = 50; // Porcentaje de ejemplo
-                color = '#2196F3'; // Azul
-                break;
-            case '5': // Arreglado
-                percent = 100;
-                color = '#4caf50'; // Verde
-                break;
-            default:
-                percent = 0;
-                color = '#f44336'; // Rojo por defecto
-        }
+                        switch (estado) {
+                            case '1': // Ingresado
+                                percent = 0;
+                                color = '#FF5733'; // Cambiar color aquí (ejemplo: Naranja)
+                                break;
+                            case '4': // En proceso
+                                percent = 50; // Porcentaje de ejemplo
+                                color = '#2196F3'; // Azul
+                                break;
+                            case '5': // Arreglado
+                                percent = 100;
+                                color = '#4caf50'; // Verde
+                                break;
+                            default:
+                                percent = 0;
+                                color = '#f44336'; // Rojo por defecto
+                        }
 
-        $('#progress-bar').css('width', percent + '%');
-        $('#progress-bar').text(percent + '%');
-        $('#progress-bar').css('background-color', color);
-    }
+                        $('#progress-bar').css('width', percent + '%');
+                        $('#progress-bar').text(percent + '%');
+                        $('#progress-bar').css('background-color', color);
+                    }
 
-    // Obtener el estado inicial desde PHP
-    <?php
-    // Suponiendo que $ver_arreglo['estado'] contiene el valor inicial del estado
-    if (isset($ver_arreglo['estado'])) {
-        $estado_actual = $ver_arreglo['estado'];
-        echo "updateProgressBar('$estado_actual');";
-    } else {
-        echo "console.error('Estado no definido');";
-    }
-    ?>
+                    // Obtener el estado inicial desde PHP
+                    <?php
+                    // Suponiendo que $ver_arreglo['estado'] contiene el valor inicial del estado
+                    if (isset($ver_arreglo['estado'])) {
+                        $estado_actual = $ver_arreglo['estado'];
+                        echo "updateProgressBar('$estado_actual');";
+                    } else {
+                        echo "console.error('Estado no definido');";
+                    }
+                    ?>
 
-    // Actualizar la barra de progreso cuando cambie el estado
-    $('#estado_prenda').change(function() {
-        var estadoSeleccionado = $(this).val();
-        updateProgressBar(estadoSeleccionado);
-    });
-</script>
-
-
-            
-
+                    // Actualizar la barra de progreso cuando cambie el estado
+                    $('#estado_prenda').change(function() {
+                        var estadoSeleccionado = $(this).val();
+                        updateProgressBar(estadoSeleccionado);
+                    });
+                </script>
+            <?php } else { ?>
+                <p>No se encontraron resultados para esta prenda.</p>
+            <?php } ?>
         </form>
         <h1 class="form_heading" id="resultado_editar"></h1>
 
-        <div class=" flex">
-        <button class="button" onclick="history.back();">Atrás</button>
-
-        <button id="editar_arreglo"  class="button">Editar arreglo</button>
+        <div class="flex">
+            <button class="button" onclick="history.back();">Atrás</button>
+            <button id="editar_arreglo" class="button">Editar arreglo</button>
         </div>
-
-
+    </div>
 </div>
-</div>
-
 
 <?php
 
@@ -189,5 +183,6 @@ if (file_exists($ruta)) {
 } else {
     echo "El archivo $ruta no existe.";
 }
+
 
 ?>

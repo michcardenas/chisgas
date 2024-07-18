@@ -59,21 +59,25 @@ function prendas_por_orden_con_cliente($id_orden) {
 
     $query = "
                 SELECT 
-                p.nombre_ropa,
-                p.tiempo_estimado,
-                p.estado,
-                p.id,
-                c.nombre AS nombre_cliente,
-                c.telefono AS telefono_cliente,
-                u.login
-            FROM 
-                prendas p
-            LEFT JOIN 
-                clientes c ON c.id = p.id_cliente
-            LEFT JOIN 
-                usuarios u ON  p.id_asignacion = u.id
-            WHERE 
-                p.id_orden = ?
+            p.nombre_ropa,
+            p.tiempo_estimado,
+            p.estado,
+            p.id,
+            c.nombre AS nombre_cliente,
+            c.telefono AS telefono_cliente,
+            u.login,
+            ep.id AS en_entregas_parciales
+        FROM 
+            prendas p
+        LEFT JOIN 
+            clientes c ON c.id = p.id_cliente
+        LEFT JOIN 
+            usuarios u ON p.id_asignacion = u.id
+        LEFT JOIN 
+            entregas_parciales ep ON ep.id_prenda = p.id
+        WHERE 
+            p.id_orden = ?
+
     ";
 
     // Preparar la consulta y vincular el parámetro
@@ -246,13 +250,17 @@ function ver_arreglo($prenda_id) {
             p.descripcion_arreglo,
             p.id_orden,
             p.id_asignacion,
-            u.login
+            u.login,
+            COALESCE(ep.cantidad_entregada, 0) AS cantidad_entregada
         FROM 
             prendas p
         LEFT JOIN 
             usuarios u ON u.id = p.id_asignacion
+        LEFT JOIN 
+            entregas_parciales ep ON ep.id_prenda = p.id
         WHERE 
             p.id = ?
+
     ";
 
     // Preparar la consulta y vincular el parámetro

@@ -36,10 +36,6 @@ $id_orden = isset($_GET['id_orden']) ? htmlspecialchars($_GET['id_orden']) : '';
 // Este es tu código para obtener los datos
 $arreglos_prendas = prendas_por_orden_con_cliente($id_orden);
 
-
-
-
-
 ?>
 <div class="p_centrar">
 <div class="centrar">
@@ -111,20 +107,24 @@ if ($totalPrendas > 0) {
             <td><?php echo htmlspecialchars($prenda['login']); ?></td>
             <td>
                 <?php 
-                switch ($prenda['estado']) {
-                    case 1:
-                    case 3:
-                        echo 'Ingresado';
-                        break;
-                    case 4:
-                        echo 'En Proceso';
-                        break;
-                    case 5:
-                        echo 'Arreglado';
-                        break;
-                    default:
-                        echo 'Estado desconocido'; // O puedes dejarlo vacío si prefieres
-                        break;
+                if (!empty($prenda['en_entregas_parciales'])) {
+                    echo 'Entrega Parcial';
+                } else {
+                    switch ($prenda['estado']) {
+                        case 1:
+                        case 3:
+                            echo 'Ingresado';
+                            break;
+                        case 4:
+                            echo 'En Proceso';
+                            break;
+                        case 5:
+                            echo 'Arreglado';
+                            break;
+                        default:
+                            echo 'Estado desconocido'; // O puedes dejarlo vacío si prefieres
+                            break;
+                    }
                 }
                 ?>
             </td>

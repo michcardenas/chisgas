@@ -34,7 +34,6 @@ if (isset($_GET['fecha_entrega'])) {
 }
 $ordenes_del_dia = obtener_ordenes_del_dia($fecha_entrega);
 
-
 echo '
 <div class="p_centrar">
 <div class="centrar">';
@@ -67,28 +66,30 @@ foreach ($ordenes_del_dia as $orden) {
 
     echo '<td>' . htmlspecialchars($orden["total_prendas_por_orden"]) . '</td>';
     
-    // Mostrar el estado general
+    // Mostrar el estado general y la barra de progreso
     echo '<td>';
     $estadoGeneral = obtenerEstadoGeneral($orden["estado_orden"]);
     echo htmlspecialchars($estadoGeneral);
-    echo '</td>';
     
-    echo '</tr>';
-
     // Mostrar la barra de progreso solo si no es "Entregado" ni "Entrega parcial"
     if ($orden["estado_orden"] != 6 && $orden["estado_orden"] != 7) {
-        echo '<tr>';
-        echo '<td colspan="3">'; // Colspan para ocupar toda la fila
         echo '<div class="progress-container">';
         echo '<div class="progress-bar ' . htmlspecialchars($progressBarClass) . '" style="width:' . htmlspecialchars($porcentajeOrden) . '%;"></div>';
         echo '<span>' . htmlspecialchars($porcentajeOrden) . '%</span>';
         echo '</div>';
-        echo '</td>';
-        echo '</tr>';
     }
+
+    echo '</td>';
+    echo '</tr>';
 }
 echo '</tbody>';
 echo '</table>';
+
+// Agregar el botón de volver
+echo '<div class="flex">';
+echo '<button class="button" onclick="window.location.href=\'calendario.php\';">Volver</button>';
+echo '</div>';
+
 echo '</div>';
 echo '</div>';
 ?>
@@ -97,18 +98,16 @@ echo '</div>';
 .progress-container {
     position: relative;
     width: 100%;
-    height: 20px;
     background-color: #f3f3f3;
     border-radius: 5px;
-    overflow: hidden;
+    height: 10px;
+    margin-top: 5px;
 }
 
 .progress-bar {
+    background-color: #4caf50;
     height: 100%;
-    text-align: center;
-    line-height: 20px;
-    color: white;
-    border-radius: 5px 0 0 5px;
+    border-radius: 5px;
 }
 
 /* Different color classes for the progress bar */
@@ -130,24 +129,21 @@ echo '</div>';
     text-align: center;
     top: 0;
     left: 0;
-    line-height: 20px;
+    line-height: 10px;
     color: #000;
+}
+
+td {
+    vertical-align: top;
 }
 </style>
 
-
 <?php
-
 $ruta_footer = '../footer.php';
-
-if (file_exists($ruta)) {
-    $ruta_css = '../css/style.css';
-    $ruta_image = "../img/chisgas_fondo_blanco.png";
+if (file_exists($ruta_footer)) {
     $ruta_js = "../js/main.js";
-
     include $ruta_footer;
 } else {
     echo "El archivo $ruta no existe.";
 }
-
 ?>

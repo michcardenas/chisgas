@@ -16,12 +16,12 @@ FROM
 JOIN 
     prendas p ON o.id = p.id_orden
 WHERE 
-    p.estado IN ('3', '4', '5') 
-    AND (o.estado = '0' OR o.estado IS NULL)  -- Asegura que las órdenes en estado 0 también sean incluidas
+    p.estado = '3' 
+    AND (o.estado = '0' OR o.estado IS NULL)
 GROUP BY 
     o.fecha_entrega, p.estado
 ORDER BY 
-    FIELD(p.estado, '3', '4', '5'), 
+    FIELD(p.estado, '3'), 
     o.fecha_entrega;
     ";
 
