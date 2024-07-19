@@ -9,6 +9,9 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+// Establecer la zona horaria a Bogotá
+date_default_timezone_set('America/Bogota');
+
 // Rutas para los archivos incluidos
 $ruta_template = '../template.php';
 $ruta_footer = '../footer.php';
@@ -90,7 +93,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
 
     // Botón para volver a cerrar_caja.php
     echo '<div class="volver-menu">';
-    echo '<a href="' . $ruta_image_menu . '"><button>Volver a Cerrar Caja</button></a>';
+    echo '<a href="' . $ruta_image_menu . '"><button>Volver</button></a>';
     echo '</div>'; // Cierre del contenedor volver-menu
     
     echo '</div>'; // Cierre del contenedor p_centrar

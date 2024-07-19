@@ -752,3 +752,20 @@ then set the desired styles for .card-img. */
   font-weight: bold;
 }
 
+.centrarcaja {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  gap: 3rem; 
+}
+
+.centrarcaja1 {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 50vh;  /* Reduce la altura a la mitad */
+  width: 80%;    /* Reduce el ancho */
+  gap: 1.5rem;   /* Reduce el espacio entre elementos */
+}

@@ -50,8 +50,10 @@ foreach ($arreglos_prendas as $prenda) {
 }
 
 $totalPrendasBaseDatos = $arreglos_prendas[0]['total_prendas'] ?? 0;
-$totalPrendasEntregadas = array_reduce($arreglos_prendas, function($carry, $prenda) {
-    return $carry + $prenda['prendas_numero'];
+$totalPrendasEntregadas = array_reduce($arreglos_prendas, function($carry, $prenda) use ($cantidades_por_prenda) {
+    $id_prenda = $prenda['id'];
+    $cantidad_entregada = $cantidades_por_prenda[$id_prenda] ?? 0;
+    return $carry + $cantidad_entregada;
 }, 0);
 
 $todasArregladas = ($totalPrendasBaseDatos == $totalPrendasEntregadas);
@@ -151,11 +153,8 @@ $todasArregladas = ($totalPrendasBaseDatos == $totalPrendasEntregadas);
         </div>
 
         <div class="flex">
-            <?php if ($todasArregladas): ?>
-                <button id="entrega_total" class="button">Entrega total &#128722;</button>
-            <?php else: ?>
-                <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
-            <?php endif; ?>
+            <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
+            <button id="entrega_total" class="button" <?php echo $todasArregladas ? '' : 'disabled'; ?>>Entrega total &#128722;</button>
         </div>
     </div>
 </div>

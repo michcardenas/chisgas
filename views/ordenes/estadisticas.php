@@ -88,7 +88,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
 
     // Botón para volver a cerrar_caja.php
     echo '<div class="volver-menu">';
-    echo '<a href="' . $ruta_image_menu . '"><button>Atras</button></a>';
+    echo '<a href="' . $ruta_image_menu . '"><button>Volver</button></a>';
     echo '</div>'; // Cierre del contenedor del botón
 
     echo '</div>'; // Cierre del contenedor p_centrar

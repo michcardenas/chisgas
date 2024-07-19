@@ -164,7 +164,7 @@ $ver_arreglo = ver_arreglo($id_prenda);
         <h1 class="form_heading" id="resultado_editar"></h1>
 
         <div class="flex">
-            <button class="button" onclick="history.back();">Atrás</button>
+            <button class="button" onclick="history.back();">Volver</button>
             <button id="editar_arreglo" class="button">Editar arreglo</button>
         </div>
     </div>
