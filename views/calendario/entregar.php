@@ -56,7 +56,7 @@ $totalPrendasEntregadas = array_reduce($arreglos_prendas, function($carry, $pren
     return $carry + $cantidad_entregada;
 }, 0);
 
-$todasArregladas = ($totalPrendasBaseDatos == $totalPrendasEntregadas);
+$prendasPorEntregar = $totalPrendasBaseDatos - $totalPrendasEntregadas;
 
 ?>
 
@@ -154,7 +154,12 @@ $todasArregladas = ($totalPrendasBaseDatos == $totalPrendasEntregadas);
 
         <div class="flex">
             <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
-            <button id="entrega_total" class="button" <?php echo $todasArregladas ? '' : 'disabled'; ?>>Entrega total &#128722;</button>
+            <button id="entrega_total" class="button" 
+                <?php echo ($prendasPorEntregar > 0) ? '' : 'disabled'; ?>
+                title="<?php echo ($prendasPorEntregar > 0) ? 'Realizar entrega total' : 'Todas las prendas ya han sido entregadas'; ?>"
+            >
+                Entrega total &#128722;
+            </button>
         </div>
     </div>
 </div>

@@ -170,10 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && emp
         <div class="container">
         <div class="centrarcaja">
             <h1>Cerrar Caja</h1>
-            </div>
             <div class="centrarcaja1">
             <h1>Detalles:</h1>
-            </div>
             <?php if (!empty($mensaje)) : ?>
                 <p><?php echo $mensaje; ?></p>
             <?php endif; ?>

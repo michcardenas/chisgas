@@ -281,6 +281,7 @@ $(document).ready(function(){
                 dataType: "json",
                 success: function(response) {
                     alert("Se ha realizado de manera correcta la entrega parcial o abono.");
+                    history.back();
                 },
                 error: function(xhr, status, error) {
                     console.error("Error en AJAX:", status, error);
