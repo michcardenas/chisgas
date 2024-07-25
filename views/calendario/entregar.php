@@ -49,17 +49,22 @@ foreach ($arreglos_prendas as $prenda) {
     $subtotal += $prenda['valor'];
 }
 
-// Calcular el número de prendas por entregar
+// Calcular el número de prendas por entregar y actualizar la cantidad total
 $prendasPorEntregar = 0;
 foreach ($arreglos_prendas as $prenda) {
     $cantidad_original = $prenda['prendas_numero'];
+    $cantidad_total =  $prenda['total_prendas'];
     $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
+
+    // Actualizar la cantidad total restando las entregas parciales
+    $cantidad_total_actualizada = max(0, $cantidad_total - $cantidad_entregada);
     $prendasPorEntregar += max(0, $cantidad_original - $cantidad_entregada);
 }
-
-// Determinar si mostrar solo el botón de entrega total
-$mostrarSoloEntregaTotal = ($prendasPorEntregar === 1);
-
+var_dump($cantidad_original);
+var_dump($cantidad_total);
+var_dump($cantidad_entregada);
+var_dump($prendasPorEntregar);
+var_dump($cantidad_total_actualizada);
 ?>
 
 <div class="p_centrar">
@@ -155,11 +160,11 @@ $mostrarSoloEntregaTotal = ($prendasPorEntregar === 1);
         </div>
 
         <div class="flex">
-            <?php if (!$mostrarSoloEntregaTotal): ?>
+            <?php if ($prendasPorEntregar < $cantidad_total_actualizada): ?>
                 <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
             <?php endif; ?>
             
-            <?php if ($prendasPorEntregar > 0): ?>
+            <?php if ($prendasPorEntregar == $cantidad_total_actualizada): ?>
                 <button id="entrega_total" class="button" 
                     title="Realizar entrega total">
                     Entrega total &#128722;
