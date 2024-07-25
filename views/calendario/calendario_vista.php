@@ -53,6 +53,8 @@ function convertirMinutosAHoras($minutos) {
         <input placeholder="Buscar cliente..." id="nombre_cliente" type="text">
         <button class="button-buscar_orden" onclick="buscarPrenda()">Buscar</button>
     </div>
+    <div id="resultados">
+    </div>
     <div class="select-container">
     <select class="select-container" id="estadoPrendaSelect">
     <option value="3">Pendiente</option>
@@ -62,6 +64,7 @@ function convertirMinutosAHoras($minutos) {
     <option value="7">Entrega Parcial</option>
     <option value="all">Todos</option>
 </select>
+
             <!-- Aquí se mostrará la lista de nombres -->
         </div>
         <table id="calendarioTabla" border="1">
@@ -87,21 +90,15 @@ function convertirMinutosAHoras($minutos) {
 </div>
 </div>
 <script>
+ function buscarPrenda() {
+            var criterio = document.getElementById('nombre_telefono').value;
+            var valor = document.getElementById('nombre_cliente').value;
+            var estado = document.getElementById('estadoPrendaSelect').value;
 
-    function buscarPrenda() {
-        var criterio = document.getElementById('nombre_telefono').value;
-        var valor = document.getElementById('nombre_cliente').value;
-        var estado = document.getElementById('estado_prenda').value;
-        
-        // Lógica para buscar la prenda con el criterio y el valor ingresado, y filtrar por estado
-        console.log('Buscar prenda por:', criterio, valor, 'Estado:', estado);
-        // Actualiza el contenido de 'resultados' con los datos filtrados
-    }
+            // Mostrar un mensaje de carga
+            document.getElementById('resultados').innerHTML = '<p>Buscando...</p>';
 
-
-        function volver() {
-            window.history.back();
-        }
+ }
     </script>
 <?php 
 $ruta_footer = '../footer.php';

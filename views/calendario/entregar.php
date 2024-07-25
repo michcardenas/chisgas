@@ -49,14 +49,16 @@ foreach ($arreglos_prendas as $prenda) {
     $subtotal += $prenda['valor'];
 }
 
-$totalPrendasBaseDatos = $arreglos_prendas[0]['total_prendas'] ?? 0;
-$totalPrendasEntregadas = array_reduce($arreglos_prendas, function($carry, $prenda) use ($cantidades_por_prenda) {
-    $id_prenda = $prenda['id'];
-    $cantidad_entregada = $cantidades_por_prenda[$id_prenda] ?? 0;
-    return $carry + $cantidad_entregada;
-}, 0);
+// Calcular el número de prendas por entregar
+$prendasPorEntregar = 0;
+foreach ($arreglos_prendas as $prenda) {
+    $cantidad_original = $prenda['prendas_numero'];
+    $cantidad_entregada = $cantidades_por_prenda[$prenda['id']] ?? 0;
+    $prendasPorEntregar += max(0, $cantidad_original - $cantidad_entregada);
+}
 
-$prendasPorEntregar = $totalPrendasBaseDatos - $totalPrendasEntregadas;
+// Determinar si mostrar solo el botón de entrega total
+$mostrarSoloEntregaTotal = ($prendasPorEntregar === 1);
 
 ?>
 
@@ -71,7 +73,7 @@ $prendasPorEntregar = $totalPrendasBaseDatos - $totalPrendasEntregadas;
                 <tr>
                     <th>Prenda</th>
                     <th># prendas a entregar</th>
-                    <th>Valor </th>
+                    <th>Valor</th>
                 </tr>
             </thead>
             <tbody>
@@ -153,13 +155,16 @@ $prendasPorEntregar = $totalPrendasBaseDatos - $totalPrendasEntregadas;
         </div>
 
         <div class="flex">
-            <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
-            <button id="entrega_total" class="button" 
-                <?php echo ($prendasPorEntregar > 0) ? '' : 'disabled'; ?>
-                title="<?php echo ($prendasPorEntregar > 0) ? 'Realizar entrega total' : 'Todas las prendas ya han sido entregadas'; ?>"
-            >
-                Entrega total &#128722;
-            </button>
+            <?php if (!$mostrarSoloEntregaTotal): ?>
+                <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
+            <?php endif; ?>
+            
+            <?php if ($prendasPorEntregar > 0): ?>
+                <button id="entrega_total" class="button" 
+                    title="Realizar entrega total">
+                    Entrega total &#128722;
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 </div>
