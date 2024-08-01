@@ -56,15 +56,15 @@ $sql_ordenes_dia = "
 SELECT 
     COALESCE(SUM(CASE WHEN forma_pago = 'Efectivo' THEN saldo ELSE 0 END), 0) AS total_efectivo,
     COALESCE(SUM(CASE WHEN forma_pago = 'Nequi' THEN saldo ELSE 0 END), 0) AS total_nequi,
-    COALESCE(SUM(saldo), 0) AS total_recogido 
+    COALESCE(SUM(saldo), 0) AS total_recogido
 FROM (
     -- Total saldo de las órdenes restando abonos parciales
     SELECT 
-        o.saldo - COALESCE(SUM(ep.abono), 0) AS saldo, 
+        o.saldo - COALESCE(SUM(ep.abono), 0) AS saldo,
         o.forma_pago
     FROM ordenes o
     LEFT JOIN entregas_parciales ep ON o.id = ep.id_orden 
-      AND DATE(ep.fecha_hora) = CURDATE()
+      AND DATE(ep.fecha_hora) = DATE(o.fecha_entrega)
     WHERE DATE(o.fecha_entrega) = CURDATE()
       AND (o.estado = '6' OR o.estado = '7')
     GROUP BY o.id, o.saldo, o.forma_pago
@@ -85,7 +85,7 @@ FROM (
         o.abono AS saldo, 
         o.forma_pago
     FROM ordenes o
-    WHERE DATE(o.fecha_creacion) = CURDATE() 
+    WHERE DATE(o.fecha_entrega) = CURDATE() 
       AND o.abono IS NOT NULL
     
     UNION ALL

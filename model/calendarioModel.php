@@ -16,13 +16,18 @@ FROM
 JOIN 
     prendas p ON o.id = p.id_orden
 WHERE 
-    p.estado = '3' 
-    AND (o.estado = '0' OR o.estado IS NULL)
+    (p.estado = '3' AND o.estado IN ('0', 'NULL'))
+    OR NOT EXISTS (
+        SELECT 1
+        FROM prendas p2
+        JOIN ordenes o2 ON p2.id_orden = o2.id
+        WHERE p2.estado = '3' AND o2.estado IN ('0', 'NULL')
+    )
 GROUP BY 
     o.fecha_entrega, p.estado
 ORDER BY 
-    FIELD(p.estado, '3'), 
-    o.fecha_entrega;
+    o.fecha_entrega DESC,  -- Ordena por fecha de entrega más reciente
+    FIELD(p.estado, '3');
     ";
 
     $result = $conn->query($query);
