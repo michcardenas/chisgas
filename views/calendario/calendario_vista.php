@@ -42,9 +42,9 @@ function convertirMinutosAHoras($minutos) {
 ?>
 
 <div class="p_centrar">
-
+<h2>Calendario de prendas</h2>
+<label for="prendas" style=" margin-top:10px;">Buscar por cliente</label>
 <div class="centrar">
-    <h4 class="form_heading">Busca el estado de las prendas aquí!</h4>
     <div class="search">
         <select name="nombre" id="nombre_telefono"> 
             <option value="nombre">Nombre</option>
@@ -52,11 +52,17 @@ function convertirMinutosAHoras($minutos) {
         </select>
         <input placeholder="Buscar cliente..." id="nombre_cliente" type="text">
         <button class="button-buscar_orden" onclick="buscarPrenda()">Buscar</button>
+        <div class="select-container">
+ 
+
     </div>
-    <div id="resultados">
-    </div>
-    <div class="select-container">
-    <select class="select-container" id="estadoPrendaSelect">
+    <div class="select" style="display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center; margin-top:10px;">
+    <label for="Buscar por estado">Buscar por estado</label>
+    <select class="select-container" id="estadoPrendaSelect" style="margin:10px;">
+    <option value="">Seleccione</option>
     <option value="3">Pendiente</option>
     <option value="4">En Proceso</option>
     <option value="5">Arreglado</option>
@@ -64,6 +70,15 @@ function convertirMinutosAHoras($minutos) {
     <option value="7">Entrega Parcial</option>
     <option value="all">Todos</option>
 </select>
+    <button id="botonAtras" class="button-buscar_orden" >
+    <span style="margin-right: 5px;">&#8592;</span>
+    <span>Atrás</span>
+</button>
+</div>
+    <div id="resultados" style="display: flex;
+    justify-content: center;">
+    </div>
+ 
 
             <!-- Aquí se mostrará la lista de nombres -->
         </div>

@@ -635,7 +635,6 @@ $("#calendario").click(function() {
           }
       },
       error: function() {
-          alert("Error en la comunicación con el servidor.");
       }
   });
 });
@@ -714,6 +713,9 @@ $('#agendar_orden_btn').click(function(){
 $("#atras").click(function(){
   console.log(window.location.href);
   window.location.href = "ordenes.php";
+});
+$('#botonAtras').on('click', function() {
+    window.history.back();
 });
 $("#entrega_total").click(function(e) {
   e.preventDefault();

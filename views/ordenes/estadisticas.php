@@ -28,7 +28,10 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     // Obtener el mes y año seleccionados del formulario
     $mes = isset($_GET['mes']) ? $_GET['mes'] : null;
     $anio = isset($_GET['anio']) ? $_GET['anio'] : null;
-
+    $nombres_meses = [
+        1 => 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
     // Llamar a la función para obtener los datos de la tabla caja filtrados por mes y año
     $resultados = seleccionar_todas_las_columnas_caja_por_mes($mes, $anio);
 
@@ -42,7 +45,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     echo '<select id="mes" name="mes">';
     for ($i = 1; $i <= 12; $i++) {
         $selected = ($i == $mes) ? 'selected' : '';
-        echo '<option value="' . $i . '" ' . $selected . '>' . strftime('%B', mktime(0, 0, 0, $i, 1)) . '</option>';
+        echo '<option value="' . $i . '" ' . $selected . '>' . $nombres_meses[$i] . '</option>';
     }
     echo '</select>';
     echo '<label for="anio">Año:</label>';
@@ -61,18 +64,16 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     // Mostrar los resultados en una tabla HTML
     echo '<div class="table-container">';
     echo '<table border="1" class="centered-table">';
-    echo '<thead><tr><th>ID</th><th>Fecha</th><th>Base</th><th>Dinero Final</th><th>Total Recogido</th><th>Usuarios Día</th></tr></thead>';
+    echo '<thead><tr><th>Fecha</th><th>Base</th><th>Dinero Final</th><th>Total Recogido</th></tr></thead>';
     echo '<tbody>';
 
     // Iterar sobre los resultados y mostrar cada fila en la tabla
     foreach ($resultados as $fila) {
         echo '<tr>';
-        echo '<td>' . $fila['id'] . '</td>';
         echo '<td><a href="detalle_fecha2.php?fecha=' . urlencode($fila['fecha']) . '&id=' . urlencode($fila['id']) . '">' . date('Y-m-d', strtotime($fila['fecha'])) . '</a></td>';
-        echo '<td>' . number_format($fila['base'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
-        echo '<td>' . number_format($fila['dinero_final'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
-        echo '<td>' . number_format($fila['total_recogido'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
-        echo '<td>' . (isset($fila['total_entregas']) ? $fila['total_entregas'] : 0) . '</td>'; // Verificar si el campo existe
+        echo '<td> $' . number_format($fila['base'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
+        echo '<td> $' . number_format($fila['dinero_final'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
+        echo '<td> $' . number_format($fila['total_recogido'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
         echo '</tr>';
         // Sumar el dinero final de la fila actual al total
         $total_dinero_final += $fila['dinero_final'];

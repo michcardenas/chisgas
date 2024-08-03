@@ -36,26 +36,20 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
         // Mostrar los resultados en una tabla HTML
         echo '<div class="p_centrar">';
         echo '<div class="table-container">';
-        echo '<table border="1" class="centered-table">';
-        echo '<thead><tr><th>ID</th><th>Fecha</th><th>Base</th><th>Dinero Final</th><th>Total Recogido</th><th>Usuarios Día</th><th>Gastos</th><th>Entregas</th><th>Abonos</th></tr></thead>';
-        echo '<tbody>';
-
-        // Iterar sobre los resultados y mostrar cada fila en la tabla
+        echo '<div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px; padding: 20px;">'; // cards-container
         foreach ($resultados as $fila) {
-            echo '<tr>';
-            echo '<td>' . $fila['id'] . '</td>';
-            echo '<td>' . date('Y-m-d', strtotime($fila['fecha'])) . '</td>'; // Mostrar solo el día en formato YYYY-MM-DD
-            echo '<td>' . number_format($fila['base'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
-            echo '<td>' . number_format($fila['dinero_final'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
-            echo '<td>' . number_format($fila['total_recogido'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
-            echo '<td>' . $fila['total_entregas'] . '</td>'; // Este campo ya debería ser un entero según la consulta
-            echo '<td>' . $fila['gastos'] . '</td>';
-            echo '<td>' . $fila['nombre_cliente'] . '</td>';
-            echo '<td>' . $fila['nombres_abonos'] . '</td>';
-            echo '</tr>';
+            echo '<div style="background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 15px; width: 300px; transition: transform 0.3s ease;">'; // card
+            echo '<div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px; color: #333;">Fecha : ' . date('Y-m-d', strtotime($fila['fecha'])) . '</div>'; // card-date
+            echo '<div style="display: flex; flex-direction: column; gap: 10px;">'; // card-content
+            echo '<div style="display: flex; justify-content: space-between;"><span style="font-weight: bold; color: #666;">Base:</span> ' . number_format($fila['base'], 0, ',', '.') . '</div>'; // card-item
+            echo '<div style="display: flex; justify-content: space-between;"><span style="font-weight: bold; color: #666;">Gastos:</span> ' . $fila['gastos'] . '</div>'; // card-item
+            echo '<div style="display: flex; justify-content: space-between;"><span style="font-weight: bold; color: #666;">Total Recogido:</span> ' . number_format($fila['total_recogido'], 0, ',', '.') . '</div>'; // card-item
+            echo '<div style="display: flex; justify-content: space-between;"><span style="font-weight: bold; color: #666;">Dinero Final:</span> ' . number_format($fila['dinero_final'], 0, ',', '.') . '</div>'; // card-item
+
+            echo '</div>';
+            echo '</div>';
         }
-        echo '</tbody>';
-        echo '</table>';
+        echo '</div>';
         echo '</div>'; // Cierre del contenedor de la tabla
         echo '</div>'; // Cierre del contenedor p_centrar
 

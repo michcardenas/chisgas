@@ -41,6 +41,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
 
     // Array para almacenar detalles de facturas
     $facturas = array();
+    
 
     // Obtener la fecha de hoy en formato Y-m-d para comparar
     $today = date("Y-m-d");

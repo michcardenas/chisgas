@@ -141,7 +141,7 @@ if (isset($_SESSION['cliente_consultar'])) {
 <tr>
 
 <form id="calendario_form" style="display: flex; justify-content: space-between;" onsubmit="guardarDatosYConsultar(event)">
-<button type="submit" class="button" style="display: flex; align-items: center;">
+<button id="calendario" class="button" style="display: flex; align-items: center;">
             <span style="margin-right: 5px;">&#128197;</span>
             <span>Consultar Calendario</span>
         </button>

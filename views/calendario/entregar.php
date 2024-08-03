@@ -77,13 +77,10 @@ foreach ($arreglos_prendas as $prenda) {
 // Sumar todas las cantidades originales
 $totalPrendasOriginales = array_sum($prendasOriginales);
 
-var_dump($totalPrendasOriginales);
 // Calcular la cantidad total entregada
 $cantidad_entregada_total = array_sum($cantidades_por_prenda);
 $totalPrendasOriginales - $cantidad_total = $prendasPorEntregar;
-var_dump($cantidad_total);
-var_dump($cantidad_entregada_total);
-var_dump($prendasPorEntregar);
+
 
 ?>
 
@@ -184,7 +181,7 @@ var_dump($prendasPorEntregar);
                 <button id="entrega_parcial" class="button">Entrega parcial o abonos &#9203;</button>
             <?php endif; ?>
             
-            <?php if ($prendasPorEntregar == 1 && $cantidad_total == 1): ?>
+            <?php  if ($prendasPorEntregar == $cantidad_total): ?>
                 <button id="entrega_total" class="button" 
                     title="Realizar entrega total">
                     Entrega total &#128722;
