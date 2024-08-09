@@ -708,7 +708,7 @@ $('.fecha-link').on('click', function(e){
 $('#agendar_orden_btn').click(function(){
   var cliente_id = $('#cliente_id').val(); // Obtener el id del cliente del formulario anterior
 
-  window.location.href = "../../controllers/ordencontroller.php?cliente_id=" + cliente_id + "&action=agendar_orden";
+  window.location.href = "../../controllers/ordenController.php?cliente_id=" + cliente_id + "&action=agendar_orden";
 });
 $("#atras").click(function(){
   console.log(window.location.href);
