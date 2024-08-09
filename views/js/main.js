@@ -629,7 +629,7 @@ $("#calendario").click(function() {
               sessionStorage.setItem('calendarioData', JSON.stringify(response.data));
 
               // Ahora, redirigir a la vista:
-              window.location.href = "/chisgas/views/calendario/calendario.php";
+              window.location.href = "views/calendario/calendario.php";
             } else {
               alert(response.message);
           }
