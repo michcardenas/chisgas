@@ -33,7 +33,7 @@ $sql = "SELECT fecha FROM caja WHERE DATE(fecha) = CURDATE()";
 $result = $conn->query($sql);
 
 $caja_abierta = $result->num_rows > 0;
-
+$caja_abierta =1; // Quitar esta línea después de probar
 // Cerrar la conexión
 $conn->close();
 ?>
