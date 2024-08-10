@@ -96,11 +96,11 @@ if (isset($_SESSION['cliente_consultar'])) {
         } elseif ($cliente['nombre_ropa'] == 'Otro') {
             $imagen_card = '<img src="../img/otro.png" alt="otro" class="img_card">';
         }elseif ($cliente['nombre_ropa'] == 'Sueter') {
-            $imagen_card = '<img src="../img/sueter.png" alt="sueter" class="img_card">';
+            $imagen_card = '<img src="../img/Sueter.png" alt="sueter" class="img_card">';
         }elseif ($cliente['nombre_ropa'] == 'Camiseta') {
-            $imagen_card = '<img src="../img/camiseta.png" alt="camiseta" class="img_card">';
+            $imagen_card = '<img src="../img/Camiseta.png" alt="camiseta" class="img_card">';
         }elseif ($cliente['nombre_ropa'] == 'Blusa') {
-            $imagen_card = '<img src="../img/blusa.png" alt="blusa" class="img_card">';
+            $imagen_card = '<img src="../img/Blusa.png" alt="blusa" class="img_card">';
         } else {
             $imagen_card = '<img src="../img/otro.png" alt="otro" class="img_card">';
         }

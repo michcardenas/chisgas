@@ -89,7 +89,7 @@ if (mysqli_num_rows($result_check) > 0) {
 <body>
 <div class="p_centrar">
     <div class="centrar">
-        <div class="container">
+        <div class="container" style="margin-top: 8rem;">
             <h1 class="form_heading">Iniciar Caja</h1>
 
             <?php if (!empty($mensaje)) : ?>

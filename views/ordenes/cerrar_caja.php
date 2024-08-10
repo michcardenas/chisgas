@@ -85,7 +85,7 @@ FROM (
         o.abono AS saldo, 
         o.forma_pago
     FROM ordenes o
-    WHERE DATE(o.fecha_entrega) = CURDATE() 
+    WHERE DATE(o.fecha_creacion) = CURDATE() 
       AND o.abono IS NOT NULL
     
     UNION ALL
