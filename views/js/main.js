@@ -754,7 +754,7 @@ $("#entrega_total").click(function(e) {
               var filePath = responseData.pdf;
               var fileName = filePath.split('/').pop();
 
-              var whatsappMessage = `¡Gracias por elegirnos para el arreglo de tu prenda! 🎉 Tu orden está completa y los detalles están disponibles en el siguiente enlace: http://localhost/chisgas/facturas/${fileName} 📝 Agradecemos tu confianza en nosotros y estamos aquí para cualquier otro servicio que necesites. 😊 ¡Esperamos verte pronto! 👋`;
+              var whatsappMessage = `¡Gracias por elegirnos para el arreglo de tu prenda! 🎉 Tu orden está completa y los detalles están disponibles en el siguiente enlace: https://sastreriachisgas.shop/facturas/${fileName} 📝 Agradecemos tu confianza en nosotros y estamos aquí para cualquier otro servicio que necesites. 😊 ¡Esperamos verte pronto! 👋`;
               var whatsappUrl = `https://api.whatsapp.com/send?phone=+57${telefono}&text=${encodeURIComponent(whatsappMessage)}`;
 
               // Redirige a la URL de WhatsApp
