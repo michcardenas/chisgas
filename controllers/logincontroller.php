@@ -1,5 +1,5 @@
 <?php
-$title = "Mi Título Personalizado";
+$title = "Sastreria chisgas";
 include '../views/login/login.php';
 ?>
 

@@ -790,13 +790,13 @@ $("#entrega_parcial").click(function(e) {
           id_usuario: id_usuario
       },
       beforeSend: function() {
-          // Opcional: Mostrar un loader o mensaje de "enviando..."
-      },
+
+    },
       success: function(response) {
         console.log(response);
         if(response.success) {
           // Construye la URL con los parámetros ID y nombre de usuario
-          var url = '/chisgas/views/calendario/entrega_parcial.php';
+          var url = 'views/calendario/entrega_parcial.php';
           url += '?idOrden=' + encodeURIComponent(response.idOrden);
           url += '&nombreUsuario=' + encodeURIComponent(response.nombreUsuario);
           

@@ -76,7 +76,6 @@
                     ' . $saludo . '
                     <span>' . htmlspecialchars($_SESSION['username']) . '</span>
                 </div>
-                <a href="ruta_a_usuarios.php" class="nav-link">Usuarios</a>
                 <a href="' . $ruta_cerrar_sesion . '" class="nav-link">Cerrar sesión</a>
             </div>
         </nav>';
