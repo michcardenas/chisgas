@@ -428,7 +428,7 @@ EOD;
 $pdf->writeHTML($html, true, false, true, false, '');
         
         // Define el nombre del archivo y la ruta de guardado
-        $nombreArchivo = 'Orden_' . $id_orden . $nombre_cliente.'.pdf';
+        $nombreArchivo = 'Orden_Numero' . $id_orden .'.pdf';
         $rutaGuardado = __DIR__ . '/../facturas/' . $nombreArchivo;
         
         // Guardar el PDF en el servidor
