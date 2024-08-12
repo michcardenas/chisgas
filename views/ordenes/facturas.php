@@ -24,7 +24,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     include $ruta_template;
 
     // Construir la URL base para las facturas
-    $base_url = 'https://' . $_SERVER['HTTP_HOST'] . 'facturas/';
+    $base_url = 'https://sastreriachisgas.shop/facturas';
     $dir = $_SERVER['DOCUMENT_ROOT'] . 'facturas/';
 
     // Incluir archivo de estilos CSS para centrar la tabla
