@@ -281,7 +281,9 @@ $(document).ready(function(){
                 dataType: "json",
                 success: function(response) {
                     alert("Se ha realizado de manera correcta la entrega parcial o abono.");
-                    history.back();
+                    var url = 'https://sastreriachisgas.shop/views/menu.php';
+ 
+                     window.location.href = url;
                 },
                 error: function(xhr, status, error) {
                     console.error("Error en AJAX:", status, error);
