@@ -796,7 +796,7 @@ $("#entrega_parcial").click(function(e) {
         console.log(response);
         if(response.success) {
           // Construye la URL con los parámetros ID y nombre de usuario
-          var url = 'views/calendario/entrega_parcial.php';
+          var url = 'entrega_parcial.php';
           url += '?idOrden=' + encodeURIComponent(response.idOrden);
           url += '&nombreUsuario=' + encodeURIComponent(response.nombreUsuario);
           
