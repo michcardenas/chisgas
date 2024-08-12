@@ -81,7 +81,6 @@
         </nav>';
     }
     ?>
-    <!-- Aquí puedes añadir el contenido principal de tu página -->
-    <!-- Aquí puedes añadir el contenido principal de tu página -->
+
 </body>
 </html>

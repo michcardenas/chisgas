@@ -24,8 +24,8 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     include $ruta_template;
 
     // Construir la URL base para las facturas
-    $base_url = 'http://' . $_SERVER['HTTP_HOST'] . '/chisgas/facturas/';
-    $dir = $_SERVER['DOCUMENT_ROOT'] . '/chisgas/facturas/';
+    $base_url = 'http://' . $_SERVER['HTTP_HOST'] . 'facturas/';
+    $dir = $_SERVER['DOCUMENT_ROOT'] . 'facturas/';
 
     // Incluir archivo de estilos CSS para centrar la tabla
     echo '<link rel="stylesheet" type="text/css" href="' . $ruta_css . '">';
