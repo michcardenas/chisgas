@@ -718,58 +718,65 @@ $('#botonAtras').on('click', function() {
     window.history.back();
 });
 $("#entrega_total").click(function(e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  var idOrden = $("#id_orden").val(); 
-  var id_usuario = $("#id_usuario").val(); 
-  var forma_pago = $("#forma_pago").val(); // Corregido a 'forma_pago'
-  var telefono = $("#telefono_cliente").val(); 
-  
-  console.log("idOrden:", idOrden);
-  console.log("id_usuario:", id_usuario);
-  console.log("forma_pago:", forma_pago);
-  console.log("telefono:", telefono);
-  
-  var confirmar = confirm("¿Quieres entregar toda la orden?");
-  if (!confirmar) {
-      return;
-  }
+    var idOrden = $("#id_orden").val(); 
+    var id_usuario = $("#id_usuario").val(); 
+    var forma_pago = $("#forma_pago").val(); 
+    var telefono = $("#telefono_cliente").val(); 
+    
+    console.log("idOrden:", idOrden);
+    console.log("id_usuario:", id_usuario);
+    console.log("forma_pago:", forma_pago);
+    console.log("telefono:", telefono);
+    
+    var confirmar = confirm("¿Quieres entregar toda la orden?");
+    if (!confirmar) {
+        return;
+    }
 
-  $.ajax({
-      url: '../../controllers/calendarioController.php',
-      type: 'post',
-      dataType: 'json',
-      data: {
-          action: 'entregaTotal',
-          idOrden: idOrden,
-          id_usuario: id_usuario,
-          forma_pago: forma_pago
-      },
-      beforeSend: function() {
-          // Aquí puedes mostrar un loader o un mensaje de carga si es necesario
-      },
-      success: function(responseData) {
-          console.log(responseData);
-          if (responseData.success) {
-              var filePath = responseData.pdf;
-              var fileName = filePath.split('/').pop();
+    // Deshabilitar el botón para evitar múltiples clics
+    $(this).prop('disabled', true);
 
-              var whatsappMessage = `¡Gracias por elegirnos para el arreglo de tu prenda! 🎉 Tu orden está completa y los detalles están disponibles en el siguiente enlace: https://sastreriachisgas.shop/facturas/${fileName} 📝 Agradecemos tu confianza en nosotros y estamos aquí para cualquier otro servicio que necesites. 😊 ¡Esperamos verte pronto! 👋`;
-              var whatsappUrl = `https://api.whatsapp.com/send?phone=+57${telefono}&text=${encodeURIComponent(whatsappMessage)}`;
+    $.ajax({
+        url: '../../controllers/calendarioController.php',
+        type: 'post',
+        dataType: 'json',
+        data: {
+            action: 'entregaTotal',
+            idOrden: idOrden,
+            id_usuario: id_usuario,
+            forma_pago: forma_pago
+        },
+        beforeSend: function() {
+            // Aquí puedes mostrar un loader o un mensaje de carga si es necesario
+        },
+        success: function(responseData) {
+            console.log(responseData);
+            if (responseData.success) {
+                var filePath = responseData.pdf;
+                var fileName = filePath.split('/').pop();
 
-              // Redirige a la URL de WhatsApp
-              window.location.href = whatsappUrl;
-          } else {
-              alert("Hubo un problema al procesar la entrega total. Por favor, inténtalo de nuevo más tarde.");
-          }
-      },
-      error: function(xhr, status, error) {
-          alert( jqXHR.responseText);
-          console.error('Error en la solicitud AJAX:', status, error);
-          alert("Hubo un error al procesar la solicitud. Por favor, inténtalo de nuevo más tarde.");
-      }
-  });
+                var whatsappMessage = `¡Gracias por elegirnos para el arreglo de tu prenda! 🎉 Tu orden está completa y los detalles están disponibles en el siguiente enlace: https://sastreriachisgas.shop/facturas/${fileName} 📝 Agradecemos tu confianza en nosotros y estamos aquí para cualquier otro servicio que necesites. 😊 ¡Esperamos verte pronto! 👋`;
+                var whatsappUrl = `https://api.whatsapp.com/send?phone=+57${telefono}&text=${encodeURIComponent(whatsappMessage)}`;
+
+                // Redirige a la URL de WhatsApp
+                window.location.href = whatsappUrl;
+            } else {
+                alert("Hubo un problema al procesar la entrega total. Por favor, inténtalo de nuevo más tarde.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error en la solicitud AJAX:', status, error);
+            alert("Hubo un error al procesar la solicitud. Por favor, inténtalo de nuevo más tarde.");
+        },
+        complete: function() {
+            // Rehabilitar el botón después de completar la solicitud
+            $("#entrega_total").prop('disabled', false);
+        }
+    });
 });
+
 
 
 $("#entrega_parcial").click(function(e) {

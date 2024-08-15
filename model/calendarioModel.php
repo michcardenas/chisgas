@@ -577,7 +577,7 @@ function ver_calendario_estado_prenda($estado) {
     global $conn;  // Asegúrate de que tu conexión se llama $conn
 
     if ($estado == '6') {
-        // Si se solicita el estado 6, seleccionamos sólo las órdenes y prendas en estado 6
+        // Si se solicita el estado 6 (Entregado), seleccionamos sólo las órdenes y prendas en estado 6
         $query = "
         SELECT 
             o.fecha_entrega,
@@ -597,7 +597,7 @@ function ver_calendario_estado_prenda($estado) {
             o.fecha_entrega;
         ";
     } elseif ($estado == '7') {
-        // Si se solicita el estado 7, seleccionamos sólo las órdenes y prendas en estado 7
+        // Si se solicita el estado 7 (Entrega Parcial), seleccionamos sólo las órdenes y prendas en estado 7
         $query = "
         SELECT 
             o.fecha_entrega,
@@ -636,7 +636,7 @@ function ver_calendario_estado_prenda($estado) {
             o.fecha_entrega;
         ";
     } elseif ($estado == '3') {
-        // Si se solicita el estado 3, seleccionamos prendas en estado 3 y órdenes en estado 0
+        // Si se solicita el estado 3 (Pendiente), seleccionamos prendas en estado 3
         $query = "
         SELECT 
             o.fecha_entrega,
@@ -649,11 +649,10 @@ function ver_calendario_estado_prenda($estado) {
         JOIN 
             prendas p ON o.id = p.id_orden
         WHERE 
-            p.estado = '3' OR o.estado = '0'
+            p.estado = '3'
         GROUP BY 
             o.fecha_entrega, p.estado, o.estado
         ORDER BY 
-            FIELD(p.estado, '3', '4', '5'), 
             o.fecha_entrega;
         ";
     } else {
@@ -685,7 +684,6 @@ function ver_calendario_estado_prenda($estado) {
             o.fecha_entrega;
         ";
     }
-
     $result = $conn->query($query);
 
     // Verificar si la consulta devuelve resultados

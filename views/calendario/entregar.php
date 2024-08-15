@@ -72,7 +72,6 @@ foreach ($arreglos_prendas as $prenda) {
     $prendasOriginales[$id_prenda] = $cantidad_original;
 }
 
-// Mostrar el array de prendas original
 
 // Sumar todas las cantidades originales
 $totalPrendasOriginales = array_sum($prendasOriginales);
