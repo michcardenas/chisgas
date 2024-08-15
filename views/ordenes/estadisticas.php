@@ -76,7 +76,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
         echo '<td> $' . number_format($fila['total_recogido'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
         echo '</tr>';
         // Sumar el dinero final de la fila actual al total
-        $total_dinero_final += $fila['dinero_final'];
+        $total_dinero_final = $fila['dinero_final'];
     }
     echo '</tbody>';
     echo '</table>';
