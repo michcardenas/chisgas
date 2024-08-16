@@ -58,48 +58,45 @@ SELECT
     COALESCE(SUM(CASE WHEN forma_pago = 'Nequi' THEN saldo ELSE 0 END), 0) AS total_nequi,
     COALESCE(SUM(saldo), 0) AS total_recogido
 FROM (
-    -- Total saldo de las órdenes restando abonos parciales
+    -- Saldos de órdenes entregadas hoy
     SELECT 
+        o.id,
         o.saldo - COALESCE(SUM(ep.abono), 0) AS saldo,
         o.forma_pago
     FROM ordenes o
     LEFT JOIN entregas_parciales ep ON o.id = ep.id_orden 
-      AND DATE(ep.fecha_hora) = DATE(o.fecha_entrega)
+      AND DATE(ep.fecha_hora) = CURDATE()
     WHERE DATE(o.fecha_entrega) = CURDATE()
       AND (o.estado = '6' OR o.estado = '7')
     GROUP BY o.id, o.saldo, o.forma_pago
     
     UNION ALL
     
-    -- Abonos parciales de entregas
+    -- Abonos iniciales en órdenes creadas hoy (que no hayan sido entregadas hoy)
     SELECT 
-        ep.abono AS saldo, 
-        ep.forma_pago
-    FROM entregas_parciales ep
-    WHERE DATE(ep.fecha_hora) = CURDATE()
-    
-    UNION ALL
-    
-    -- Abonos iniciales en órdenes
-    SELECT 
+        o.id,
         o.abono AS saldo, 
         o.forma_pago
     FROM ordenes o
     WHERE DATE(o.fecha_creacion) = CURDATE() 
       AND o.abono IS NOT NULL
+      AND DATE(o.fecha_entrega) != CURDATE()
     
     UNION ALL
     
-    -- Saldos de entregas
+    -- Abonos parciales de entregas (que no sean de órdenes entregadas hoy)
     SELECT 
-        o.saldo, 
-        o.forma_pago
-    FROM entregas e
-    INNER JOIN ordenes o ON e.orden_id = o.id
-    WHERE DATE(e.fecha) = CURDATE()
+        ep.id_orden,
+        ep.abono AS saldo, 
+        ep.forma_pago
+    FROM entregas_parciales ep
+    LEFT JOIN ordenes o ON ep.id_orden = o.id
+    WHERE DATE(ep.fecha_hora) = CURDATE()
+      AND (DATE(o.fecha_entrega) != CURDATE() OR o.fecha_entrega IS NULL)
 ) AS totales;
 ";
-
+var_dump($sql_ordenes_dia);
+die
 
 $result_ordenes_dia = mysqli_query($conn, $sql_ordenes_dia);
 
