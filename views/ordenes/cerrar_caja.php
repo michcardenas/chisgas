@@ -54,46 +54,25 @@ $total_nequi = 0;
 
 $sql_ordenes_dia = "
 SELECT 
-    COALESCE(SUM(CASE WHEN forma_pago = 'Efectivo' THEN saldo ELSE 0 END), 0) AS total_efectivo,
-    COALESCE(SUM(CASE WHEN forma_pago = 'Nequi' THEN saldo ELSE 0 END), 0) AS total_nequi,
-    COALESCE(SUM(saldo), 0) AS total_recogido
-FROM (
-    -- Saldos de órdenes entregadas hoy
-    SELECT 
-        o.id,
-        o.saldo - COALESCE(SUM(ep.abono), 0) AS saldo,
-        o.forma_pago
-    FROM ordenes o
-    LEFT JOIN entregas_parciales ep ON o.id = ep.id_orden 
-      AND DATE(ep.fecha_hora) = CURDATE()
-    WHERE DATE(o.fecha_entrega) = CURDATE()
-      AND (o.estado = '6' OR o.estado = '7')
-    GROUP BY o.id, o.saldo, o.forma_pago
+    COALESCE(SUM(CASE 
+        WHEN o.forma_pago = 'Efectivo' THEN o.saldo - COALESCE(e.abono, 0)
+        WHEN o.forma_pago != 'Efectivo' AND e.forma_pago = 'Efectivo' THEN e.abono
+        ELSE 0 
+    END), 0) AS total_efectivo,
     
-    UNION ALL
+    COALESCE(SUM(CASE 
+        WHEN o.forma_pago = 'Nequi' THEN o.saldo - COALESCE(e.abono, 0)
+        WHEN o.forma_pago != 'Nequi' AND e.forma_pago = 'Nequi' THEN e.abono
+        ELSE 0 
+    END), 0) AS total_nequi,
     
-    -- Abonos iniciales en órdenes creadas hoy (que no hayan sido entregadas hoy)
-    SELECT 
-        o.id,
-        o.abono AS saldo, 
-        o.forma_pago
-    FROM ordenes o
-    WHERE DATE(o.fecha_creacion) = CURDATE() 
-      AND o.abono IS NOT NULL
-      AND DATE(o.fecha_entrega) != CURDATE()
-    
-    UNION ALL
-    
-    -- Abonos parciales de entregas (que no sean de órdenes entregadas hoy)
-    SELECT 
-        ep.id_orden,
-        ep.abono AS saldo, 
-        ep.forma_pago
-    FROM entregas_parciales ep
-    LEFT JOIN ordenes o ON ep.id_orden = o.id
-    WHERE DATE(ep.fecha_hora) = CURDATE()
-      AND (DATE(o.fecha_entrega) != CURDATE() OR o.fecha_entrega IS NULL)
-) AS totales;
+    COALESCE(SUM(o.saldo - COALESCE(e.abono, 0)), 0) AS total_recogido
+FROM 
+    entregas s 
+    JOIN ordenes o ON s.orden_id = o.id
+    LEFT JOIN entregas_parciales e ON s.orden_id = e.id_orden
+WHERE 
+    DATE(s.fecha) = CURDATE();
 ";
 
 
