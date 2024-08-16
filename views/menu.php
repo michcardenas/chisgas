@@ -40,6 +40,12 @@ if (file_exists($ruta)) {
     Caja
     <img src="img/cajero-automatico.png" alt="Icono de Ordenes" class="button-image">
 </button></a>
+
+<a href='ordenes/caja.php'>
+<button class="button2">
+    Usuarios
+    <img src="img/usuario.png" alt="Icono de Ordenes" class="button-image">
+</button></a>
 </div>
 <?php 
 $ruta_footer = 'footer.php';
