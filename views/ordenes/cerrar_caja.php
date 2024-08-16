@@ -95,8 +95,7 @@ FROM (
       AND (DATE(o.fecha_entrega) != CURDATE() OR o.fecha_entrega IS NULL)
 ) AS totales;
 ";
-var_dump($sql_ordenes_dia);
-die
+
 
 $result_ordenes_dia = mysqli_query($conn, $sql_ordenes_dia);
 
