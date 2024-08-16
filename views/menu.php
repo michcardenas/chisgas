@@ -24,7 +24,7 @@ if (file_exists($ruta)) {
 
 ?>
 <div class="centrar_botones_menu">
-<a href="ordenes/ordenes.php"><button class="button2">
+<a style="margin-top: 8rem;" href="ordenes/ordenes.php"><button class="button2">
     Ordenes
     <img src="img/factura.png" alt="Icono de Ordenes" class="button-image">
 </button></a>
