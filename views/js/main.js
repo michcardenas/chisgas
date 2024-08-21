@@ -922,6 +922,25 @@ $('.ff').on('submit', function(e) {
 }
 
 
-
+$("#usuarios").click(function() {
+    $.ajax({
+        url: '../controllers/usuariosController.php',
+        type: 'POST',
+        data: {
+            'action': 'ver_calendario'
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                // Ahora, redirigir a la vista:
+                window.location.href = "usuarios.php";
+              } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+        }
+    });
+  });
 
 

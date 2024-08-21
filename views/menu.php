@@ -41,7 +41,7 @@ if (file_exists($ruta)) {
     <img src="img/cajero-automatico.png" alt="Icono de Ordenes" class="button-image">
 </button></a>
 
-<a href='ordenes/caja.php'>
+<a id='usuarios'>
 <button class="button2">
     Usuarios
     <img src="img/usuario.png" alt="Icono de Ordenes" class="button-image">
