@@ -10,6 +10,7 @@ if (!isset($_SESSION['username'])) {
 }
 
 date_default_timezone_set('America/Bogota');
+
 // Rutas para los archivos incluidos
 $ruta_template = '../template.php';
 $ruta_footer = '../footer.php';
@@ -25,7 +26,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
 
     // Construir la URL base para las facturas
     $base_url = 'https://sastreriachisgas.shop/facturas/';
-    $dir = $_SERVER['DOCUMENT_ROOT'] . 'facturas';
+    $dir = $_SERVER['DOCUMENT_ROOT'] . '/facturas';  // Asegúrate de incluir la barra '/'
 
     // Incluir archivo de estilos CSS para centrar la tabla
     echo '<link rel="stylesheet" type="text/css" href="' . $ruta_css . '">';
@@ -40,52 +41,55 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     // Array para almacenar detalles de facturas
     $facturas = array();
 
-    // Abre el directorio
-    if ($handle = opendir($base_url)) {
-        // Itera sobre cada archivo en el directorio
-        while (false !== ($file = readdir($handle))) {
-            // Excluye directorios y archivos ocultos
-            if ($file != "." && $file != "..") {
-                // Obtiene la fecha y hora de modificación (o creación)
-                $modification_time = date("Y-m-d H:i:s", filemtime($base_url . $file));
+    // Verificar si el directorio existe antes de intentar abrirlo
+    if (is_dir($dir)) {
+        // Abre el directorio
+        if ($handle = opendir($dir)) {
+            // Itera sobre cada archivo en el directorio
+            while (false !== ($file = readdir($handle))) {
+                // Excluye directorios y archivos ocultos
+                if ($file != "." && $file != ".." && !is_dir($dir . '/' . $file)) {
+                    // Obtiene la fecha y hora de modificación (o creación)
+                    $modification_time = date("Y-m-d H:i:s", filemtime($dir . '/' . $file));
 
-                // Almacena detalles de factura en el array
-                $facturas[] = array(
-                    'fecha' => $modification_time,
-                    'factura' => $file
-                );
+                    // Almacena detalles de factura en el array
+                    $facturas[] = array(
+                        'fecha' => $modification_time,
+                        'factura' => $file
+                    );
+                }
             }
-        }
-        closedir($handle);
+            closedir($handle);
 
-        // Ordena las facturas por fecha ascendente
-        usort($facturas, function($a, $b) {
-            return strtotime($a['fecha']) - strtotime($b['fecha']);
-        });
+            // Ordena las facturas por fecha ascendente
+            usort($facturas, function($a, $b) {
+                return strtotime($a['fecha']) - strtotime($b['fecha']);
+            });
 
-        // Imprime las filas ordenadas
-        foreach ($facturas as $factura) {
-            echo '<tr>';
-            echo '<td>' . $factura['fecha'] . '</td>';
-            echo '<td>' . $factura['factura'] . '</td>';
-            echo '<td><a href="' . $base_url . $factura['factura'] . '" download>Descargar</a></td>';
-            echo '</tr>';
+            // Imprime las filas ordenadas
+            foreach ($facturas as $factura) {
+                echo '<tr>';
+                echo '<td>' . $factura['fecha'] . '</td>';
+                echo '<td>' . $factura['factura'] . '</td>';
+                echo '<td><a href="' . $base_url . $factura['factura'] . '" download>Descargar</a></td>';
+                echo '</tr>';
+            }
+        } else {
+            echo '<tr><td colspan="3">No se pudo abrir el directorio de facturas.</td></tr>';
         }
     } else {
-        echo '<tr><td colspan="3">No se pudo abrir el directorio de facturas.</td></tr>';
+        echo '<tr><td colspan="3">El directorio de facturas no existe.</td></tr>';
     }
 
     // Cierra la tabla HTML
     echo '</tbody>';
     echo '</table>';
-        // Botón para volver a cerrar_caja.php
-        echo '<div class="volver-menu">';
-        echo '<a href="' . $ruta_image_menu . '"><button>Volver</button></a>';
-        echo '</div>'; // Cierre del contenedor del botón
-    
-        echo '</div>'; // Cierre del contenedor p_centrar
-    
-    echo '</div>'; // Cierre del contenedor de la tabla
+    // Botón para volver a cerrar_caja.php
+    echo '<div class="volver-menu">';
+    echo '<a href="' . $ruta_image_menu . '"><button>Volver</button></a>';
+    echo '</div>'; // Cierre del contenedor del botón
+
+    echo '</div>'; // Cierre del contenedor table-container
     echo '</div>'; // Cierre del contenedor p_centrar
 
     // Incluir archivo de JavaScript y footer
