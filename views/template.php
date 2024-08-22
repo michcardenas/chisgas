@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="<?php echo $ruta_css; ?>">
     <link rel="icon" type="image/png" href="<?php echo $ruta_icon; ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <title><?php echo $title ?? 'Chisgas'; ?></title>
     <style>    
 
