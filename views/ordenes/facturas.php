@@ -24,7 +24,7 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     include $ruta_template;
 
     // Construir la URL base para las facturas
-    $base_url = 'https://sastreriachisgas.shop/facturas';
+    $base_url = 'https://sastreriachisgas.shop/facturas/';
     $dir = $_SERVER['DOCUMENT_ROOT'] . 'facturas';
 
     // Incluir archivo de estilos CSS para centrar la tabla
@@ -41,13 +41,13 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     $facturas = array();
 
     // Abre el directorio
-    if ($handle = opendir($dir)) {
+    if ($handle = opendir($base_url)) {
         // Itera sobre cada archivo en el directorio
         while (false !== ($file = readdir($handle))) {
             // Excluye directorios y archivos ocultos
             if ($file != "." && $file != "..") {
                 // Obtiene la fecha y hora de modificación (o creación)
-                $modification_time = date("Y-m-d H:i:s", filemtime($dir . $file));
+                $modification_time = date("Y-m-d H:i:s", filemtime($base_url . $file));
 
                 // Almacena detalles de factura en el array
                 $facturas[] = array(
