@@ -527,5 +527,39 @@ SELECT
     // Cerrar el statement (liberar los recursos)
     $stmt->close();
 }
+
+function obtener_id_usuario($username) {
+    // Suponiendo que tienes una conexión a la base de datos almacenada en $conn
+    global $conn;
+
+    // Consulta SQL para obtener el ID del usuario basado en su nombre de usuario
+    $sql = "SELECT id FROM usuarios WHERE login = ?";
+    
+    // Preparar la consulta
+    if ($stmt = $conn->prepare($sql)) {
+        // Vincular el parámetro
+        $stmt->bind_param("s", $username);
+        
+        // Ejecutar la consulta
+        $stmt->execute();
+        
+        // Vincular el resultado
+        $stmt->bind_result($id);
+        
+        // Obtener el resultado
+        if ($stmt->fetch()) {
+            return $id;
+        } else {
+            return null; // Retorna null si no se encuentra el usuario
+        }
+        
+        // Cerrar la declaración
+        $stmt->close();
+    } else {
+        // Manejar el error en caso de que la preparación falle
+        die("Error en la consulta SQL: " . $conn->error);
+    }
+}
+
 ?>
 

@@ -165,9 +165,9 @@ if (file_exists($ruta)) {
                         <div class="mb-3">
     <label for="editarUsuarioGrupo" class="form-label">Grupo de Usuario</label>
     <select class="form-select" id="editarUsuarioGrupo" name="grupo_usuario">
-        <option value="Administrador">Administrador</option>
-        <option value="Caja">Caja</option>
-        <option value="Sastre">Sastre</option>
+        <option value="administrador">Administrador</option>
+        <option value="caja">Caja</option>
+        <option value="sastre">Sastre</option>
     </select>
 </div>
                     </form>
@@ -292,6 +292,34 @@ function guardarCambiosUsuario() {
             alert('Hubo un error al actualizar el usuario.');
         });
 }
+
+function eliminarUsuario(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+        fetch('../controllers/usuariosController.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                'action': 'eliminar_usuario',
+                'id': id
+            })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Usuario eliminado con éxito.');
+                    location.reload(); // Recargar la página para actualizar la tabla
+                } else {
+                    alert('Error al eliminar el usuario: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error al eliminar el usuario:', error);
+                alert('Hubo un error al eliminar el usuario.');
+            });
+    }
+}
+
 
 
 </script>

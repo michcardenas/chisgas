@@ -10,7 +10,7 @@ class UsuariosModel {
     
     // Obtener todos los usuarios
     public function obtenerUsuarios() {
-        $sql = "SELECT * FROM `usuarios`";
+        $sql = "SELECT * FROM `usuarios` WHERE activo = 1";
         $result = $this->conn->query($sql);
 
         // Verificar que la consulta se haya ejecutado correctamente
@@ -56,24 +56,24 @@ class UsuariosModel {
     }
     
 
-    // Eliminar un usuario por ID
-    public function eliminarUsuario($id) {
-        // Usar una consulta preparada para evitar inyecciones SQL
-        $stmt = $this->conn->prepare("DELETE FROM `usuarios` WHERE `id` = ?");
-        if ($stmt === false) {
-            throw new Exception("Error en la preparación de la consulta: " . $this->conn->error);
-        }
-
-        // Vincular los parámetros y ejecutar la consulta
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-
-        // Verificar si la consulta fue exitosa
-        if ($stmt->affected_rows === 0) {
-            throw new Exception("No se encontró el usuario con el ID: " . $id);
-        }
-
-        $stmt->close();
+// Marcar un usuario como inactivo por ID
+public function eliminarUsuario($id) {
+    // Usar una consulta preparada para evitar inyecciones SQL
+    $stmt = $this->conn->prepare("UPDATE `usuarios` SET `activo` = 0 WHERE `id` = ?");
+    if ($stmt === false) {
+        throw new Exception("Error en la preparación de la consulta: " . $this->conn->error);
     }
+
+    // Vincular los parámetros y ejecutar la consulta
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+
+    // Verificar si la consulta fue exitosa
+    if ($stmt->affected_rows === 0) {
+        throw new Exception("No se encontró el usuario con el ID: " . $id);
+    }
+
+    $stmt->close();
+}
 }
 ?>
