@@ -10,6 +10,14 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+// Verificar si la sesión contiene el grupo de usuario
+if (!isset($_SESSION['grupo_usuario'])) {
+    echo "No se encontró el grupo de usuario.";
+    exit();
+}
+
+$grupo_usuario = $_SESSION['grupo_usuario']; // Obtener el grupo de usuario de la sesión
+
 $ruta = '../template.php';
 
 if (file_exists($ruta)) {
@@ -25,16 +33,15 @@ if (file_exists($ruta)) {
 
 if (isset($_GET['fecha_entrega'])) {
     $fecha_entrega = $_GET['fecha_entrega'];
-
-    // Ahora puedes usar la variable $fecha_entrega en tus operaciones.
-    echo $fecha_entrega; // Esto imprimirá: 2023-09-25
+    echo $fecha_entrega;
 } else {
-    // Aquí manejas el caso en que no se envió la fecha.
     echo "Fecha no proporcionada.";
 }
 $id_prenda = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : '';
-// Este es tu código para obtener los datos
 $ver_arreglo = ver_arreglo($id_prenda);
+
+// Determinar si los campos deben ser deshabilitados (solo pueden editar el select "Asignado a")
+$solo_asignado_editable = ($grupo_usuario == 'caja');
 ?>
 
 <div class="p_centrar">
@@ -52,7 +59,7 @@ $ver_arreglo = ver_arreglo($id_prenda);
 
                 <div class="field">
                     <label for="nombre_prenda">Nombre prenda: </label>
-                    <select class="input" name="nombre_prenda" id="nombre_prenda">
+                    <select class="input" name="nombre_prenda" id="nombre_prenda" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
                         <option value="">Seleccione</option>
                         <?php
                         $nombres_prenda = ["Camisa", "Camiseta", "Blusa", "Pantalon", "Chaqueta", "Saco", "Sueter", "Falda", "Vestido", "Otro"];
@@ -70,17 +77,17 @@ $ver_arreglo = ver_arreglo($id_prenda);
                     <?php
                     $prendas_numero_restado = $ver_arreglo['prendas_numero'] - $ver_arreglo['cantidad_entregada'];
                     ?>
-                    <input class="input" name="prendas_numero" type="text" id="prendas_numero" value="<?php echo htmlspecialchars($prendas_numero_restado); ?>">
+                    <input class="input" name="prendas_numero" type="text" id="prendas_numero" value="<?php echo htmlspecialchars($prendas_numero_restado); ?>" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
                 </div>
 
                 <div class="field">
                     <label for="descripcion_arreglo">Descripcion Arreglo: </label>
-                    <textarea class="input" name="descripcion_arreglo" id="descripcion_arreglo"><?php echo htmlspecialchars($ver_arreglo['descripcion_arreglo']); ?></textarea>
+                    <textarea class="input" name="descripcion_arreglo" id="descripcion_arreglo" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>><?php echo htmlspecialchars($ver_arreglo['descripcion_arreglo']); ?></textarea>
                 </div>
 
                 <div class="field">
                     <label for="valor">Valor: </label>
-                    <input class="input" name="valor" type="text" id="valor_prenda" value="$ <?php echo htmlspecialchars(number_format($ver_arreglo['valor'])); ?>">
+                    <input class="input" name="valor" type="text" id="valor_prenda" value="$ <?php echo htmlspecialchars(number_format($ver_arreglo['valor'])); ?>" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
                 </div>
 
                 <div class="field">
@@ -90,7 +97,6 @@ $ver_arreglo = ver_arreglo($id_prenda);
                         <?php
                         $usuarios = obtener_usuarios();
                         foreach ($usuarios as $usuario) {
-                            // Si el usuario actual es el que está asignado, lo seleccionamos por defecto
                             $selected = ($ver_arreglo && $ver_arreglo['id_asignacion'] == $usuario['id']) ? 'selected' : '';
                             echo "<option value='{$usuario['id']}' $selected>{$usuario['login']}</option>";
                         }
@@ -100,7 +106,7 @@ $ver_arreglo = ver_arreglo($id_prenda);
 
                 <div class="field">
                     <label for="estado_prenda">Estado:</label>
-                    <select class="input" id="estado_prenda" name="estado_prenda">
+                    <select class="input" id="estado_prenda" name="estado_prenda" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
                         <option value="1" <?php echo $ver_arreglo['estado'] == 1 ? 'selected' : ''; ?>>Ingresado</option>
                         <option value="4" <?php echo $ver_arreglo['estado'] == 4 ? 'selected' : ''; ?>>En proceso</option>
                         <option value="5" <?php echo $ver_arreglo['estado'] == 5 ? 'selected' : ''; ?>>Arreglado</option>
@@ -120,10 +126,10 @@ $ver_arreglo = ver_arreglo($id_prenda);
                         switch (estado) {
                             case '1': // Ingresado
                                 percent = 0;
-                                color = '#FF5733'; // Cambiar color aquí (ejemplo: Naranja)
+                                color = '#FF5733'; // Naranja
                                 break;
                             case '4': // En proceso
-                                percent = 50; // Porcentaje de ejemplo
+                                percent = 50;
                                 color = '#2196F3'; // Azul
                                 break;
                             case '5': // Arreglado
@@ -142,7 +148,6 @@ $ver_arreglo = ver_arreglo($id_prenda);
 
                     // Obtener el estado inicial desde PHP
                     <?php
-                    // Suponiendo que $ver_arreglo['estado'] contiene el valor inicial del estado
                     if (isset($ver_arreglo['estado'])) {
                         $estado_actual = $ver_arreglo['estado'];
                         echo "updateProgressBar('$estado_actual');";
@@ -174,15 +179,14 @@ $ver_arreglo = ver_arreglo($id_prenda);
 
 $ruta_footer = '../footer.php';
 
-if (file_exists($ruta)) {
+if (file_exists($ruta_footer)) {
     $ruta_css = '../css/style.css';
     $ruta_image = "../img/chisgas_fondo_blanco.png";
     $ruta_js = "../js/main.js";
 
     include $ruta_footer;
 } else {
-    echo "El archivo $ruta no existe.";
+    echo "El archivo $ruta_footer no existe.";
 }
-
 
 ?>

@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="<?php echo $ruta_css; ?>">
     <link rel="icon" type="image/png" href="<?php echo $ruta_icon; ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <title><?php echo $title ?? 'Chisgas'; ?></title>
     <style>    
 
@@ -61,12 +62,27 @@
     } else {
         $ruta_cerrar_sesion = 'login/cerrar_sesion.php';
     }
-
     if (isset($_SESSION['username']) && $_SESSION['username'] == true) {
-        $saludo = (isset($_SESSION['grupo_usuario']) && $_SESSION['grupo_usuario'] == 'administrador') 
-            ? '<span>Bienvenido</span><span>Administrador:</span>' 
-            : '<span>Bienvenido,</span>';
-        
+        $saludo = '<span>Bienvenido</span>';
+    
+        // Condiciones para diferentes roles
+        if (isset($_SESSION['grupo_usuario'])) {
+            switch ($_SESSION['grupo_usuario']) {
+                case 'administrador':
+                    $saludo .= '<span>Administrador:</span>';
+                    break;
+                case 'caja':
+                    $saludo .= '<span>Caja:</span>';
+                    break;
+                case 'sastre':
+                    $saludo .= '<span>Sastre:</span>';
+                    break;
+                default:
+                    $saludo .= '<span>Usuario:</span>';
+                    break;
+            }
+        }
+    
         echo '<nav class="image-nav">
             <a href="'.$ruta_image_menu.'">
                 <img src="'.$ruta_image.'" alt="Chisgas logo" class="center-image">
@@ -80,7 +96,6 @@
             </div>
         </nav>';
     }
-    ?>
-
+?>
 </body>
 </html>

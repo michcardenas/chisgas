@@ -922,6 +922,33 @@ $('.ff').on('submit', function(e) {
 }
 
 
-
-
+$("#usuarios").click(function() {
+    $.ajax({
+        url: '../controllers/usuariosController.php',
+        type: 'POST',
+        data: {
+            'action': 'obtener_usuarios'
+        },
+        dataType: 'json',
+        success: function(response) {
+            console.log("Respuesta recibida:", response); // Muestra la respuesta completa en la consola
+            if (response.success) {
+                // Almacena los datos en sessionStorage
+                sessionStorage.setItem('usuariosData', JSON.stringify(response.data));
+                
+                // Redirige a la vista usuarios.php
+                window.location.href = "usuarios.php";
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Error en la solicitud AJAX:");
+            console.log("Estado:", textStatus); // Muestra el estado de la solicitud (ej: 'error')
+            console.log("Error lanzado:", errorThrown); // Muestra cualquier error específico lanzado
+            console.log("Detalles del jqXHR:", jqXHR); // Muestra el objeto jqXHR completo para inspección
+            alert("Ocurrió un error al procesar la solicitud.");
+        }
+    });
+});
 
