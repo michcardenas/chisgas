@@ -52,29 +52,26 @@ $total_recogido = 0;
 $total_efectivo = 0;
 $total_nequi = 0;
 
+### 1. Consulta para Órdenes Normales del Día ###
 $sql_ordenes_dia = "
 SELECT 
     COALESCE(SUM(CASE 
-        WHEN o.forma_pago = 'Efectivo' THEN o.saldo - COALESCE(e.abono, 0)
-        WHEN o.forma_pago != 'Efectivo' AND e.forma_pago = 'Efectivo' THEN e.abono
+        WHEN o.forma_pago = 'Efectivo' THEN o.saldo - COALESCE(o.abono, 0)
         ELSE 0 
     END), 0) AS total_efectivo,
     
     COALESCE(SUM(CASE 
-        WHEN o.forma_pago = 'Nequi' THEN o.saldo - COALESCE(e.abono, 0)
-        WHEN o.forma_pago != 'Nequi' AND e.forma_pago = 'Nequi' THEN e.abono
+        WHEN o.forma_pago = 'Nequi' THEN o.saldo - COALESCE(o.abono, 0)
         ELSE 0 
     END), 0) AS total_nequi,
     
-    COALESCE(SUM(o.saldo - COALESCE(e.abono, 0)), 0) AS total_recogido
+    COALESCE(SUM(o.saldo - COALESCE(o.abono, 0)), 0) AS total_recogido
 FROM 
     entregas s 
     JOIN ordenes o ON s.orden_id = o.id
-    LEFT JOIN entregas_parciales e ON s.orden_id = e.id_orden
 WHERE 
     DATE(s.fecha) = CURDATE();
 ";
-
 
 $result_ordenes_dia = mysqli_query($conn, $sql_ordenes_dia);
 
@@ -87,6 +84,76 @@ if (!$result_ordenes_dia) {
         $total_recogido = $row_ordenes_dia['total_recogido'];
         $total_efectivo = $row_ordenes_dia['total_efectivo'];
         $total_nequi = $row_ordenes_dia['total_nequi'];
+    }
+}
+
+### 2. Consulta para Entregas Parciales del Día ###
+$sql_abonos_parciales_dia = "
+SELECT 
+    COALESCE(SUM(CASE 
+        WHEN ep.forma_pago = 'Efectivo' THEN ep.abono
+        ELSE 0 
+    END), 0) AS total_abonos_efectivo,
+    
+    COALESCE(SUM(CASE 
+        WHEN ep.forma_pago = 'Nequi' THEN ep.abono
+        ELSE 0 
+    END), 0) AS total_abonos_nequi,
+    
+    COALESCE(SUM(ep.abono), 0) AS total_abonos_parciales
+FROM 
+    entregas_parciales ep
+WHERE 
+    DATE(ep.fecha_hora) = CURDATE();
+";
+
+$result_abonos_parciales_dia = mysqli_query($conn, $sql_abonos_parciales_dia);
+
+if (!$result_abonos_parciales_dia) {
+    // Manejo de errores en la consulta
+    $mensaje .= " Error: " . mysqli_error($conn);
+} else {
+    $row_abonos_parciales_dia = mysqli_fetch_assoc($result_abonos_parciales_dia);
+    if ($row_abonos_parciales_dia) {
+        // Sumar los abonos parciales a los totales correspondientes
+        $total_recogido += $row_abonos_parciales_dia['total_abonos_parciales'];
+        $total_efectivo += $row_abonos_parciales_dia['total_abonos_efectivo'];
+        $total_nequi += $row_abonos_parciales_dia['total_abonos_nequi'];
+    }
+}
+
+### 3. Consulta para Abonos de Órdenes por Fecha de Creación ###
+$sql_abonos_ordenes_creacion = "
+SELECT 
+    COALESCE(SUM(CASE 
+        WHEN o.forma_pago = 'Efectivo' THEN o.abono
+        ELSE 0 
+    END), 0) AS total_abonos_efectivo,
+    
+    COALESCE(SUM(CASE 
+        WHEN o.forma_pago = 'Nequi' THEN o.abono
+        ELSE 0 
+    END), 0) AS total_abonos_nequi,
+    
+    COALESCE(SUM(o.abono), 0) AS total_abonos_ordenes
+FROM 
+    ordenes o
+WHERE 
+    DATE(o.fecha_creacion) = CURDATE();
+";
+
+$result_abonos_ordenes_creacion = mysqli_query($conn, $sql_abonos_ordenes_creacion);
+
+if (!$result_abonos_ordenes_creacion) {
+    // Manejo de errores en la consulta
+    $mensaje .= " Error: " . mysqli_error($conn);
+} else {
+    $row_abonos_ordenes_creacion = mysqli_fetch_assoc($result_abonos_ordenes_creacion);
+    if ($row_abonos_ordenes_creacion) {
+        // Sumar los abonos de órdenes por fecha de creación a los totales correspondientes
+        $total_recogido += $row_abonos_ordenes_creacion['total_abonos_ordenes'];
+        $total_efectivo += $row_abonos_ordenes_creacion['total_abonos_efectivo'];
+        $total_nequi += $row_abonos_ordenes_creacion['total_abonos_nequi'];
     }
 }
 
