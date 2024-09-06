@@ -640,60 +640,54 @@ $("#calendario").click(function() {
 });
 
 $('#editar_arreglo').click(function() {
-    // Capturar los valores
-    var prendaId = $('#prenda_id').val();
-    var nombre_prenda = $('#nombre_prenda').val();
-    var prendas_numero = $('#prendas_numero').val();
-    var descripcion_arreglo = $('#descripcion_arreglo').val();
-    var valor_prenda = $('#valor_prenda').val(); 
-    var id_orden = $('#id_orden').val();
-    var asignado = $('#Asignado').val();
-    var estado = $('#estado_prenda').val();
-    console.log(estado);
-    // Corregido el ID del selector
-    var valor_prenda_text = valor_prenda.replace(/[$\s.,]/g, "");
-    // Convierte la cadena en un número (opcional)
-    var valor_prenda_real = parseInt(valor_prenda_text);
-    console.log(valor_prenda_real);
-
-    // Enviarlos a través de AJAX
-    $.ajax({
-        type: "POST",
-        url: '../../controllers/calendarioController.php',
-        data: {
-            action: "editar_arreglo",
-            id: prendaId,
-            nombre_prenda: nombre_prenda,
-            prendas_numero: prendas_numero,
-            descripcion_arreglo: descripcion_arreglo,
-            valor: valor_prenda_real,
-            asignado: asignado,
-            estado: estado
-        },
-        dataType: "json",
-        success: function(response) {
-            if (response.success) {
-                $("#resultado_editar").text(response.success);
-                
-                // Redirigir dependiendo del grupo de usuario
-                setTimeout(function() {
-                    if (grupoUsuario === 'sastre') {
-                        window.location.href = '../sastre.php';
-                    } else {
-                        window.location.href = "ver_arreglos.php?id_orden=" + id_orden;
-                    }
-                }, 1000);
-                
-            } else {
-                // Manejar errores
-                alert(response.message);
-            }
-        },
-        error: function() {
-            // Si hay un error en la solicitud AJAX
-            alert("Error al actualizar la prenda.");
-        }
-    });
+  // Capturar los valores
+  var prendaId = $('#prenda_id').val();
+  var nombre_prenda = $('#nombre_prenda').val();
+  var prendas_numero = $('#prendas_numero').val();
+  var descripcion_arreglo = $('#descripcion_arreglo').val();
+  var valor_prenda = $('#valor_prenda').val(); 
+  var id_orden = $('#id_orden').val();
+  var asignado = $('#Asignado').val();
+  var estado = $('#estado_prenda').val();
+  console.log(estado);
+   // Corregido el ID del selector
+  var valor_prenda_text = valor_prenda.replace(/[$\s.,]/g, "");
+  // Convierte la cadena en un número (opcional)
+  var valor_prenda_real = parseInt(valor_prenda_text);
+  console.log(valor_prenda_real);
+  // Enviarlos a través de AJAX
+  $.ajax({
+      type: "POST",
+      url: '../../controllers/calendarioController.php',
+      data: {
+          action: "editar_arreglo",
+          id: prendaId,
+          nombre_prenda: nombre_prenda,
+          prendas_numero: prendas_numero,
+          descripcion_arreglo: descripcion_arreglo,
+          valor: valor_prenda_real,
+          asignado: asignado,
+          estado: estado
+      },
+      dataType: "json",
+      success: function(response) {
+          if (response.success) {
+            $("#resultado_editar").text(response.success);
+            setTimeout(function(){
+              window.location.href = "ver_arreglos.php?id_orden=" + id_orden;
+            }, 1000);
+            
+              // Aquí puedes agregar código para manejar una respuesta exitosa (por ejemplo, mostrar un mensaje, redirigir, etc.)
+          } else {
+              // Aquí puedes agregar código para manejar errores
+              alert(response.message);
+          }
+      },
+      error: function() {
+          // Si hay un error en la solicitud AJAX
+          alert("Error al actualizar la prenda.");
+      }
+  });
 });
 
 
@@ -958,32 +952,3 @@ $("#usuarios").click(function() {
     });
 });
 
-$("#sastre").click(function() {
-    $.ajax({
-        url: '../controllers/sastreController.php', // Ruta al controlador
-        type: 'POST',
-        data: {
-            'action': 'obtener_arreglos_sastre'
-        },
-        dataType: 'json',
-        success: function(response) {
-            console.log("Respuesta recibida:", response); // Muestra la respuesta completa en la consola
-            if (response.success) {
-                // Almacena los datos en sessionStorage
-                sessionStorage.setItem('sastreData', JSON.stringify(response.data));
-                
-                // Redirige a la vista sastre.php
-                window.location.href = "sastre.php";
-            } else {
-                alert(response.message); // Muestra el mensaje de error en caso de que no sea exitoso
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log("Error en la solicitud AJAX:");
-            console.log("Estado:", textStatus); // Muestra el estado de la solicitud (ej: 'error')
-            console.log("Error lanzado:", errorThrown); // Muestra cualquier error específico lanzado
-            console.log("Detalles del jqXHR:", jqXHR); // Muestra el objeto jqXHR completo para inspección
-            alert("Ocurrió un error al procesar la solicitud.");
-        }
-    });
-});

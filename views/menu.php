@@ -15,10 +15,7 @@ if (!isset($_SESSION['grupo_usuario'])) {
     exit();
 }
 
-
-
 $grupo_usuario = $_SESSION['grupo_usuario']; // Obtener el grupo de usuario de la sesión
-$id_usuario = $_SESSION['id']; // Obtener el grupo de usuario de la sesión
 
 $ruta = 'template.php';
 
@@ -36,7 +33,7 @@ if (file_exists($ruta)) {
 
 <div class="centrar_botones_menu">
     <!-- Mostrar el botón "Ordenes" solo si el usuario es "Administrador" o "Caja" -->
-    <?php if ($grupo_usuario == 'administrador' || $grupo_usuario == 'caja') { ?>
+    <?php if ($grupo_usuario == 'administrador' || $grupo_usuario == 'Caja') { ?>
     <a style="margin-top: 8rem;" href="ordenes/ordenes.php">
         <button class="button2">
             Ordenes
@@ -54,7 +51,7 @@ if (file_exists($ruta)) {
     </a>
 
     <!-- Mostrar el botón "Caja" solo para "Administrador" y "Caja" -->
-    <?php if ($grupo_usuario == 'administrador' || $grupo_usuario == 'caja') { ?>
+    <?php if ($grupo_usuario == 'administrador' || $grupo_usuario == 'Caja') { ?>
     <a href='ordenes/caja.php'>
         <button class="button2">
             Caja
@@ -68,16 +65,6 @@ if (file_exists($ruta)) {
     <a id='usuarios'>
         <button class="button2">
             Usuarios
-            <img src="img/usuario.png" alt="Icono de Usuarios" class="button-image">
-        </button>
-    </a>
-    <?php } ?>
-
-     <!-- Mostrar el botón "Usuarios" solo para "Administrador" -->
-     <?php if ($grupo_usuario == 'administrador' || $grupo_usuario == 'sastre') { ?>
-    <a id='sastre'>
-        <button class="button2">
-            Sastre Auxiliar
             <img src="img/usuario.png" alt="Icono de Usuarios" class="button-image">
         </button>
     </a>
