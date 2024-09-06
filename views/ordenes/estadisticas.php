@@ -26,8 +26,9 @@ if (file_exists($ruta_template) && file_exists($ruta_footer)) {
     include '../../model/funciones.php';
 
     // Obtener el mes y año seleccionados del formulario
-    $mes = isset($_GET['mes']) ? $_GET['mes'] : null;
-    $anio = isset($_GET['anio']) ? $_GET['anio'] : null;
+    $mes = isset($_GET['mes']) ? $_GET['mes'] : date('m'); // Si no se selecciona, usa el mes actual
+$anio = isset($_GET['anio']) ? $_GET['anio'] : date('Y'); // Si no se selecciona, usa el año actual
+
     $nombres_meses = [
         1 => 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
