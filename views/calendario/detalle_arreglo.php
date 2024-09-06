@@ -31,17 +31,13 @@ if (file_exists($ruta)) {
     echo "El archivo $ruta no existe.";
 }
 
-if (isset($_GET['fecha_entrega'])) {
-    $fecha_entrega = $_GET['fecha_entrega'];
-    echo $fecha_entrega;
-} else {
-    echo "Fecha no proporcionada.";
-}
 $id_prenda = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : '';
 $ver_arreglo = ver_arreglo($id_prenda);
 
-// Determinar si los campos deben ser deshabilitados (solo pueden editar el select "Asignado a")
-$solo_asignado_editable = ($grupo_usuario == 'caja');
+// Determinar los permisos según el grupo de usuario
+$puede_modificar_asignado = ($grupo_usuario == 'caja' || $grupo_usuario == 'administrador');
+$puede_modificar_estado = ($grupo_usuario == 'sastre' || $grupo_usuario == 'administrador');
+$puede_modificar_todo = ($grupo_usuario == 'administrador');
 ?>
 
 <div class="p_centrar">
@@ -51,15 +47,13 @@ $solo_asignado_editable = ($grupo_usuario == 'caja');
                 <h1 class="form_heading">Detalle Arreglo</h1>
             </div>
 
-            <?php
-            if ($ver_arreglo) {
-            ?>
+            <?php if ($ver_arreglo) { ?>
                 <input type="hidden" name="prenda_id" id="prenda_id" value="<?php echo htmlspecialchars($ver_arreglo['id']); ?>">
                 <input type="hidden" name="id_orden" id="id_orden" value="<?php echo htmlspecialchars($ver_arreglo['id_orden']); ?>">
 
                 <div class="field">
                     <label for="nombre_prenda">Nombre prenda: </label>
-                    <select class="input" name="nombre_prenda" id="nombre_prenda" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
+                    <select class="input" name="nombre_prenda" id="nombre_prenda" <?php echo !$puede_modificar_todo ? 'disabled' : ''; ?>>
                         <option value="">Seleccione</option>
                         <?php
                         $nombres_prenda = ["Camisa", "Camiseta", "Blusa", "Pantalon", "Chaqueta", "Saco", "Sueter", "Falda", "Vestido", "Otro"];
@@ -77,22 +71,22 @@ $solo_asignado_editable = ($grupo_usuario == 'caja');
                     <?php
                     $prendas_numero_restado = $ver_arreglo['prendas_numero'] - $ver_arreglo['cantidad_entregada'];
                     ?>
-                    <input class="input" name="prendas_numero" type="text" id="prendas_numero" value="<?php echo htmlspecialchars($prendas_numero_restado); ?>" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
+                    <input class="input" name="prendas_numero" type="text" id="prendas_numero" value="<?php echo htmlspecialchars($prendas_numero_restado); ?>" <?php echo !$puede_modificar_todo ? 'disabled' : ''; ?>>
                 </div>
 
                 <div class="field">
                     <label for="descripcion_arreglo">Descripcion Arreglo: </label>
-                    <textarea class="input" name="descripcion_arreglo" id="descripcion_arreglo" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>><?php echo htmlspecialchars($ver_arreglo['descripcion_arreglo']); ?></textarea>
+                    <textarea class="input" name="descripcion_arreglo" id="descripcion_arreglo" <?php echo !$puede_modificar_todo ? 'disabled' : ''; ?>><?php echo htmlspecialchars($ver_arreglo['descripcion_arreglo']); ?></textarea>
                 </div>
 
                 <div class="field">
                     <label for="valor">Valor: </label>
-                    <input class="input" name="valor" type="text" id="valor_prenda" value="$ <?php echo htmlspecialchars(number_format($ver_arreglo['valor'])); ?>" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
+                    <input class="input" name="valor" type="text" id="valor_prenda" value="$ <?php echo htmlspecialchars(number_format($ver_arreglo['valor'])); ?>" <?php echo !$puede_modificar_todo ? 'disabled' : ''; ?>>
                 </div>
 
                 <div class="field">
                     <label for="Asignado">Asignado a :</label>
-                    <select class="input" name="Asignado" id="Asignado">
+                    <select class="input" name="Asignado" id="Asignado" <?php echo !$puede_modificar_asignado ? 'disabled' : ''; ?>>
                         <option value="">Seleccione</option>
                         <?php
                         $usuarios = obtener_usuarios();
@@ -106,7 +100,7 @@ $solo_asignado_editable = ($grupo_usuario == 'caja');
 
                 <div class="field">
                     <label for="estado_prenda">Estado:</label>
-                    <select class="input" id="estado_prenda" name="estado_prenda" <?php echo $solo_asignado_editable ? 'disabled' : ''; ?>>
+                    <select class="input" id="estado_prenda" name="estado_prenda" <?php echo !$puede_modificar_estado ? 'disabled' : ''; ?>>
                         <option value="1" <?php echo $ver_arreglo['estado'] == 1 ? 'selected' : ''; ?>>Ingresado</option>
                         <option value="4" <?php echo $ver_arreglo['estado'] == 4 ? 'selected' : ''; ?>>En proceso</option>
                         <option value="5" <?php echo $ver_arreglo['estado'] == 5 ? 'selected' : ''; ?>>Arreglado</option>
@@ -161,7 +155,10 @@ $solo_asignado_editable = ($grupo_usuario == 'caja');
                         var estadoSeleccionado = $(this).val();
                         updateProgressBar(estadoSeleccionado);
                     });
+
+                    var grupoUsuario = "<?php echo $grupo_usuario; ?>";
                 </script>
+
             <?php } else { ?>
                 <p>No se encontraron resultados para esta prenda.</p>
             <?php } ?>
@@ -169,7 +166,6 @@ $solo_asignado_editable = ($grupo_usuario == 'caja');
         <h1 class="form_heading" id="resultado_editar"></h1>
 
         <div class="flex">
-            <button class="button" onclick="history.back();">Volver</button>
             <button id="editar_arreglo" class="button">Editar arreglo</button>
         </div>
     </div>
