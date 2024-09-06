@@ -434,8 +434,14 @@ function obtenerEstadoGeneral($estadoOrden) {
 
 // Asumiendo que $conn es tu conexión a la base de datos
 
-function seleccionar_todas_las_columnas_caja_por_mes($mes, $anio) {
+function seleccionar_todas_las_columnas_caja_por_mes($mes = null, $anio = null) {
     global $conn;
+
+    // Si no se pasa mes o año, se filtra por el mes y año actuales
+    if (is_null($mes) || is_null($anio)) {
+        $mes = date('m');  // Mes actual
+        $anio = date('Y');  // Año actual
+    }
 
     $sql = "SELECT 
                 c.*, 
@@ -443,22 +449,35 @@ function seleccionar_todas_las_columnas_caja_por_mes($mes, $anio) {
             FROM 
                 caja c
             LEFT JOIN 
-                entregas e ON DATE(c.fecha) = DATE(e.fecha) -- Comparación de las fechas sin la hora
-                          AND c.fecha >= e.fecha            -- Asegura que las fechas coincidan
+                entregas e ON DATE(c.fecha) = DATE(e.fecha)
+                          AND c.fecha >= e.fecha
             WHERE 
-                (? IS NULL OR MONTH(c.fecha) = ?) AND
-                (? IS NULL OR YEAR(c.fecha) = ?)
+                MONTH(c.fecha) = ? AND  -- Filtra por el mes proporcionado
+                YEAR(c.fecha) = ?       -- Filtra por el año proporcionado
             GROUP BY 
                 c.fecha
             ORDER BY 
-                c.fecha";
+                c.fecha;";
 
+    // Preparar la consulta
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iiii", $mes, $mes, $anio, $anio);
+    if ($stmt === false) {
+        throw new Exception("Error en la preparación de la consulta: " . $conn->error);
+    }
+
+    // Vincular los parámetros mes y año
+    $stmt->bind_param("ii", $mes, $anio);
+
+    // Ejecutar la consulta
     $stmt->execute();
+
+    // Obtener los resultados
     $result = $stmt->get_result();
+
+    // Retornar los resultados como un array asociativo
     return $result->fetch_all(MYSQLI_ASSOC);
 }
+
 
 function seleccionar_datos_por_id($id) {
     global $conn; // Asegúrate de que tu conexión se llama $conn

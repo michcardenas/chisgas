@@ -987,3 +987,59 @@ $("#sastre").click(function() {
         }
     });
 });
+
+function cargarCalendarioPorEstadoPrenda1(estado) {
+    $.ajax({
+        url: '../controllers/sastreController.php',
+        type: 'POST',
+        data: {
+            'action': 'ver_calendario_estado_prenda',
+            'estado': estado
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                console.log(response);
+                // Guardar los datos en sessionStorage
+                sessionStorage.setItem('sastreData', JSON.stringify(response.data));
+                actualizarVistaCalendario1(response.data); // Actualizar la vista con los nuevos datos
+                alert("Datos de calendario actualizados según el estado de la prenda.");
+            } else {
+                alert(response.message); // Mostrar el mensaje de error si algo falla
+            }
+        },
+        error: function() {
+            alert("Error en la comunicación con el servidor."); // Mensaje de error en la conexión AJAX
+        }
+    });
+}
+
+function actualizarVistaCalendario1(data) {
+    // Ordenar los datos por fecha de entrega
+    data.sort(function(a, b) {
+        return new Date(b.fecha_entrega) - new Date(a.fecha_entrega);
+    });
+
+    // Obtener el cuerpo de la tabla
+    var tbody = $("#calendarioArreglosTabla tbody");
+    tbody.empty(); // Limpiar el contenido previo
+
+    // Iterar sobre los datos para crear filas dinámicas
+    data.forEach(function(item) {
+        var row = `
+            <tr>
+                <td>${item.nombre_cliente}</td>
+                <td><a href="#" onclick="verCalendario(${item.id_prenda})">${item.nombre_ropa}</a></td>
+                <td>${item.valor}</td> <!-- Aquí se asegura que se muestre el valor -->
+            </tr>
+        `;
+        tbody.append(row); // Agregar la fila al cuerpo de la tabla
+    });
+}
+
+
+// Evento al cambiar el estado en el select
+$("#estadoPrendaSelect1").change(function() {
+    var estado = $(this).val(); // Obtener el valor seleccionado
+    cargarCalendarioPorEstadoPrenda1(estado); // Llamar a la función AJAX con el estado seleccionado
+});

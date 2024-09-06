@@ -45,57 +45,57 @@ function convertirMinutosAHoras($minutos) {
     }
 }
 ?>
-
 <div class="p_centrar">
     <h2>Calendario de Arreglos de Prendas</h2>
     <p>Bienvenido, <?php echo htmlspecialchars($_SESSION['username']); ?></p>
-        <div class="select" style="display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; margin-top:10px;">
-            <label for="Buscar por estado">Buscar por estado</label>
-            <select class="select-container" id="estadoPrendaSelect" style="margin:10px;">
-                <option value="">Seleccione</option>
-                <option value="3">Pendiente</option>
-                <option value="5">Arreglado</option>
-                <option value="all">Todos</option>
-            </select>
-            <button id="botonAtras" class="button-buscar_orden">
-                <span style="margin-right: 5px;">&#8592;</span>
-                <span>Atrás</span>
-            </button>
-        </div>
-        <div id="resultados" style="display: flex; justify-content: center;"></div>
-        
-        <table id="calendarioArreglosTabla" border="1">
-    <thead>
-        <tr>
-            <th>Nombre del Cliente</th>
-            <th>Nombre de la Prenda</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($sastreData as $arreglo): ?>
-        <tr>
-            <td>
-            <!-- <td style="display:none;"><?php echo htmlspecialchars($arreglo["id_asignacion"]); ?></td> -->
-            <!-- <td style="display:none;"><?php echo htmlspecialchars($arreglo["id_prenda"]); ?></td> -->
-                <?php echo htmlspecialchars($arreglo["nombre_cliente"]); ?>
-            </td>
-            <td>
-                <?php
-                $idPrenda = htmlspecialchars($arreglo["id_prenda"]);
-                $nombreRopa = htmlspecialchars($arreglo["nombre_ropa"]);
-                echo '<a href="#" onclick="verCalendario(' . $idPrenda . ')">' . $nombreRopa . '</a>';
-                ?>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+    <div class="select" style="display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; margin-top:10px;">
+        <label for="Buscar por estado">Buscar por estado</label>
+        <select class="select-container" id="estadoPrendaSelect1" style="margin:10px;">
+            <option value="">Seleccione</option>
+            <option value="3">Pendiente</option>
+            <option value="5">Arreglado</option>
+            <option value="all">Todos</option>
+        </select>
+        <button id="botonAtras" class="button-buscar_orden">
+            <span style="margin-right: 5px;">&#8592;</span>
+            <span>Atrás</span>
+        </button>
     </div>
+    <div id="resultados" style="display: flex; justify-content: center;"></div>
+    
+    <table id="calendarioArreglosTabla" border="1">
+        <thead>
+            <tr>
+                <th>Nombre del Cliente</th>
+                <th>Nombre de la Prenda</th>
+                <th>Valor</th> <!-- Columna para el valor -->
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($sastreData as $arreglo): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($arreglo["nombre_cliente"]); ?></td>
+                <td>
+                    <?php
+                    $idPrenda = htmlspecialchars($arreglo["id_prenda"]);
+                    $nombreRopa = htmlspecialchars($arreglo["nombre_ropa"]);
+                    echo '<a href="#" onclick="verCalendario(' . $idPrenda . ')">' . $nombreRopa . '</a>';
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    $valor = htmlspecialchars($arreglo["valor"]); // Valor de la prenda
+                    echo $valor; // Imprimir el valor en la columna correspondiente
+                    ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>
 
 <script>
 function verCalendario(idPrenda) {
-    
     $.ajax({
         url: '../controllers/sastreController.php',
         type: 'GET',
@@ -108,10 +108,8 @@ function verCalendario(idPrenda) {
             if (response.success) {
                 // Almacena los datos de la prenda en sessionStorage
                 sessionStorage.setItem('detalleArreglo', JSON.stringify(response.data));
-                
-                // Verifica que los datos se almacenaron correctamente
-                console.log("Datos almacenados en sessionStorage:", sessionStorage.getItem('detalleArreglo'));
 
+                // Redirigir a la vista de detalle
                 window.location.href = "../views/calendario/detalle_arreglo.php?id=" + idPrenda;
             } else {
                 alert(response.message);
@@ -122,12 +120,26 @@ function verCalendario(idPrenda) {
         }
     });
 }
+
+
+$(document).ready(function() {
+    // Verificar si ya hay datos en sessionStorage
+    const sastreData = sessionStorage.getItem('sastreData');
+    
+    if (sastreData) {
+        // Si existen datos, actualiza la vista del calendario con esos datos
+        const parsedData = JSON.parse(sastreData);
+        actualizarVistaCalendario1(parsedData);
+    }
+});
+
 </script>
 
 <?php 
 $ruta_footer = 'footer.php';
 
 if (file_exists($ruta_footer)) {
+    $ruta_js = "js/main.js";
     include $ruta_footer;
 } else {
     echo "El archivo $ruta_footer no existe.";

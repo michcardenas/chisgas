@@ -17,6 +17,7 @@ class SastreModel {
     p.id AS id_prenda,
     p.nombre_ropa,
     p.id_cliente,
+    p.valor,
     c.nombre AS nombre_cliente
 FROM 
     prendas p
@@ -105,6 +106,97 @@ function ver_arreglo($idPrenda) {
 
     // Cerrar el statement
     $stmt->close();
+}
+
+
+function ver_calendario_estado_prenda($estado) {
+    global $conn;  // Asegúrate de que tu conexión se llama $conn
+
+    // Validar si el estado proporcionado está en la lista permitida
+    $validStates = ['3', '4', '5', '6', 'all'];
+    if (!in_array($estado, $validStates)) {
+        return false;  // O podrías lanzar un error si lo prefieres
+    }
+
+    // Preparar la consulta basada en el estado proporcionado
+    if ($estado == 'all') {
+        // Seleccionar todas las prendas en los estados permitidos
+        $query = "
+        SELECT 
+            p.id_asignacion, 
+            p.id AS id_prenda,
+            p.nombre_ropa,
+            p.id_cliente,
+            p.valor,
+            c.nombre AS nombre_cliente
+        FROM 
+            prendas p
+        JOIN 
+            clientes c ON p.id_cliente = c.id
+        WHERE 
+            p.estado IN ('3', '4', '5', '6')
+        ORDER BY 
+            p.nombre_ropa ASC;
+        ";
+    } elseif ($estado == '5') {
+        // Seleccionar sólo las prendas en estado 6
+        $query = "
+        SELECT 
+            p.id_asignacion, 
+            p.id AS id_prenda,
+            p.nombre_ropa,
+            p.id_cliente,
+            p.valor,
+            c.nombre AS nombre_cliente
+        FROM 
+            prendas p
+        JOIN 
+            clientes c ON p.id_cliente = c.id
+        WHERE 
+            p.estado = '5'
+        ORDER BY 
+            p.nombre_ropa ASC;
+        ";
+    } elseif ($estado == '3') {
+        // Seleccionar prendas en uno de los estados específicos (3, 4, 0)
+        $query = "
+          SELECT 
+        p.id_asignacion, 
+        p.id AS id_prenda,
+        p.nombre_ropa,
+        p.id_cliente,
+        p.valor,
+        c.nombre AS nombre_cliente
+    FROM 
+        prendas p
+    JOIN 
+        clientes c ON p.id_cliente = c.id
+    WHERE 
+        p.estado IN ('0', '3', '4')
+    ORDER BY 
+        p.nombre_ropa ASC;
+        ";
+    } else {
+        // Manejo para estados no válidos o casos de error
+        return false;  // O podrías lanzar un error si lo prefieres
+    }
+
+    $stmt = $conn->prepare($query);
+
+    // Ejecutar la consulta
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Verificar si la consulta devuelve resultados
+    if ($result->num_rows > 0) {
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        return $data;
+    } else {
+        return false;  // O podrías devolver un array vacío dependiendo de lo que necesites
+    }
 }
 
 ?>
