@@ -770,3 +770,12 @@ then set the desired styles for .card-img. */
   font-size: 13px;   /* Reduce el espacio entre elementos */
 }
 
+.filter-form {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.filter-form select, .filter-form input[type="submit"] {
+  margin: 0 5px;
+  padding: 5px;
+}
