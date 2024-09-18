@@ -1,16 +1,16 @@
 <?php
 date_default_timezone_set('America/Bogota');
-// $servidor = "localhost";
-// $usuario = "root";
-// $contraseña = "";  
-// $basedatos = "chisgas";
-// $puerto = 3306; 
-
 $servidor = "localhost";
-$usuario = "c2621289_chsigas";
-$contraseña = "65noPEtuma";  
-$basedatos = "c2621289_chsigas";
+$usuario = "root";
+$contraseña = "";  
+$basedatos = "chisgas";
 $puerto = 3306; 
+
+// $servidor = "localhost";
+// $usuario = "c2621289_chsigas";
+// $contraseña = "65noPEtuma";  
+// $basedatos = "c2621289_chsigas";
+// $puerto = 3306; 
 
 $conn = new mysqli($servidor, $usuario, $contraseña, $basedatos, $puerto);
 

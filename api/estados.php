@@ -80,20 +80,3 @@ $conexion->close();
 echo json_encode($response);
 ?>
 
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Prendas</title>
-</head>
-<body>
-    <h1>Consulta de Prendas por Teléfono</h1>
-    <form method="post" action="">
-        <label for="telefono">Número de Teléfono:</label>
-        <input type="text" id="telefono" name="telefono" required>
-        <button type="submit">Consultar</button>
-    </form>
-</body>
-</html>

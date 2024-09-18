@@ -77,7 +77,7 @@ $anio = isset($_GET['anio']) ? $_GET['anio'] : date('Y'); // Si no se selecciona
         echo '<td> $' . number_format($fila['total_recogido'], 0, ',', '.') . '</td>'; // Formato sin decimales, con separadores de miles
         echo '</tr>';
         // Sumar el dinero final de la fila actual al total
-        $total_dinero_final += $fila['dinero_final'];
+        $total_dinero_final += $fila['total_recogido'];
     }
     echo '</tbody>';
     echo '</table>';
