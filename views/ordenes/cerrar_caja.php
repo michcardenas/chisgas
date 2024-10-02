@@ -205,6 +205,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && emp
     <meta charset="UTF-8">
     <title>Cerrar Caja</title>
     <link rel="stylesheet" href="<?php echo $ruta_css; ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 <body>
 <div class="p_centrar">
@@ -251,21 +253,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && emp
                 <form id="cerrar_caja_form" class="card" method="post">
                     <div class="card_header"></div>
 
-                    <div class="field">
-                        <label for="gasto">Agregar Gasto:</label>
-                        <input class="input" type="text" id="gasto" name="gasto" placeholder="Descripción del gasto">
-                        <button type="button" id="add_gasto_button" class="button">Agregar Gasto</button>
-                    </div>
+                  <!-- Botón para abrir el modal -->
+<!-- Botón para abrir el modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gastoModal">
+        Agregar Gasto
+        </button>
 
-                    <div class="field">
-                        <label for="gastos">Gastos:</label>
-                        <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
+<!-- Modal -->
+<div class="modal fade" id="gastoModal" tabindex="-1" aria-labelledby="gastoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gastoModalLabel">Agregar Gasto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="gastoForm">
+                    <div class="mb-3">
+                        <label for="titulo_gasto" class="form-label">Título del Gasto</label>
+                        <input type="text" class="form-control" id="titulo_gasto" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="monto_gasto" class="form-label">Monto del Gasto</label>
+                        <input type="number" class="form-control" id="monto_gasto" required min="0" step="0.01">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="agregarGastoBtn">Agregar Gasto</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    <div class="field">
-                        <label for="suma_gastos">Suma Total de Gastos:</label>
-                        <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
-                    </div>
+<!-- Textarea para mostrar los gastos -->
+<div class="field">
+    <label for="gastos">Gastos:</label>
+    <textarea class="input" id="gastos" name="gastos" placeholder="Gastos" required readonly></textarea>
+</div>
+
+<!-- Input para la suma total de gastos -->
+<div class="field">
+    <label for="suma_gastos">Suma Total de Gastos:</label>
+    <input class="input" type="text" id="suma_gastos" name="suma_gastos" placeholder="$" readonly>
+</div>
 
                     <div class="field">
                         <label for="dinero_final">Dinero Final en Caja</label>
@@ -283,62 +315,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dinero_final']) && emp
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"></script>
+
 <script>
-    // Función para retroceder en la historia del navegador
-    function goBack() {
-        window.history.back();
+document.addEventListener('DOMContentLoaded', function() {
+    const dineroFinalInput = document.getElementById('dinero_final');
+    const sumaGastosInput = document.getElementById('suma_gastos');
+    const gastosTextarea = document.getElementById('gastos');
+    const gastoForm = document.getElementById('gastoForm');
+    const agregarGastoBtn = document.getElementById('agregarGastoBtn');
+    const gastoModal = new bootstrap.Modal(document.getElementById('gastoModal'));
+
+    let totalGastos = 0;
+    let gastos = [];
+
+    function formatNumber(num) {
+        return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
-    // Función para formatear el número con separadores de miles mientras se escribe
-    document.addEventListener('DOMContentLoaded', function() {
-        const dineroFinalInput = document.getElementById('dinero_final');
-        const sumaGastosInput = document.getElementById('suma_gastos');
-        const gastosTextarea = document.getElementById('gastos');
-        const gastoInput = document.getElementById('gasto');
-        const addGastoButton = document.getElementById('add_gasto_button');
+    function parseFormattedNumber(str) {
+        return parseInt(str.replace(/,/g, ''), 10);
+    }
 
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    function updateGastosDisplay() {
+        gastosTextarea.value = gastos.map(gasto => `${gasto.titulo}: $${formatNumber(gasto.monto)}`).join('\n');
+        sumaGastosInput.value = `$${formatNumber(totalGastos)}`;
+        
+        // Actualizar el dinero final restando los gastos
+        let dineroFinalOriginal = parseFormattedNumber(dineroFinalInput.getAttribute('data-original-value') || dineroFinalInput.value);
+        let dineroFinalActualizado = dineroFinalOriginal - totalGastos;
+        dineroFinalInput.value = formatNumber(dineroFinalActualizado);
+    }
+
+    function addGasto() {
+        const titulo = document.getElementById('titulo_gasto').value.trim();
+        const monto = parseFloat(document.getElementById('monto_gasto').value);
+
+        if (titulo && !isNaN(monto) && monto > 0) {
+            const montoRedondeado = Math.round(monto);
+            gastos.push({ titulo, monto: montoRedondeado });
+            totalGastos += montoRedondeado;
+
+            updateGastosDisplay();
+            gastoModal.hide();
+            gastoForm.reset();
+        } else {
+            alert('Por favor, ingrese un título válido y un monto mayor que cero.');
         }
+    }
 
-        if (dineroFinalInput) { // Verificar si el elemento existe antes de añadir el event listener
-            dineroFinalInput.addEventListener('input', function(e) {
-                let val = this.value.replace(/[^\d]/g, '');
-                this.value = formatNumber(val);
-            });
-        }
+    agregarGastoBtn.addEventListener('click', addGasto);
 
-        // Función para actualizar la suma total de gastos
-        function actualizarGastos() {
-            const gastos = gastosTextarea.value.split('\n');
-            let totalGastos = 0;
-            gastos.forEach(gasto => {
-                totalGastos += parseFloat(gasto.replace(/[^\d.]/g, '')) || 0;
-            });
-            sumaGastosInput.value = formatNumber(totalGastos);
-
-            // Actualizar el dinero final en caja
-            const base = <?php echo $base; ?>;
-            const totalRecogido = <?php echo $total_recogido; ?>;
-            const dineroFinalCalculado = base + totalRecogido - totalGastos;
-            dineroFinalInput.value = formatNumber(dineroFinalCalculado);
-        }
-
-        // Función para agregar un gasto a la lista de gastos
-        addGastoButton.addEventListener('click', function() {
-            const gasto = gastoInput.value.trim();
-            if (gasto) {
-                const currentGastos = gastosTextarea.value;
-                gastosTextarea.value = currentGastos ? currentGastos + '\n' + gasto : gasto;
-                gastoInput.value = '';
-                actualizarGastos();
-            }
-        });
-
-        // Actualizar la suma de los gastos cuando se modifique
-        gastosTextarea.addEventListener('input', actualizarGastos);
+    gastoForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        addGasto();
     });
+});
 </script>
+
 
 <?php 
 $ruta_footer = '../footer.php';
