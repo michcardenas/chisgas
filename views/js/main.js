@@ -263,101 +263,110 @@ var changingValue = false;
         });
     });
 
-
-  $("#generar_orden").click(function(e) {
-    e.preventDefault();
-    var forma_pago = $("#forma_pago").val();
-    var fechaEntrega = $("#fecha_entrega").val();
-    var abono = extractNumber($("#abono").val());
-
-    if (!fechaEntrega) {
-        alert("Por favor, llena la fecha de entrega.");
-        return;
-    }
-
-    if (isNaN(abono)) {
-        alert("Por favor, ingresa un abono válido.");
-        return;
-    }
-
-    var today = new Date().toISOString().split('T')[0];
-
-    if (fechaEntrega < today) {
-        if (!confirm('¿Estás seguro de que deseas agendar antes del día de hoy?')) {
+    $("#generar_orden").click(function(e) {
+        e.preventDefault();
+        var forma_pago = $("#forma_pago").val();
+        var fechaEntrega = $("#fecha_entrega").val();
+        var abono = extractNumber($("#abono").val());
+    
+        if (!fechaEntrega) {
+            alert("Por favor, llena la fecha de entrega.");
             return;
         }
-    }
-
-    var franjaHoraria = $("#franja_horaria").val();
-    var totalPrendas = extractNumber($("#total_prendas").val());
-    var valorTotal = extractNumber($("#valor_total").val());
-    var saldo = valorTotal - abono;
-
-    if (saldo < 0) {
-        alert("El saldo no puede ser negativo. Por favor, verifica el abono ingresado.");
-        return;
-    }
-
-    $("#saldo").val("$ " + saldo.toLocaleString('es-CO', { maximumFractionDigits: 0 }));
-
-     var prendaIDs = [];
-   
-     $(".btn-delete").each(function() {
-         prendaIDs.push($(this).data("id"));
-     });
-    console.log(abono);
-    console.log(saldo);
-    console.log(forma_pago);
-    var hayValoresEnCero = false;
-    $(".valor_actualizado").each(function() {
-        var valor = extractNumber($(this).val());
-        if (valor === 0) {
-            hayValoresEnCero = true;
-            return false; // Salir del bucle
-        }
-    });
-
-    if (hayValoresEnCero) {
-        const userConfirmed = window.confirm("Hay valores de prenda en $0 . ¿Estás seguro de que quieres continuar, estas prendas seran pasadas como garantia?");
-        if (!userConfirmed) {
-            return; 
-        }
-    }
-
-    $.ajax({
-      url: '../../controllers/ordenController.php',
-      type: 'post',
-      data: {
-        action: 'generar_orden', 
-        fecha_entrega: fechaEntrega, 
-        franja_horaria: franjaHoraria, 
-        total_prendas: totalPrendas,
-        valor_total: valorTotal,
-        abono: abono,
-        saldo: saldo,
-        prenda_ids: prendaIDs,
-        forma_pago: forma_pago  
-
-       
-      },
-      dataType: 'json',
-      success: function(response) {
-        if (response.success) {
-            $("#resultado_editar").text(response.message).css("color", "green");
-            setTimeout(function(){
-                window.location.href = "../../controllers/ordenController.php?order_id=" + response.order_id; // Cambia aquí
-            }, 1000);
-        } else {
-            $("#resultado_editar").text(response.message).css("color", "red");
-        }
-    }
     
-  });
-  });
-
-
-
-
+        if (isNaN(abono)) {
+            alert("Por favor, ingresa un abono válido.");
+            return;
+        }
+    
+        var today = new Date().toISOString().split('T')[0];
+    
+        if (fechaEntrega < today) {
+            if (!confirm('¿Estás seguro de que deseas agendar antes del día de hoy?')) {
+                return;
+            }
+        }
+    
+        var franjaHoraria = $("#franja_horaria").val();
+        var totalPrendas = extractNumber($("#total_prendas").val());
+        var valorTotal = extractNumber($("#valor_total").val());
+        var saldo = valorTotal - abono;
+    
+        if (saldo < 0) {
+            alert("El saldo no puede ser negativo. Por favor, verifica el abono ingresado.");
+            return;
+        }
+    
+        $("#saldo").val("$ " + saldo.toLocaleString('es-CO', { maximumFractionDigits: 0 }));
+    
+        var prendaIDs = [];
+    
+        $(".btn-delete").each(function() {
+            prendaIDs.push($(this).data("id"));
+        });
+    
+        var hayValoresEnCero = false;
+        $(".valor_actualizado").each(function() {
+            var valor = extractNumber($(this).val());
+            if (valor === 0) {
+                hayValoresEnCero = true;
+                return false; // Salir del bucle
+            }
+        });
+    
+        if (hayValoresEnCero) {
+            const userConfirmed = window.confirm("Hay valores de prenda en $0. ¿Estás seguro de que quieres continuar? Estas prendas serán pasadas como garantía.");
+            if (!userConfirmed) {
+                return; 
+            }
+        }
+    
+        $.ajax({
+            url: '../../controllers/ordenController.php',
+            type: 'post',
+            data: {
+                action: 'generar_orden', 
+                fecha_entrega: fechaEntrega, 
+                franja_horaria: franjaHoraria, 
+                total_prendas: totalPrendas,
+                valor_total: valorTotal,
+                abono: abono,
+                saldo: saldo,
+                prenda_ids: prendaIDs,
+                forma_pago: forma_pago  
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    var mensaje = response.message;
+                    if (response.factura_path) {
+                        mensaje += "<br>Factura generada y guardada exitosamente.";
+                        
+                        // Guardamos la URL de la factura en un campo oculto
+                        var factura_url = `https://sastreriachisgas.shop/facturas/${response.factura_path}`;
+                        $("#factura_url").val(factura_url);
+                        
+                        // Mostrar en la consola para verificar
+                        console.log("Factura URL generada: ", factura_url);
+                    }
+                    $("#resultado_editar").html(mensaje).css("color", "green");
+                    
+                    setTimeout(function(){
+                        window.location.href = "../../controllers/ordenController.php?order_id=" + response.order_id;
+                    }, 2000);
+                } else {
+                    $("#resultado_editar").text(response.message).css("color", "red");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error en la solicitud AJAX:", status, error);
+                $("#resultado_editar").text("Ocurrió un error al procesar la solicitud.").css("color", "red");
+            }
+        });
+    });
+    
+    
+    
 function extractNumber(str) {
   return parseFloat(str.replace(/[^0-9]/g, ''));
 }
@@ -903,29 +912,7 @@ $('.ff').on('submit', function(e) {
   function goBack() {
     window.history.back();
   }
-  function enviarAWhatsapp() {
-    let nombre_cliente = document.getElementById("nombre_cliente").value;
-    let order_id = document.getElementById("order_id").value;
-    let valor_total = document.getElementById("valor").value;
-    let abono = document.getElementById("abono").value;
-    let saldo = document.getElementById("saldo").value;
-    let fecha_entrega = document.getElementById("fecha_entrega").value; // Asegúrate de tener un input con id "fecha_entrega" en tu formulario.
-    let cliente_telefono = document.getElementById("telefono_cliente").value; 
 
-    let mensaje = `¡Hola ${nombre_cliente}! 🎩\n`;
-    mensaje += `Desde *Sastrería Chisgas* queremos contarte sobre tu orden:\n\n`;
-    mensaje += `🔖 Número de Orden: *#${order_id}*\n`;
-    mensaje += `💰 Valor Total: *${valor_total}*\n`;
-    mensaje += `💵 Abono: *${abono}*\n`;
-    mensaje += `🪙 Saldo Pendiente: *${saldo}*\n`;
-    mensaje += `Puedes cancelar este saldo el día que vengas a recoger tu prenda.👖\n`;
-    mensaje += `🗓 ¡Tu arreglo estará listo el ${fecha_entrega}! ✂️\n\n`;
-    mensaje += `¡Gracias por confiar en nuestro talento y profesionalismo! 🌟`;
-
-    // Añadir código de país y número de teléfono al enlace de WhatsApp
-    let whatsappURL = `https://api.whatsapp.com/send?phone=+57${cliente_telefono}&text=${encodeURIComponent(mensaje)}`;
-    window.open(whatsappURL);
-}
 
 
 $("#usuarios").click(function() {

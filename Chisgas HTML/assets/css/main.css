@@ -2421,9 +2421,9 @@ input, select, textarea {
 		display: inline-block;
 		font-size: 0.7em; /* Ajusta el tamaño de la fuente */
 		font-weight: 600;
-		height: 3.125em;
+		height: 5em;
 		letter-spacing: 0.225em;
-		line-height: 3.125em;
+		line-height: 5em;
 		max-width: none; /* Elimina el ancho máximo */
 		padding: 0 2em; /* Ajusta el espaciado interno */
 		text-align: center;

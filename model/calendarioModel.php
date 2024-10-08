@@ -311,8 +311,8 @@ foreach ($datosPrendas as $prenda) {
 // Configura el documento
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('Tu Empresa');
-$pdf->SetTitle('Factura');
-$pdf->SetSubject('Factura Detallada');
+$pdf->SetTitle('Factura Entregada');
+$pdf->SetSubject('Factura de Orden Entregada');
 $pdf->SetMargins(20, 20, 20);
 $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 $pdf->AddPage();
@@ -428,7 +428,7 @@ EOD;
 $pdf->writeHTML($html, true, false, true, false, '');
         
         // Define el nombre del archivo y la ruta de guardado
-        $nombreArchivo = 'Orden_Numero' . $id_orden .'.pdf';
+        $nombreArchivo = 'Orden_Entregada_Numero' . $id_orden .'.pdf';
         $rutaGuardado = __DIR__ . '/../facturas/' . $nombreArchivo;
         
         // Guardar el PDF en el servidor
@@ -697,4 +697,5 @@ function ver_calendario_estado_prenda($estado) {
         return false;  // O podrías devolver un array vacío dependiendo de lo que necesites
     }
 }
+
 ?>

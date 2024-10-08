@@ -135,14 +135,26 @@ if ($_POST['action'] == 'generar_orden') {
         $orden_id = generador_orden($fecha_entrega, $franja_horaria, $total_prendas, $valor_total, $abono, $saldo, $prendas_ids, $forma_pago);
 
         if ($orden_id) {
-            echo json_encode(["success" => true, "message" => "Orden generada y prendas actualizadas exitosamente.", "order_id" => $orden_id]);
-        } else {
-            echo json_encode(["success" => false, "message" => "Hubo un error al procesar la orden."]);
+            // Generar la factura
+            $resultado_factura = generarFacturaIngresadaPDF($orden_id);
+        
+            if ($resultado_factura) {
+                echo json_encode([
+                    "success" => true, 
+                    "message" => "Orden generada y factura creada exitosamente.", 
+                    "order_id" => $orden_id
+                ]);
+            } else {
+                echo json_encode([
+                    "success" => true, 
+                    "message" => "Orden generada exitosamente, pero hubo un problema al crear la factura.", 
+                    "order_id" => $orden_id
+                ]);
+            }
         }
-    } else {
-        echo json_encode(["success" => false, "message" => "Datos incompletos."]);
     }
 }
+
 
 
 elseif ($_POST['action']== 'actualizar_valor') {

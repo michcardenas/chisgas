@@ -22,6 +22,8 @@ if (file_exists($ruta)) {
 }
 
 $orden = $_SESSION['orden_consultar'][0];
+
+
 ?>
 
 <div class="p_centrar">
@@ -104,6 +106,7 @@ $orden = $_SESSION['orden_consultar'][0];
     </tbody>
 </table>
 
+<input type="hidden" id="factura_url" name="factura_url">
 
         <h1 class="form_heading" id="resultado_editar"></h1>
 
@@ -112,6 +115,27 @@ $orden = $_SESSION['orden_consultar'][0];
         </div>
     </div>
 </div>
+
+
+<script>
+function enviarAWhatsapp() {
+    let order_id = document.getElementById('order_id').value;
+    let telefono_cliente = document.getElementById('telefono_cliente').value;
+    let facturaUrl = `https://sastreriachisgas.shop/facturas/Orden_Ingresada${order_id}.pdf`;
+    
+    let mensaje = `¡Hola! 🎩\n\n`;
+    mensaje += `Desde *Sastrería Chisgas* queremos contarte sobre tu orden:\n\n`;
+    mensaje += `🔖 Número de Orden: *#${order_id}*\n\n`;
+    mensaje += `📄 Puedes ver tu factura aquí: ${facturaUrl}\n\n`;
+    mensaje += `¡Gracias por confiar en nuestro talento y profesionalismo! 🌟`;
+
+    let whatsappURL = `https://api.whatsapp.com/send?phone=${telefono_cliente}&text=${encodeURIComponent(mensaje)}`;
+    window.open(whatsappURL, '_blank');
+}
+
+
+</script>
+
 
 <?php 
 $ruta_footer = '../footer.php';

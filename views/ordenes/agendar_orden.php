@@ -193,11 +193,13 @@ if (isset($_SESSION['cliente_consultar'])) {
         <input readonly class="input input_readonly" name="saldo" type="text" id="saldo">
     </div>
 
+    <input type="hidden" id="factura_url" name="factura_url">
 
 <div class="field_boton_editar">
     <button value="generar_orden" id="generar_orden" class="button">Generar Orden &#10133;</button>
     <button onclick="goBack()" class="button atras">Atras</button>
 </div>
+
 
 <script>
 // Función para guardar los datos y consultar el calendario
